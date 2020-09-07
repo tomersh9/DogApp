@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bottom_home"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="Home" />
+    <item
+        android:id="@+id/bottom_explore"
+        android:icon="@drawable/ic_explore_black_24dp"
+        android:title="Explore" />
+    <item
+        android:id="@+id/bottom_chat"
+        android:icon="@drawable/ic_chat_black_24dp"
+        android:title="Chats" />
+    <item
+        android:id="@+id/bottom_profile"
+        android:icon="@drawable/person_icon_24"
+        android:title="Profile" />
+</menu>

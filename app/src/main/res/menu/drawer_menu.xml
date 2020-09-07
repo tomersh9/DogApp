@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--Only 1 item can be selected-->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/item_profile"
+            android:icon="@drawable/person_icon_24"
+            android:title="Profile" />
+
+        <item
+            android:id="@+id/item_settings"
+            android:checked="false"
+            android:icon="@drawable/person_icon_24"
+            android:title="Settings" />
+
+    </group>
+
+    <!--A way to make sub menu inside-->
+    <item
+        android:id="@+id/sub_menu"
+        android:title="Sub Menu">
+
+        <menu>
+
+            <item android:title="item_1" />
+            <item android:title="item_2" />
+
+        </menu>
+    </item>
+</menu>
