@@ -2,29 +2,43 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <!--Only 1 item can be selected-->
     <group android:checkableBehavior="single">
+
         <item
             android:id="@+id/item_profile"
-            android:icon="@drawable/person_icon_24"
+            android:icon="@drawable/account_icon"
             android:title="Profile" />
+
+        <item
+            android:id="@+id/item_add_friend"
+            android:icon="@drawable/friends_icon"
+            android:title="Friends" />
+
+        <item
+            android:id="@+id/item_rate_us"
+            android:icon="@drawable/star_icon"
+            android:title="Rate us" />
 
         <item
             android:id="@+id/item_settings"
             android:checked="false"
-            android:icon="@drawable/person_icon_24"
+            android:icon="@drawable/settings_icon"
             android:title="Settings" />
+
+        <item
+            android:id="@+id/item_sign_out"
+            android:icon="@drawable/sign_out_icon"
+            android:title="Sign out" />
 
     </group>
 
     <!--A way to make sub menu inside-->
-    <item
-        android:id="@+id/sub_menu"
-        android:title="Sub Menu">
 
+    <!--<item
+        android:id="@+id/bla"
+        android:title="">
         <menu>
 
-            <item android:title="item_1" />
-            <item android:title="item_2" />
 
         </menu>
-    </item>
+    </item>-->
 </menu>

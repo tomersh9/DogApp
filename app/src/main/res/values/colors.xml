@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#fe8c00</color>
-    <color name="colorPrimaryDark">#ED8F03</color>
+    <color name="colorPrimaryDark">#fe8c00</color>
     <color name="colorAccent">#FFFFFF</color>
-    <color name="orange">#F7971E</color>
+    <color name="orange">#fe8c00</color>
+    <color name="dark_orange">#E88102</color>
+    <color name="darker_orange">#D67600</color>
+    <color name="dialog_btn_color">#FAA840</color>
     <color name="whitish">#F4F4F4</color>
     <color name="red">#FF0000</color>
+    <color name="green">#26CD09</color>
+    <color name="yellow">#F1D907</color>
 </resources>

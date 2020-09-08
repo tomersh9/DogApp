@@ -1,25 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/login_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/login_main_layout"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_shape"
+        android:background="@drawable/white_bg_shape"
         android:orientation="vertical">
 
-        <ImageView
+        <!--<ImageView
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/orange_dog_100" />
+            android:src="@drawable/orange_dog_100" />-->
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:scaleType="center"
+            app:lottie_rawRes="@raw/main_dog_icon"
+            app:lottie_autoPlay="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            app:lottie_loop="true"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -90,6 +101,7 @@
             android:layout_gravity="bottom"
             android:layout_marginHorizontal="50dp"
             android:layout_marginTop="30dp"
+            android:layout_above="@id/register_btn"
             android:background="@drawable/btn_shape"
             android:text="Login"
             android:textAllCaps="false"
@@ -97,6 +109,7 @@
 
         <Button
             android:id="@+id/register_btn"
+            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -108,6 +121,7 @@
             android:textColor="@color/colorPrimary"
             android:textSize="18sp"
             app:backgroundTint="@color/whitish" />
-
     </LinearLayout>
+
+
 </RelativeLayout>

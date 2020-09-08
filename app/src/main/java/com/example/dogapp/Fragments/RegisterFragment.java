@@ -2,6 +2,7 @@ package com.example.dogapp.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ public class RegisterFragment extends Fragment {
     private TextInputLayout fullNameEt, emailEt, usernameEt, passwordEt;
 
     public interface OnRegisterFragmentListener {
+
         void onRegister(String fullName, String email, String username, String password);
         void onBack();
     }
@@ -60,7 +62,7 @@ public class RegisterFragment extends Fragment {
                 String user = usernameEt.getEditText().getText().toString().trim();
                 String pass = passwordEt.getEditText().getText().toString().trim();
 
-                isValid = verifyFields(name,email,user,pass); //check all fields validation
+                isValid = verifyFields(name, email, user, pass); //check all fields validation
 
                 if (isValid) {
                     listener.onRegister(name, email, user, pass);
@@ -79,9 +81,9 @@ public class RegisterFragment extends Fragment {
         return rootView;
     }
 
-    private boolean verifyFields(String name,String email,String user,String pass) {
+    private boolean verifyFields(String name, String email, String user, String pass) {
         //pass all tests
-        if(!validateName(name) | !validateEmail(email) | !validateUsername(user) | !validatePass(pass)) {
+        if (!validateName(name) | !validateEmail(email) | !validateUsername(user) | !validatePass(pass)) {
             return false;
         }
         return true;
@@ -117,7 +119,10 @@ public class RegisterFragment extends Fragment {
             emailEt.setError("Field cannot be empty");
             return false;
 
-        } else {
+        } /*else if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailEt.setError("Enter valid email address");
+            return false;
+        }*/ else {
             emailEt.setError(null);
             return true;
         }

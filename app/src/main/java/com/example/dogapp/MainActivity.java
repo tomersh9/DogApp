@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +30,8 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,10 +50,26 @@ public class MainActivity extends AppCompatActivity {
     private ChatFragment chatFragment;
     private ProfileFragment profileFragment;
 
+    //firebase stuff
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(); //sign in/up auth instance
+    FirebaseAuth.AuthStateListener authStateListener; //listens to login/out changes
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        firebaseAuth.addAuthStateListener(authStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        firebaseAuth.removeAuthStateListener(authStateListener);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == android.R.id.home) { //if press hamburger icon
+        if (item.getItemId() == android.R.id.home) { //if press hamburger icon
             drawerLayout.openDrawer(GravityCompat.START);
         }
         return super.onOptionsItemSelected(item);
@@ -60,6 +79,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+            }
+        };
 
         //assign material design layout
         toolbar = findViewById(R.id.toolbar);
@@ -77,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar(); //getting the ToolBar we made
         actionBar.setDisplayHomeAsUpEnabled(true); //setting home button in top left
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp); //hamburger icon
+
+        //icons tint
+        navigationView.setItemIconTintList(null);
 
         //assign fragments
         homeFragment = new HomeFragment();
@@ -108,7 +140,8 @@ public class MainActivity extends AppCompatActivity {
                         viewPager.setCurrentItem(3);
                         break;
 
-                    default: return false;
+                    default:
+                        return false;
                 }
 
                 //getSupportFragmentManager().beginTransaction().replace(R.id.view_pager,currFragment).commit();
@@ -117,11 +150,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //create adapter for the fragment view pager and set fragments
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(),0);
-        adapter.addFragment(homeFragment,"Home");
-        adapter.addFragment(exploreFragment,"Explore");
-        adapter.addFragment(chatFragment,"Chat");
-        adapter.addFragment(profileFragment,"Profile");
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), 0);
+        adapter.addFragment(homeFragment, "Home");
+        adapter.addFragment(exploreFragment, "Explore");
+        adapter.addFragment(chatFragment, "Chat");
+        adapter.addFragment(profileFragment, "Profile");
         viewPager.setAdapter(adapter);
 
 
@@ -134,6 +167,18 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch (item.getItemId()) {
+
+                    case R.id.item_sign_out:
+                        firebaseAuth.signOut();
+                        Toast.makeText(MainActivity.this, "NOT exist", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                        break;
+                }
+
                 item.setChecked(true);
                 drawerLayout.closeDrawers();
                 return true;
@@ -148,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("press me", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Snackbar.make(coordinatorLayout,"OK",Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(coordinatorLayout, "OK", Snackbar.LENGTH_SHORT).show();
                             }
                         }).show();
             }

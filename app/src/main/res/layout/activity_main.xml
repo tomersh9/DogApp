@@ -91,6 +91,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@drawable/white_bg_shape"
+        app:itemIconTint="@null"
         app:headerLayout="@layout/header_drawer_layout"
         app:menu="@menu/drawer_menu" />
 

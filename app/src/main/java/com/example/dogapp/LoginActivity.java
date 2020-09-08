@@ -1,6 +1,10 @@
 package com.example.dogapp;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -15,8 +19,6 @@ import androidx.fragment.app.Fragment;
 import com.example.dogapp.Fragments.RegisterFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -82,8 +84,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                                         }
                                     }
                                 });
-                    }
-                    else { //only sign in
+                    } else { //only sign in
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
@@ -106,16 +107,23 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                 if (!validateEmail() | !validatePassword()) {
                     return;
                 } else {
+
+                    //dialog with round edges
+                    final AlertDialog alertDialog;
+                    View dialogView = getLayoutInflater().inflate(R.layout.custom_alert_dialog, null);
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                    alertDialog = builder.setView(dialogView).setCancelable(false).show();
+                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
                     //login account with firebase
                     firebaseAuth.signInWithEmailAndPassword(emailEt.getEditText().getText().toString(), passwordEt.getEditText().getText().toString())
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                        startActivity(intent);
-                                        finish();
+                                        alertDialog.dismiss();
                                     } else {
+                                        alertDialog.dismiss();
                                         Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
                                     }
                                 }
@@ -132,7 +140,10 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
             emailEt.setError("Field cannot be empty");
             return false;
 
-        } else {
+        } /*else if(Patterns.EMAIL_ADDRESS.matcher(emailEt.getEditText().getText().toString()).matches()) {
+            emailEt.setError("Enter valid email address");
+            return false;
+        }*/ else {
             emailEt.setError(null);
             return true;
         }
@@ -155,25 +166,30 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
         this.fullName = fullName; //for the auth listener
 
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+        progressDialog.setTitle("Loading");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.putExtra("full_name", fullName);
                     intent.putExtra("username", username);
                     startActivity(intent);
+                    progressDialog.dismiss();
 
                     //close fragment
-                    Fragment fragment = getSupportFragmentManager().findFragmentByTag(REGISTER_FRAGMENT_TAG);
-                    if (fragment != null) {
-                        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-                        getSupportFragmentManager().popBackStack(); //remove from back stack
-                    }
 
                     //close activity
                     finish();
+
                 } else {
+                    progressDialog.dismiss();
+
                     //close fragment
                     Fragment fragment = getSupportFragmentManager().findFragmentByTag(REGISTER_FRAGMENT_TAG);
                     if (fragment != null) {

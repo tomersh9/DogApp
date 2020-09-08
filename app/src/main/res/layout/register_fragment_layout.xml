@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_shape"
+    android:background="@drawable/white_bg_shape"
     android:orientation="vertical">
 
     <ImageButton
@@ -17,13 +17,20 @@
         android:scaleType="fitCenter"
         android:src="@drawable/ic_arrow_back_black_24dp" />
 
-    <ImageView
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:lottie_rawRes="@raw/green_dog"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        android:layout_gravity="center"/>
+    <!--<ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/orange_dog_100" />
+        android:src="@drawable/orange_dog_100" />-->
 
     <TextView
         android:layout_width="wrap_content"
