@@ -4,33 +4,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/login_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/white_bg_shape">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/login_main_layout"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/login_main_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/white_bg_shape"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!--<ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/orange_dog_100" />-->
         <com.airbnb.lottie.LottieAnimationView
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:scaleType="center"
-            app:lottie_rawRes="@raw/main_dog_icon"
-            app:lottie_autoPlay="true"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            app:lottie_loop="true"/>
+            android:scaleType="center"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/main_dog_icon" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -42,6 +35,15 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:textColor="@color/colorPrimary"
             android:textSize="25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/login_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/login_main_layout"
+        android:orientation="vertical">
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/email_login_input"
@@ -50,9 +52,9 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="50dp"
             android:layout_marginTop="30dp"
+            app:boxStrokeErrorColor="@color/red"
             app:endIconMode="clear_text"
             app:errorEnabled="true"
-            app:boxStrokeErrorColor="@color/red"
             app:startIconDrawable="@drawable/person_icon_24">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -70,10 +72,10 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="50dp"
             android:layout_marginTop="20dp"
+            app:boxStrokeErrorColor="@color/red"
             app:endIconCheckable="true"
             app:endIconMode="password_toggle"
             app:errorEnabled="true"
-            app:boxStrokeErrorColor="@color/red"
             app:startIconDrawable="@drawable/ic_lock_black_24dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -94,34 +96,45 @@
             android:text="Forgot password?"
             android:textSize="15sp" />
 
-        <Button
-            android:id="@+id/login_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="30dp"
-            android:layout_above="@id/register_btn"
-            android:background="@drawable/btn_shape"
-            android:text="Login"
-            android:textAllCaps="false"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/register_btn"
-            android:layout_alignParentBottom="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="30dp"
-            android:background="@drawable/btn_shape"
-            android:text="Register"
-            android:textAllCaps="false"
-            android:textColor="@color/colorPrimary"
-            android:textSize="18sp"
-            app:backgroundTint="@color/whitish" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/login_btn_layout"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:layout_below="@id/login_input_layout"
+        android:orientation="vertical">
+
+    <Button
+        android:id="@+id/login_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/register_btn"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="50dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/btn_shape"
+        android:text="Login"
+        android:textAllCaps="false"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/register_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="50dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/btn_shape"
+        android:text="Register"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimary"
+        android:textSize="18sp"
+        app:backgroundTint="@color/whitish" />
+
+    </LinearLayout>
 
 </RelativeLayout>

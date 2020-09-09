@@ -2,13 +2,11 @@ package com.example.dogapp.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -52,7 +50,7 @@ public class RegisterFragment extends Fragment {
         usernameEt = rootView.findViewById(R.id.user_input);
         passwordEt = rootView.findViewById(R.id.pass_input);
 
-        Button regBtn = rootView.findViewById(R.id.reg_btn);
+        Button regBtn = rootView.findViewById(R.id.next_register_frag_btn);
         regBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

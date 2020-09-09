@@ -24,13 +24,6 @@
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         android:layout_gravity="center"/>
-    <!--<ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/orange_dog_100" />-->
 
     <TextView
         android:layout_width="wrap_content"
@@ -139,14 +132,14 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
-                android:id="@+id/reg_btn"
+                android:id="@+id/next_register_frag_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="50dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/btn_shape"
-                android:text="Register"
+                android:text="Next"
                 android:textAllCaps="false"
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"

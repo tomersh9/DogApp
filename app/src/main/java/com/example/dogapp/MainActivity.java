@@ -9,40 +9,48 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Fragments.ChatFragment;
 import com.example.dogapp.Fragments.ExploreFragment;
 import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
-import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
     //UI Layout
     private Toolbar toolbar;
-    private ViewPager viewPager;
+    // private ViewPager viewPager;
     private BottomNavigationView bottomNavBar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private CoordinatorLayout coordinatorLayout;
     private FloatingActionButton fab;
+
+    //UI ref
+    TextView fullNameTv;
 
     //Main Fragments
     private HomeFragment homeFragment;
@@ -53,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     //firebase stuff
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(); //sign in/up auth instance
     FirebaseAuth.AuthStateListener authStateListener; //listens to login/out changes
+    FirebaseDatabase database = FirebaseDatabase.getInstance(); //actual database
+    DatabaseReference users = database.getReference("users"); //create new table named "users" and we get a reference to it
 
     @Override
     protected void onStart() {
@@ -80,22 +90,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        authStateListener = new FirebaseAuth.AuthStateListener() {
-
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-            }
-        };
-
+        //initial set up of referencing
         //assign material design layout
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //references
-        viewPager = findViewById(R.id.view_pager);
+        //viewPager = findViewById(R.id.view_pager);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
@@ -103,12 +104,38 @@ public class MainActivity extends AppCompatActivity {
         fab = findViewById(R.id.fab);
 
         //hamburger
-        ActionBar actionBar = getSupportActionBar(); //getting the ToolBar we made
-        actionBar.setDisplayHomeAsUpEnabled(true); //setting home button in top left
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp); //hamburger icon
+        setUpActionBar();
 
-        //icons tint
+        //navigation initialize
         navigationView.setItemIconTintList(null);
+
+        //get data of current user from firebase
+        users.child(firebaseAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    //get current user data
+                    int age = dataSnapshot.child("age").getValue(Integer.class);
+                    String fullName = dataSnapshot.child("fullName").getValue(String.class);
+                    String email = dataSnapshot.child("email").getValue(String.class);
+                    String username = dataSnapshot.child("username").getValue(String.class);
+
+                    //update things from user data
+                    fullNameTv = findViewById(R.id.drawer_full_name);
+                    fullNameTv.setText(fullName);
+                }
+                else {
+                    Toast.makeText(MainActivity.this, "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
+        });
+
+        //set on click listeners
+        setOnClickListeners();
 
         //assign fragments
         homeFragment = new HomeFragment();
@@ -116,54 +143,69 @@ public class MainActivity extends AppCompatActivity {
         chatFragment = new ChatFragment();
         profileFragment = new ProfileFragment();
 
+        //set default home fragment
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
+
+        //listens to events of fire base instances
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (user != null) {
+
+                }
+            }
+        };
+    }
+
+    private void setUpActionBar() {
+        ActionBar actionBar = getSupportActionBar(); //getting the ToolBar we made
+        actionBar.setDisplayHomeAsUpEnabled(true); //setting home button in top left
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp); //hamburger icon
+    }
+
+    private void setOnClickListeners() {
+
+        //bottom nav_bar items click events (swapping different fragments)
         bottomNavBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-                //Fragment currFragment = null;
+                Fragment currFragment;
 
                 switch (item.getItemId()) {
 
                     case R.id.bottom_home:
-                        viewPager.setCurrentItem(0);
+                        //viewPager.setCurrentItem(0);
+                        currFragment = homeFragment;
                         break;
 
                     case R.id.bottom_explore:
-                        viewPager.setCurrentItem(1);
+                        currFragment = exploreFragment;
+                        //viewPager.setCurrentItem(1);
                         break;
 
                     case R.id.bottom_chat:
-                        viewPager.setCurrentItem(2);
+                        currFragment = chatFragment;
+                        //viewPager.setCurrentItem(2);
                         break;
 
                     case R.id.bottom_profile:
-                        viewPager.setCurrentItem(3);
+                        currFragment = profileFragment;
+                        //viewPager.setCurrentItem(3);
                         break;
 
                     default:
                         return false;
                 }
-
-                //getSupportFragmentManager().beginTransaction().replace(R.id.view_pager,currFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, currFragment).commit();
                 return true;
             }
         });
 
-        //create adapter for the fragment view pager and set fragments
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), 0);
-        adapter.addFragment(homeFragment, "Home");
-        adapter.addFragment(exploreFragment, "Explore");
-        adapter.addFragment(chatFragment, "Chat");
-        adapter.addFragment(profileFragment, "Profile");
-        viewPager.setAdapter(adapter);
-
-
-        /*tabLayout.getTabAt(0).setIcon(R.drawable.ic_home_black_24dp);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_explore_black_24dp);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_chat_black_24dp);
-        tabLayout.getTabAt(3).setIcon(R.drawable.person_icon_24);*/
-
-        //navigation drawer select item
+        //navigation drawer select item event
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -179,12 +221,14 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
 
-                item.setChecked(true);
+                item.setChecked(true); //highlight
                 drawerLayout.closeDrawers();
-                return true;
+                return true; //done dealing with it
             }
         });
 
+
+        //fab event listener
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -199,6 +243,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //create adapter for the fragment view pager and set fragments
+        /*ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), 0);
+        adapter.addFragment(homeFragment, "Home");
+        adapter.addFragment(exploreFragment, "Explore");
+        adapter.addFragment(chatFragment, "Chat");
+        adapter.addFragment(profileFragment, "Profile");
+        viewPager.setAdapter(adapter);*/
 
+
+        /*tabLayout.getTabAt(0).setIcon(R.drawable.ic_home_black_24dp);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_explore_black_24dp);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_chat_black_24dp);
+        tabLayout.getTabAt(3).setIcon(R.drawable.person_icon_24);*/
     }
 }

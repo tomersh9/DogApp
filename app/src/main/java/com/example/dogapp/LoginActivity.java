@@ -16,7 +16,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Fragments.RegisterFragment;
+import com.example.dogapp.Fragments.SecondRegisterFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
@@ -24,12 +26,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity extends AppCompatActivity implements RegisterFragment.OnRegisterFragmentListener {
 
     RelativeLayout loginContainer;
 
     final String REGISTER_FRAGMENT_TAG = "register_fragment";
+    final String REGISTER_FRAGMENT_2_TAG = "reg_2_frag";
 
     Button loginBtn, regBtn;
     TextInputLayout emailEt, passwordEt;
@@ -38,6 +43,8 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(); //sign in/up auth instance
     FirebaseAuth.AuthStateListener authStateListener; //listens to login/out changes
+    FirebaseDatabase database = FirebaseDatabase.getInstance(); //actual database
+    DatabaseReference users = database.getReference("users"); //create new table named "users" and we get a reference to it
 
     @Override
     protected void onStart() {
@@ -78,10 +85,11 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                                         fullName = null;
                                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                         startActivity(intent);
-                                        finish();
+
                                         if (task.isSuccessful()) {
                                             Toast.makeText(LoginActivity.this, "Hi " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
                                         }
+                                        finish();
                                     }
                                 });
                     } else { //only sign in
@@ -96,7 +104,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
         regBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, new RegisterFragment(), REGISTER_FRAGMENT_TAG).addToBackStack(null).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, new SecondRegisterFragment(), REGISTER_FRAGMENT_2_TAG).addToBackStack(null).commit();
             }
         });
 
@@ -140,10 +148,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
             emailEt.setError("Field cannot be empty");
             return false;
 
-        } /*else if(Patterns.EMAIL_ADDRESS.matcher(emailEt.getEditText().getText().toString()).matches()) {
-            emailEt.setError("Enter valid email address");
-            return false;
-        }*/ else {
+        } else {
             emailEt.setError(null);
             return true;
         }
@@ -162,14 +167,15 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     }
 
     @Override
-    public void onRegister(final String fullName, String email, final String username, String password) {
+    public void onRegister(final String fullName, final String email, final String username, String password) {
 
         this.fullName = fullName; //for the auth listener
 
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
-        progressDialog.setTitle("Loading");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        final AlertDialog alertDialog;
+        View dialogView = getLayoutInflater().inflate(R.layout.custom_alert_dialog, null);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        alertDialog = builder.setView(dialogView).setCancelable(false).show();
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -179,17 +185,20 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.putExtra("full_name", fullName);
                     intent.putExtra("username", username);
-                    startActivity(intent);
-                    progressDialog.dismiss();
 
+                    //push new User to database
+                    User user = new User(fullName,username,email);
+                    users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
+                    startActivity(intent);
+                    alertDialog.dismiss();
                     //close fragment
 
                     //close activity
                     finish();
 
                 } else {
-                    progressDialog.dismiss();
 
+                    alertDialog.dismiss();
                     //close fragment
                     Fragment fragment = getSupportFragmentManager().findFragmentByTag(REGISTER_FRAGMENT_TAG);
                     if (fragment != null) {
