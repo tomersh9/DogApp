@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -21,8 +22,7 @@ public class RegisterFragment extends Fragment {
     private TextInputLayout fullNameEt, emailEt, usernameEt, passwordEt;
 
     public interface OnRegisterFragmentListener {
-
-        void onRegister(String fullName, String email, String username, String password);
+        void onNext(String fullName,String email,String username, String password);
         void onBack();
     }
 
@@ -50,20 +50,20 @@ public class RegisterFragment extends Fragment {
         usernameEt = rootView.findViewById(R.id.user_input);
         passwordEt = rootView.findViewById(R.id.pass_input);
 
-        Button regBtn = rootView.findViewById(R.id.next_register_frag_btn);
-        regBtn.setOnClickListener(new View.OnClickListener() {
+        Button nextBtn = rootView.findViewById(R.id.next_register_frag_btn);
+        nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 String name = fullNameEt.getEditText().getText().toString().trim();
                 String email = emailEt.getEditText().getText().toString().trim();
-                String user = usernameEt.getEditText().getText().toString().trim();
+                String username = usernameEt.getEditText().getText().toString().trim();
                 String pass = passwordEt.getEditText().getText().toString().trim();
 
-                isValid = verifyFields(name, email, user, pass); //check all fields validation
+                isValid = verifyFields(name, email, username, pass); //check all fields validation
 
                 if (isValid) {
-                    listener.onRegister(name, email, user, pass);
+                    listener.onNext(name,email,username,pass);
                 }
             }
         });
@@ -80,7 +80,6 @@ public class RegisterFragment extends Fragment {
     }
 
     private boolean verifyFields(String name, String email, String user, String pass) {
-        //pass all tests
         if (!validateName(name) | !validateEmail(email) | !validateUsername(user) | !validatePass(pass)) {
             return false;
         }
@@ -88,7 +87,6 @@ public class RegisterFragment extends Fragment {
     }
 
     private boolean validatePass(String pass) {
-        //password validate
         if (pass.isEmpty()) {
             passwordEt.setError("Field cannot be empty");
             return false;
@@ -100,7 +98,6 @@ public class RegisterFragment extends Fragment {
     }
 
     private boolean validateUsername(String user) {
-        //username validate
         if (user.isEmpty()) {
             usernameEt.setError("Field cannot be empty");
             return false;
@@ -112,22 +109,17 @@ public class RegisterFragment extends Fragment {
     }
 
     private boolean validateEmail(String email) {
-        //email validate
         if (email.isEmpty()) {
             emailEt.setError("Field cannot be empty");
             return false;
 
-        } /*else if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailEt.setError("Enter valid email address");
-            return false;
-        }*/ else {
+        } else {
             emailEt.setError(null);
             return true;
         }
     }
 
     private boolean validateName(String name) {
-        //name validate
         if (name.isEmpty()) {
             fullNameEt.setError("Field cannot be empty");
             return false;

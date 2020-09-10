@@ -18,20 +18,16 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Fragments.ChatFragment;
 import com.example.dogapp.Fragments.ExploreFragment;
 import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -49,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     private FloatingActionButton fab;
 
-    //UI ref
-    TextView fullNameTv;
+    //drawer header views
+    TextView fullNameTv,titleTv,locationTv;
 
     //Main Fragments
     private HomeFragment homeFragment;
@@ -109,6 +105,12 @@ public class MainActivity extends AppCompatActivity {
         //navigation initialize
         navigationView.setItemIconTintList(null);
 
+        //setting drawer header views
+        View headerView = navigationView.getHeaderView(0);
+        fullNameTv = headerView.findViewById(R.id.drawer_full_name_tv);
+        locationTv = headerView.findViewById(R.id.drawer_location_tv);
+        titleTv = headerView.findViewById(R.id.drawer_title_tv);
+
         //get data of current user from firebase
         users.child(firebaseAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -116,14 +118,16 @@ public class MainActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
 
                     //get current user data
-                    int age = dataSnapshot.child("age").getValue(Integer.class);
                     String fullName = dataSnapshot.child("fullName").getValue(String.class);
                     String email = dataSnapshot.child("email").getValue(String.class);
                     String username = dataSnapshot.child("username").getValue(String.class);
+                    String location = dataSnapshot.child("location").getValue(String.class);
+                    String title = dataSnapshot.child("title").getValue(String.class);
 
                     //update things from user data
-                    fullNameTv = findViewById(R.id.drawer_full_name);
                     fullNameTv.setText(fullName);
+                    titleTv.setText(title);
+                    locationTv.setText(location);
                 }
                 else {
                     Toast.makeText(MainActivity.this, "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();

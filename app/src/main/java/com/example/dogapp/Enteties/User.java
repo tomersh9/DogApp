@@ -3,17 +3,51 @@ package com.example.dogapp.Enteties;
 public class User {
 
     private String fullName;
-    private int age;
+    private String dateOfBirth;
     private String username;
     private String email;
-    //List<Dog> dogs
+    private String gender;
+    private String title;
+    private String location;
 
-
-    public User(String fullName, String username, String email) {
+    /*public User(String fullName, String username, String email) {
         this.fullName = fullName;
-        //this.age = age;
         this.username = username;
         this.email = email;
+    }*/
+
+    public User(String fullName, String dateOfBirth, String username, String email, String gender, String title, String location) {
+        this.fullName = fullName;
+        this.dateOfBirth = dateOfBirth;
+        this.username = username;
+        this.email = email;
+        this.gender = gender;
+        this.title = title;
+        this.location = location;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getFullName() {
@@ -24,12 +58,12 @@ public class User {
         this.fullName = fullName;
     }
 
-    public int getAge() {
-        return age;
+    public String getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getUsername() {

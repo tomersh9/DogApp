@@ -135,6 +135,7 @@
                     android:id="@+id/male"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimary"
                     android:paddingHorizontal="5dp"
                     android:text="Male" />
 
@@ -142,6 +143,7 @@
                     android:id="@+id/female"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimary"
                     android:paddingHorizontal="5dp"
                     android:text="Female" />
 
@@ -149,6 +151,7 @@
                     android:id="@+id/other"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimary"
                     android:paddingHorizontal="5dp"
                     android:text="Other" />
             </RadioGroup>
@@ -179,15 +182,17 @@
                     android:id="@+id/dog_owner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimary"
                     android:paddingHorizontal="5dp"
                     android:text="Dog Owner" />
 
                 <RadioButton
-                    android:id="@+id/non_dog_owner"
+                    android:id="@+id/dog_walker"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimary"
                     android:paddingHorizontal="5dp"
-                    android:text="Dog Finder" />
+                    android:text="Dog Walker" />
             </RadioGroup>
 
             <View

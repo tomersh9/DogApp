@@ -29,7 +29,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class LoginActivity extends AppCompatActivity implements RegisterFragment.OnRegisterFragmentListener {
+public class LoginActivity extends AppCompatActivity implements RegisterFragment.OnRegisterFragmentListener, SecondRegisterFragment.OnSecondRegisterFragmentListener {
 
     RelativeLayout loginContainer;
 
@@ -104,7 +104,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
         regBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, new SecondRegisterFragment(), REGISTER_FRAGMENT_2_TAG).addToBackStack(null).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, new RegisterFragment(), REGISTER_FRAGMENT_TAG).addToBackStack(null).commit();
             }
         });
 
@@ -167,9 +167,23 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     }
 
     @Override
-    public void onRegister(final String fullName, final String email, final String username, String password) {
+    public void onNext(String name,String email,String username,String password) {
+        SecondRegisterFragment fragment = SecondRegisterFragment.newInstance(name,email,username,password);
+        getSupportFragmentManager().beginTransaction().add(R.id.login_container, fragment, REGISTER_FRAGMENT_2_TAG).addToBackStack(null).commit();
+    }
 
-        this.fullName = fullName; //for the auth listener
+    @Override
+    public void onBack() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(REGISTER_FRAGMENT_TAG);
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            getSupportFragmentManager().popBackStack(); //remove from back stack
+        }
+    }
+
+    @Override
+    public void onRegister(final String name, final String email, final String username, String password, final String date, final String gender, final String title, final String location) {
+        this.fullName = name; //for the auth listener
 
         final AlertDialog alertDialog;
         View dialogView = getLayoutInflater().inflate(R.layout.custom_alert_dialog, null);
@@ -183,11 +197,11 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                 if (task.isSuccessful()) {
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra("full_name", fullName);
-                    intent.putExtra("username", username);
+                    /*intent.putExtra("full_name", fullName);
+                    intent.putExtra("username", username);*/
 
                     //push new User to database
-                    User user = new User(fullName,username,email);
+                    User user = new User(name, date, username,email,gender,title, location);
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
                     startActivity(intent);
                     alertDialog.dismiss();
@@ -212,8 +226,8 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     }
 
     @Override
-    public void onBack() {
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(REGISTER_FRAGMENT_TAG);
+    public void onBackSecond() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(REGISTER_FRAGMENT_2_TAG);
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             getSupportFragmentManager().popBackStack(); //remove from back stack
