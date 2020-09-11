@@ -4,17 +4,17 @@
     <item
         android:id="@+id/bottom_home"
         android:icon="@drawable/ic_home_black_24dp"
-        android:title="Home" />
+        android:title="@string/home" />
     <item
         android:id="@+id/bottom_explore"
         android:icon="@drawable/ic_explore_black_24dp"
-        android:title="Explore" />
+        android:title="@string/explore" />
     <item
         android:id="@+id/bottom_chat"
         android:icon="@drawable/ic_chat_black_24dp"
-        android:title="Chats" />
+        android:title="@string/chats" />
     <item
         android:id="@+id/bottom_profile"
         android:icon="@drawable/person_icon_24"
-        android:title="Profile" />
+        android:title="@string/profile" />
 </menu>

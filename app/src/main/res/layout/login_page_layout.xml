@@ -29,9 +29,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="25dp"
             android:gravity="center"
-            android:text="Welcome to Dog App"
+            android:text="@string/welcome_to_dog_app"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:textColor="@color/colorPrimary"
             android:textSize="25sp" />
@@ -60,7 +60,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email"
+                android:hint="@string/email"
                 android:inputType="text" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -81,7 +81,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Password"
+                android:hint="@string/password"
                 android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -93,47 +93,45 @@
             android:layout_gravity="end"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="50dp"
-            android:text="Forgot password?"
+            android:text="@string/forgot_password"
             android:textSize="15sp" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/login_btn_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/login_btn_layout"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"
         android:layout_below="@id/login_input_layout"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="50dp"
+        android:layout_marginBottom="20dp"
         android:orientation="vertical">
 
-    <Button
-        android:id="@+id/login_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/register_btn"
-        android:layout_gravity="bottom"
-        android:layout_marginHorizontal="50dp"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/btn_shape"
-        android:text="Login"
-        android:textAllCaps="false"
-        android:textSize="18sp" />
+        <Button
+            android:id="@+id/login_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/register_btn"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/btn_shape"
+            android:text="@string/login"
+            android:textAllCaps="false"
+            android:textSize="18sp" />
 
-    <Button
-        android:id="@+id/register_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="bottom"
-        android:layout_marginHorizontal="50dp"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/btn_shape"
-        android:text="Register"
-        android:textAllCaps="false"
-        android:textColor="@color/colorPrimary"
-        android:textSize="18sp"
-        app:backgroundTint="@color/whitish" />
+        <Button
+            android:id="@+id/register_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/btn_shape"
+            android:text="@string/register"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            app:backgroundTint="@color/whitish" />
 
     </LinearLayout>
 
