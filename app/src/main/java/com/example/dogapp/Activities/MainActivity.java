@@ -1,4 +1,4 @@
-package com.example.dogapp;
+package com.example.dogapp.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +23,8 @@ import com.example.dogapp.Fragments.ChatFragment;
 import com.example.dogapp.Fragments.ExploreFragment;
 import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
+import com.example.dogapp.R;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private CoordinatorLayout coordinatorLayout;
+    private RelativeLayout rootLayout;
     private FloatingActionButton fab;
 
     //drawer header views
@@ -96,8 +100,10 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
+        rootLayout = findViewById(R.id.root_frag);
         bottomNavBar = findViewById(R.id.bottom_navbar);
         fab = findViewById(R.id.fab);
+        fab.hide();
 
         //hamburger
         setUpActionBar();
@@ -138,17 +144,17 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {}
         });
 
-        //set on click listeners
-        setOnClickListeners();
-
         //assign fragments
         homeFragment = new HomeFragment();
         exploreFragment = new ExploreFragment();
         chatFragment = new ChatFragment();
         profileFragment = new ProfileFragment();
 
+        //set on click listeners
+        setOnClickListeners();
+
         //set default home fragment
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.coordinator_layout, homeFragment).commit();
 
         //listens to events of fire base instances
         authStateListener = new FirebaseAuth.AuthStateListener() {
@@ -182,29 +188,29 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
 
                     case R.id.bottom_home:
-                        //viewPager.setCurrentItem(0);
                         currFragment = homeFragment;
+                        fab.hide();
                         break;
 
                     case R.id.bottom_explore:
                         currFragment = exploreFragment;
-                        //viewPager.setCurrentItem(1);
+                        fab.show();
                         break;
 
                     case R.id.bottom_chat:
                         currFragment = chatFragment;
-                        //viewPager.setCurrentItem(2);
+                        fab.hide();
                         break;
 
                     case R.id.bottom_profile:
                         currFragment = profileFragment;
-                        //viewPager.setCurrentItem(3);
+                        fab.hide();
                         break;
 
                     default:
                         return false;
                 }
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, currFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.coordinator_layout, currFragment).commit();
                 return true;
             }
         });
@@ -216,9 +222,13 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (item.getItemId()) {
 
+                    case R.id.item_profile:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.coordinator_layout, new ProfileFragment()).commit();
+                        bottomNavBar.setSelectedItemId(R.id.bottom_profile);
+                        break;
+
                     case R.id.item_sign_out:
                         firebaseAuth.signOut();
-                        Toast.makeText(MainActivity.this, "NOT exist", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                         startActivity(intent);
                         finish();

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DogApp</string>
+    <string name="welcome_to_dog_app">ברוכים הבאים לאפליקצית כלב</string>
+    <string name="email">אימייל</string>
+    <string name="password">סיסמה</string>
+    <string name="forgot_password">שכחת סיסמה?</string>
+    <string name="login">התחבר</string>
+    <string name="register">הרשמה</string>
+    <string name="join_our_family">הצטרף למשפחה!</string>
+    <string name="select_profile_pic">לחץ כדי לבחור תמונת פרופיל</string>
+    <string name="not_required">*לא חובה</string>
+    <string name="male">גבר</string>
+    <string name="female">אישה</string>
+    <string name="other">אחר</string>
+    <string name="gender">מגדר</string>
+    <string name="title">סוג</string>
+    <string name="dog_owner">בעל כלב</string>
+    <string name="dog_walker">מוריד כלב</string>
+    <string name="about_you">על עצמך</string>
+    <string name="full_name">שם מלא</string>
+    <string name="username">שם משתמש</string>
+    <string name="next">הבא</string>
+    <string name="home">בית</string>
+    <string name="explore">חקור</string>
+    <string name="chats">שיחות</string>
+    <string name="profile">פרופיל</string>
+    <string name="friends">חברים</string>
+    <string name="rate_us">דרג אותנו</string>
+    <string name="settings">הגדרות</string>
+    <string name="sign_out">התנתק</string>
+</resources>

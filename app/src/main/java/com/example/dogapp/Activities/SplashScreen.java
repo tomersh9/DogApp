@@ -1,21 +1,16 @@
-package com.example.dogapp;
+package com.example.dogapp.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.example.dogapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,11 +40,18 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
 
-        new Timer().schedule(new TimerTask() {
+        ImageView imageView =  findViewById(R.id.splash_bg);
+        imageView.animate().scaleX(4f).scaleY(2).setDuration(1500).withEndAction(new Runnable() {
             @Override
             public void run() {
                 bool = true;
                 firebaseAuth.addAuthStateListener(authStateListener);
+            }
+        }).start();
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
             }
         }, 1300);
 

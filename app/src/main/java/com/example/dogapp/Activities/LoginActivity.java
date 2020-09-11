@@ -1,7 +1,6 @@
-package com.example.dogapp;
+package com.example.dogapp.Activities;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -19,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Fragments.RegisterFragment;
 import com.example.dogapp.Fragments.SecondRegisterFragment;
+import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;

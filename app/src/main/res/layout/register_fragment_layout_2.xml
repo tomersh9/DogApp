@@ -29,7 +29,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:text="About you"
+            android:text="@string/about_you"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:textColor="@color/colorPrimary"
             android:textSize="25sp" />
@@ -98,7 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="5dp"
-                android:text="press to select profile image"
+                android:text="@string/select_profile_pic"
                 android:textSize="15sp" />
 
             <TextView
@@ -106,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="5dp"
-                android:text="*not required"
+                android:text="@string/not_required"
                 android:textSize="12sp" />
 
             <View
@@ -120,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:text="Gender"
+                android:text="@string/gender"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -137,7 +137,7 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimary"
                     android:paddingHorizontal="5dp"
-                    android:text="Male" />
+                    android:text="@string/male" />
 
                 <RadioButton
                     android:id="@+id/female"
@@ -145,7 +145,7 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimary"
                     android:paddingHorizontal="5dp"
-                    android:text="Female" />
+                    android:text="@string/female" />
 
                 <RadioButton
                     android:id="@+id/other"
@@ -153,7 +153,7 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimary"
                     android:paddingHorizontal="5dp"
-                    android:text="Other" />
+                    android:text="@string/other" />
             </RadioGroup>
 
             <View
@@ -167,7 +167,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:text="Title"
+                android:text="@string/title"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -184,7 +184,7 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimary"
                     android:paddingHorizontal="5dp"
-                    android:text="Dog Owner" />
+                    android:text="@string/dog_owner" />
 
                 <RadioButton
                     android:id="@+id/dog_walker"
@@ -192,7 +192,7 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimary"
                     android:paddingHorizontal="5dp"
-                    android:text="Dog Walker" />
+                    android:text="@string/dog_walker" />
             </RadioGroup>
 
             <View
@@ -229,23 +229,20 @@
 
             </RelativeLayout>
 
+            <Button
+                android:id="@+id/reg_2_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/btn_shape"
+                android:text="@string/register"
+                android:textAllCaps="false"
+                android:textColor="@color/colorPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/whitish" />
 
         </LinearLayout>
     </ScrollView>
-
-    <Button
-        android:id="@+id/reg_2_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginHorizontal="50dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp"
-        android:background="@drawable/btn_shape"
-        android:text="Register"
-        android:textAllCaps="false"
-        android:textColor="@color/colorPrimary"
-        android:textSize="18sp"
-        app:backgroundTint="@color/whitish" />
 
 </RelativeLayout>
