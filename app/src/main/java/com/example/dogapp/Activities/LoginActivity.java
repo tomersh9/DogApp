@@ -145,7 +145,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     private boolean validateEmail() {
 
         if (emailEt.getEditText().getText().toString().isEmpty()) {
-            emailEt.setError("Field cannot be empty");
+            emailEt.setError(getString(R.string.field_empty_error));
             return false;
 
         } else {
@@ -157,7 +157,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     private boolean validatePassword() {
 
         if (passwordEt.getEditText().getText().toString().isEmpty()) {
-            passwordEt.setError("Field cannot be empty");
+            passwordEt.setError(getString(R.string.field_empty_error));
             return false;
 
         } else {

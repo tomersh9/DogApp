@@ -88,7 +88,7 @@ public class RegisterFragment extends Fragment {
 
     private boolean validatePass(String pass) {
         if (pass.isEmpty()) {
-            passwordEt.setError("Field cannot be empty");
+            passwordEt.setError(getString(R.string.field_empty_error));
             return false;
 
         } else {
@@ -99,7 +99,7 @@ public class RegisterFragment extends Fragment {
 
     private boolean validateUsername(String user) {
         if (user.isEmpty()) {
-            usernameEt.setError("Field cannot be empty");
+            usernameEt.setError(getString(R.string.field_empty_error));
             return false;
 
         } else {
@@ -110,7 +110,7 @@ public class RegisterFragment extends Fragment {
 
     private boolean validateEmail(String email) {
         if (email.isEmpty()) {
-            emailEt.setError("Field cannot be empty");
+            emailEt.setError(getString(R.string.field_empty_error));
             return false;
 
         } else {
@@ -121,7 +121,7 @@ public class RegisterFragment extends Fragment {
 
     private boolean validateName(String name) {
         if (name.isEmpty()) {
-            fullNameEt.setError("Field cannot be empty");
+            fullNameEt.setError(getString(R.string.field_empty_error));
             return false;
 
         } else {

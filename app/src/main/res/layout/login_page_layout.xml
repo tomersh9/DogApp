@@ -91,7 +91,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="7dp"
             android:layout_marginEnd="50dp"
             android:text="@string/forgot_password"
             android:textSize="15sp" />
@@ -102,6 +102,7 @@
         android:id="@+id/login_btn_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_below="@id/login_input_layout"
         android:layout_alignParentBottom="true"
         android:layout_marginHorizontal="50dp"

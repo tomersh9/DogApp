@@ -29,4 +29,5 @@
     <string name="rate_us">דרג אותנו</string>
     <string name="settings">הגדרות</string>
     <string name="sign_out">התנתק</string>
+    <string name="field_empty_error">השדה לא יכול להישאר ריק</string>
 </resources>
