@@ -4,22 +4,14 @@ public class User {
 
     private String fullName;
     private String dateOfBirth;
-    private String username;
     private String email;
     private String gender;
     private String title;
     private String location;
 
-    /*public User(String fullName, String username, String email) {
-        this.fullName = fullName;
-        this.username = username;
-        this.email = email;
-    }*/
-
-    public User(String fullName, String dateOfBirth, String username, String email, String gender, String title, String location) {
+    public User(String fullName, String dateOfBirth, String email, String gender, String title, String location) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
-        this.username = username;
         this.email = email;
         this.gender = gender;
         this.title = title;
@@ -64,14 +56,6 @@ public class User {
 
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getEmail() {

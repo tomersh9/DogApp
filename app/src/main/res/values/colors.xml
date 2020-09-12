@@ -10,7 +10,8 @@
     <color name="whitish">#F4F4F4</color>
     <color name="nav_bar_item_color">#BCB3B3B3</color>
     <color name="tab_unselected_text">#D8EAE8E8</color>
-    <color name="red">#FF0000</color>
-    <color name="green">#26CD09</color>
+    <color name="red">#e3342f</color>
+    <color name="green">#38c172</color>
     <color name="yellow">#F1D907</color>
+    <color name="black">#393737</color>
 </resources>

@@ -29,4 +29,24 @@
     <string name="settings">Settings</string>
     <string name="sign_out">Sign out</string>
     <string name="field_empty_error">Field cannot be empty</string>
+    <string name="your_location">Your location</string>
+    <string name="date_of_birth">Date of birth</string>
+    <string name="pass_no_match_error">Password doesn\'t match</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="select_gender">Select a gender</string>
+    <string name="select_type">Select a type</string>
+    <string name="fill_all_fields">Fill all fields</string>
+    <string name="register_fail">Registration failed</string>
+    <string name="send_me_an_email">Send me an email</string>
+    <string name="hint_forgot_pass">Forgot your password?\nEnter your email address to get a password reset</string>
+    <string name="password_reset_sent_to">Password reset sent to</string>
+    <string name="success">Success!</string>
+    <string name="close">Close</string>
+    <string name="failed">Failed!</string>
+    <string name="invalid_email">Invalid email!</string>
+    <string name="went_wrong">Something went wrong</string>
+    <string name="try_again">Please try again</string>
+    <string name="at_least_six">At least 6 characters</string>
+    <string name="reg_complete">Registration completed!</string>
+    <string name="confirm">Confirm</string>
 </resources>

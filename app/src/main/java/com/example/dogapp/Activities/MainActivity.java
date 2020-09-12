@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -125,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
                     //get current user data
                     String fullName = dataSnapshot.child("fullName").getValue(String.class);
                     String email = dataSnapshot.child("email").getValue(String.class);
-                    String username = dataSnapshot.child("username").getValue(String.class);
                     String location = dataSnapshot.child("location").getValue(String.class);
                     String title = dataSnapshot.child("title").getValue(String.class);
 

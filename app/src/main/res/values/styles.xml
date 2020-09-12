@@ -8,4 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!--Material design round button-->
+    <style name="AppTheme.RoundedCornerMaterialButton" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:background">@drawable/holo_btn_shape</item>
+    </style>
+
 </resources>

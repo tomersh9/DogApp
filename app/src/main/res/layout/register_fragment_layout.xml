@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/white_bg_shape">
+    android:background="@drawable/white_bg_shape"
+    android:clickable="true"
+    android:focusable="true">
 
     <ImageButton
         android:id="@+id/back_frag_btn"
@@ -17,19 +19,19 @@
         android:src="@drawable/ic_arrow_back_black_24dp" />
 
     <LinearLayout
+        android:id="@+id/reg_2_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_below="@id/back_frag_btn"
-        android:id="@+id/reg_2_header">
+        android:orientation="vertical">
 
         <com.airbnb.lottie.LottieAnimationView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            app:lottie_rawRes="@raw/green_dog"
+            android:layout_gravity="center"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
-            android:layout_gravity="center"/>
+            app:lottie_rawRes="@raw/green_dog" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -47,8 +49,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_below="@id/reg_2_header">
+        android:layout_below="@id/reg_2_header"
+        android:layout_marginTop="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -97,8 +99,7 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-
-            <com.google.android.material.textfield.TextInputLayout
+            <!--<com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/user_input"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
@@ -116,7 +117,7 @@
                     android:hint="@string/username"
                     android:inputType="text" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>-->
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/pass_input"
@@ -139,19 +140,41 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/pass_valid_input"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="50dp"
+                android:layout_marginTop="20dp"
+                app:boxStrokeErrorColor="@color/red"
+                app:endIconCheckable="true"
+                app:endIconMode="password_toggle"
+                app:errorEnabled="true"
+                app:startIconDrawable="@drawable/ic_lock_black_24dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/confirm_password"
+                    android:inputType="textPassword" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/next_register_frag_btn"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="50dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="30dp"
-                android:background="@drawable/btn_shape"
+                android:paddingVertical="12dp"
                 android:text="@string/next"
                 android:textAllCaps="false"
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
-                app:backgroundTint="@color/whitish" />
+                app:cornerRadius="40dp" />
 
         </LinearLayout>
     </ScrollView>

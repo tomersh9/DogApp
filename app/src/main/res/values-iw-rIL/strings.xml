@@ -30,4 +30,24 @@
     <string name="settings">הגדרות</string>
     <string name="sign_out">התנתק</string>
     <string name="field_empty_error">השדה לא יכול להישאר ריק</string>
+    <string name="your_location">המיקום שלך</string>
+    <string name="date_of_birth">תאריך לידה</string>
+    <string name="pass_no_match_error">הסיסמה לא תואמת</string>
+    <string name="confirm_password">אשר סיסמה</string>
+    <string name="select_gender">אנא בחר מגדר</string>
+    <string name="select_type">אנא בחר טיפוס</string>
+    <string name="fill_all_fields">אנא מלא את כל השדות</string>
+    <string name="register_fail">ההרשמה נכשלה</string>
+    <string name="send_me_an_email">שלחו לי אימייל</string>
+    <string name="hint_forgot_pass">שכחת את הסיסמה? הכנס את כתובת האימייל שלך כדי שנוכל לשלוח לך איפוס סיסמה.</string>
+    <string name="password_reset_sent_to">איפוס סיסמה נשלח אל</string>
+    <string name="success">הצלחה!</string>
+    <string name="close">סגור</string>
+    <string name="failed">נכשל!</string>
+    <string name="invalid_email">אימייל לא תקין!</string>
+    <string name="went_wrong">משהו השתבש</string>
+    <string name="try_again">אנא נסה שוב</string>
+    <string name="at_least_six">לפחות 6 תווים</string>
+    <string name="reg_complete">ההרשמה בוצעה!</string>
+    <string name="confirm">אישור</string>
 </resources>

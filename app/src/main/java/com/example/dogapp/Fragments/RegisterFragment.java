@@ -19,10 +19,10 @@ import com.google.android.material.textfield.TextInputLayout;
 public class RegisterFragment extends Fragment {
 
     private boolean isValid;
-    private TextInputLayout fullNameEt, emailEt, usernameEt, passwordEt;
+    private TextInputLayout fullNameEt, emailEt, passwordValidEt, passwordEt;
 
     public interface OnRegisterFragmentListener {
-        void onNext(String fullName,String email,String username, String password);
+        void onNext(String fullName,String email, String password);
         void onBack();
     }
 
@@ -47,8 +47,9 @@ public class RegisterFragment extends Fragment {
 
         fullNameEt = rootView.findViewById(R.id.full_name_input);
         emailEt = rootView.findViewById(R.id.email_input);
-        usernameEt = rootView.findViewById(R.id.user_input);
+        //usernameEt = rootView.findViewById(R.id.user_input);
         passwordEt = rootView.findViewById(R.id.pass_input);
+        passwordValidEt = rootView.findViewById(R.id.pass_valid_input);
 
         Button nextBtn = rootView.findViewById(R.id.next_register_frag_btn);
         nextBtn.setOnClickListener(new View.OnClickListener() {
@@ -57,13 +58,14 @@ public class RegisterFragment extends Fragment {
 
                 String name = fullNameEt.getEditText().getText().toString().trim();
                 String email = emailEt.getEditText().getText().toString().trim();
-                String username = usernameEt.getEditText().getText().toString().trim();
+                //String username = usernameEt.getEditText().getText().toString().trim();
+                String passValid = passwordValidEt.getEditText().getText().toString().trim();
                 String pass = passwordEt.getEditText().getText().toString().trim();
 
-                isValid = verifyFields(name, email, username, pass); //check all fields validation
+                isValid = verifyFields(name, email, passValid, pass); //check all fields validation
 
                 if (isValid) {
-                    listener.onNext(name,email,username,pass);
+                    listener.onNext(name,email,pass);
                 }
             }
         });
@@ -79,8 +81,8 @@ public class RegisterFragment extends Fragment {
         return rootView;
     }
 
-    private boolean verifyFields(String name, String email, String user, String pass) {
-        if (!validateName(name) | !validateEmail(email) | !validateUsername(user) | !validatePass(pass)) {
+    private boolean verifyFields(String name, String email, String passValid, String pass) {
+        if (!validateName(name) | !validateEmail(email) | !validatePass(pass) | !confirmPass(pass,passValid)) {
             return false;
         }
         return true;
@@ -90,20 +92,24 @@ public class RegisterFragment extends Fragment {
         if (pass.isEmpty()) {
             passwordEt.setError(getString(R.string.field_empty_error));
             return false;
-
-        } else {
+        }
+        /*else if(pass.length() < 6) {
+            passwordEt.setError(getString(R.string.at_least_six));
+            return false;
+        }*/
+        else {
             passwordEt.setError(null);
             return true;
         }
     }
 
-    private boolean validateUsername(String user) {
-        if (user.isEmpty()) {
-            usernameEt.setError(getString(R.string.field_empty_error));
+    private boolean confirmPass(String pass, String passValid) {
+        if (!pass.equals(passValid)) {
+            passwordValidEt.setError(getString(R.string.pass_no_match_error));
             return false;
-
-        } else {
-            usernameEt.setError(null);
+        }
+        else {
+            passwordValidEt.setError(null);
             return true;
         }
     }
