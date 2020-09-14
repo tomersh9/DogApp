@@ -22,7 +22,8 @@
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/app_bar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
                 <!--<com.google.android.material.appbar.CollapsingToolbarLayout
                     android:layout_width="match_parent"
@@ -68,15 +69,7 @@
                 android:id="@+id/fragment_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
-
-            <!--<androidx.viewpager.widget.ViewPager
-                android:id="@+id/view_pager"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@id/bottom_navbar"
-                android:layout_below="@id/app_bar"
-                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />-->
+                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"/>
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -102,5 +95,7 @@
         app:headerLayout="@layout/header_drawer_layout"
         app:itemIconTint="@null"
         app:menu="@menu/drawer_menu" />
+
+
 
 </androidx.drawerlayout.widget.DrawerLayout>

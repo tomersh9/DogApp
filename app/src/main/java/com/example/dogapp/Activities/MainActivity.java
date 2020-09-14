@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
@@ -16,6 +18,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,6 +33,8 @@ import com.example.dogapp.Fragments.ProfileFragment;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -49,18 +54,20 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener {
 
     //User instance
     User currUser;
 
     //UI Layout
     private Toolbar toolbar;
+    private AppBarLayout appBarLayout;
+    private FrameLayout frameLayout;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
     private BottomNavigationView bottomNavBar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private CoordinatorLayout coordinatorLayout;
-    private RelativeLayout rootLayout;
     private FloatingActionButton fab;
 
     //drawer header views
@@ -110,10 +117,12 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //references
+        frameLayout = findViewById(R.id.fragment_container);
+        collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar_layout);
+        appBarLayout = findViewById(R.id.app_bar);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
-        rootLayout = findViewById(R.id.root_frag);
         bottomNavBar = findViewById(R.id.bottom_navbar);
         fab = findViewById(R.id.fab);
         fab.hide();
@@ -131,7 +140,37 @@ public class MainActivity extends AppCompatActivity {
         titleTv = headerView.findViewById(R.id.drawer_title_tv);
         drawerProfilePic = headerView.findViewById(R.id.drawer_profile_pic);
 
-        //get data of current user from firebase
+        //assign fragments
+        homeFragment = new HomeFragment();
+        exploreFragment = new ExploreFragment();
+        chatFragment = new ChatFragment();
+        profileFragment = new ProfileFragment();
+
+        //set on click listeners
+        setOnClickListeners();
+
+        //collapseAppBar();
+        //lockAppBar();
+
+        //set default home fragment
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
+
+        //listens to events of fire base instances
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (user != null) {
+
+                } else { //sign out
+
+                }
+            }
+        };
+
+        //get data of current user from firebase and update views
         users.child(firebaseAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -157,31 +196,6 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
-
-        //assign fragments
-        homeFragment = new HomeFragment();
-        exploreFragment = new ExploreFragment();
-        chatFragment = new ChatFragment();
-        profileFragment = new ProfileFragment();
-
-        //set on click listeners
-        setOnClickListeners();
-
-        //set default home fragment
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
-
-        //listens to events of fire base instances
-        authStateListener = new FirebaseAuth.AuthStateListener() {
-
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (user != null) {
-                } else { //sign out
-                }
-            }
-        };
     }
 
     private void setUpActionBar() {
@@ -205,24 +219,44 @@ public class MainActivity extends AppCompatActivity {
                         currFragment = homeFragment;
                         toolbar.setTitle(getString(R.string.home));
                         fab.hide();
+                        setSupportActionBar(toolbar);
+                        //collapseAppBar();
+                        //lockAppBar();
+                        //getSupportActionBar().show();
+                        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                         break;
 
                     case R.id.bottom_explore:
                         currFragment = exploreFragment;
                         toolbar.setTitle(getString(R.string.explore));
                         fab.show();
+                        setSupportActionBar(toolbar);
+                        //collapseAppBar();
+                        //lockAppBar();
+                        //getSupportActionBar().show();
+                        //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                        //toolbar.setNavigationIcon(R.drawable.ic_explore_black_24dp);
                         break;
 
                     case R.id.bottom_chat:
                         currFragment = chatFragment;
                         toolbar.setTitle(getString(R.string.chats));
                         fab.hide();
+                        setSupportActionBar(toolbar);
+                        //collapseAppBar();
+                        //lockAppBar();
+                        /*getSupportActionBar().setDisplayHomeAsUpEnabled(false);*/
+                        //getSupportActionBar().show();
                         break;
 
                     case R.id.bottom_profile:
                         currFragment = profileFragment;
                         toolbar.setTitle(getString(R.string.profile));
                         fab.hide();
+                        //getSupportActionBar().hide();
+                        //unLockAppBar();
+                        //expandAppBar();
+                        //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                         break;
 
                     default:
@@ -274,4 +308,60 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void changeToolBar(Toolbar toolbar) {
+        setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+/*    private void collapseAppBar() {
+        // Collapse the AppBarLayout with animation
+        appBarLayout.setExpanded(false, true);
+    }
+
+    private void expandAppBar() {
+        appBarLayout.setExpanded(true, false);
+    }
+
+    private void lockAppBar() {
+    *//* Disable the nestedScrolling to disable expanding the
+     appBar with dragging the nestedScrollView below it *//*
+        ViewCompat.setNestedScrollingEnabled(frameLayout, false);
+
+    *//* But still appBar is expandable with dragging the appBar itself
+    and below code disables that too
+     *//*
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+        AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
+        behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
+            @Override
+            public boolean canDrag(AppBarLayout appBarLayout) {
+                return false;
+            }
+        });
+    }
+
+    private void unLockAppBar() {
+        ViewCompat.setNestedScrollingEnabled(frameLayout, true);
+
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+        AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
+        if (behavior != null) {
+            behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
+                @Override
+                public boolean canDrag(AppBarLayout appBarLayout) {
+                    return true;
+                }
+            });
+        }
+    }*/
 }
