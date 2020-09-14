@@ -8,37 +8,36 @@
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/fail_dialog_icon"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/top_alert_dialog_fail_shape"
-        android:paddingVertical="20dp"
+        android:paddingVertical="5dp"
         app:lottie_autoPlay="true"
         app:lottie_rawRes="@raw/fail" />
 
     <TextView
-        android:id="@+id/failed_tv"
+        android:id="@+id/failed_title_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/fail_dialog_icon"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="@string/failed"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textColor="@color/black"
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:text="@string/went_wrong"
+
         android:textSize="35sp" />
 
     <TextView
         android:id="@+id/fail_body_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/failed_tv"
+        android:layout_below="@id/failed_title_tv"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
+        style="@style/TextAppearance.AppCompat.Body1"
         android:gravity="center"
         android:text="@string/invalid_email"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        android:textColor="@color/black"
         android:textSize="18sp" />
 
     <com.google.android.material.button.MaterialButton

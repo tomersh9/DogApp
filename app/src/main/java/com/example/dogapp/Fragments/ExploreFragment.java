@@ -40,8 +40,8 @@ public class ExploreFragment extends Fragment {
         BoardAdapter boardAdapter = new BoardAdapter(getChildFragmentManager(),0);
         AdoptBoardFragment adoptBoardFragment = new AdoptBoardFragment();
         WalkerBoardFragment walkerBoardFragment = new WalkerBoardFragment();
-        boardAdapter.addFragment(adoptBoardFragment,"Adopt");
-        boardAdapter.addFragment(walkerBoardFragment,"Dog Walkers");
+        boardAdapter.addFragment(adoptBoardFragment,getString(R.string.adopt_board));
+        boardAdapter.addFragment(walkerBoardFragment,getString(R.string.dog_walkers));
         viewPager.setAdapter(boardAdapter);
         tabLayout.setupWithViewPager(viewPager);
     }

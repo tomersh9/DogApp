@@ -71,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             app:boxStrokeErrorColor="@color/red"
             app:endIconCheckable="true"
             app:endIconMode="password_toggle"
@@ -140,4 +140,14 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:textSize="15sp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginHorizontal="50dp"
+        android:text="@string/login_hidden_text"/>
 </RelativeLayout>

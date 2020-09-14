@@ -3,6 +3,7 @@ package com.example.dogapp.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,12 +25,6 @@ public class SplashScreen extends AppCompatActivity {
     boolean bool = false;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        firebaseAuth.addAuthStateListener(authStateListener);
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         firebaseAuth.removeAuthStateListener(authStateListener);
@@ -49,21 +44,13 @@ public class SplashScreen extends AppCompatActivity {
             }
         }).start();
 
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-            }
-        }, 1300);
-
         //fixed second at start
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 
                 if (bool) {
-
                     final FirebaseUser user = firebaseAuth.getCurrentUser(); //get current user
-
                     if (user != null) {
                         Intent intent = new Intent(SplashScreen.this, MainActivity.class);
                         startActivity(intent);

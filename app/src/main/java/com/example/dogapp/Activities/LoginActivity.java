@@ -1,7 +1,6 @@
 package com.example.dogapp.Activities;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -46,6 +45,8 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     TextView forgotPassTv;
     ProgressBar progressBar;
     RelativeLayout hideLayout;
+
+    AlertDialog progressDialog;
 
     String fullName;
 
@@ -96,17 +97,13 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                                         fullName = null;
                                         /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                         startActivity(intent);
-
-                                        if (task.isSuccessful()) {
-                                            Toast.makeText(LoginActivity.this, "Hi " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
-                                        }
                                         finish();*/
                                     }
                                 });
                     } else { //only sign in
-                        /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
-                        finish();*/
+                        finish();
                     }
                 }
             }
@@ -127,23 +124,15 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                     return;
                 } else {
 
-                    //dialog with round edges
-                    final AlertDialog alertDialog;
-                    View dialogView = getLayoutInflater().inflate(R.layout.custom_alert_dialog, null);
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                    alertDialog = builder.setView(dialogView).setCancelable(false).show();
-                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
+                    buildLoaderDialog(getString(R.string.loggin_in));
                     //login account with firebase
                     firebaseAuth.signInWithEmailAndPassword(emailEt.getEditText().getText().toString(), passwordEt.getEditText().getText().toString())
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        alertDialog.dismiss();
-                                    } else {
-                                        alertDialog.dismiss();
-                                        Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
+                                    if (!task.isSuccessful()) {
+                                        buildFailDialog(getString(R.string.login_failed), getString(R.string.check_correct_details));
                                     }
                                 }
                             });
@@ -185,8 +174,8 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     }
 
     @Override
-    public void onNext(String name,String email,String password) {
-        SecondRegisterFragment fragment = SecondRegisterFragment.newInstance(name,email,password);
+    public void onNext(String name, String email, String password) {
+        SecondRegisterFragment fragment = SecondRegisterFragment.newInstance(name, email, password);
         getSupportFragmentManager().beginTransaction().add(R.id.login_container, fragment, REGISTER_FRAGMENT_2_TAG).addToBackStack(null).commit();
     }
 
@@ -199,16 +188,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     public void onRegister(final String name, final String email, String password, final String date, final String gender, final String title, final String location) {
         this.fullName = name; //for the auth listener
 
-        /*final AlertDialog loadingDialog;
-        View dialogView = getLayoutInflater().inflate(R.layout.custom_alert_dialog, null);
-        final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-        loadingDialog = builder.setView(dialogView).setCancelable(false).show();
-        loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));*/
-
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
-        progressDialog.setMessage("Loading");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        buildLoaderDialog(getString(R.string.create_new_acc));
 
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -220,51 +200,66 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date,email,gender,title, location);
+                    User user = new User(name, date, email, gender, title, location);
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
-                    buildConfirmDialog();
+                    String welcome = getString(R.string.welcome) + " " + fullName;
+                    buildConfirmDialog(getString(R.string.reg_complete), welcome);
 
                 } else {
-                    buildFailDialog();
+                    buildFailDialog(getString(R.string.reg_failed), getString(R.string.try_again));
+                    fullName = null;
                 }
             }
         });
     }
 
-    private void buildConfirmDialog() {
+    private void buildLoaderDialog(String body) {
+        final View dialogView;
+        final AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
+        dialogView = getLayoutInflater().inflate(R.layout.loader_dialog, null);
+        TextView bodyTv = dialogView.findViewById(R.id.loader_tv);
+        bodyTv.setText(body);
+        progressDialog = builder1.setView(dialogView).setCancelable(false).show();
+        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    private void buildConfirmDialog(String title, String body) {
+
         final AlertDialog confirmDialog;
-        View dialogView = getLayoutInflater().inflate(R.layout.success_dialog,null);
+        View dialogView = getLayoutInflater().inflate(R.layout.success_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         confirmDialog = builder.setView(dialogView).setCancelable(false).show();
         confirmDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         //dialog views
-        TextView body = dialogView.findViewById(R.id.success_body_tv);
-        body.setText(R.string.reg_complete);
+        TextView titleTv = dialogView.findViewById(R.id.success_title_tv);
+        titleTv.setText(title);
+        TextView bodyTv = dialogView.findViewById(R.id.success_body_tv);
+        bodyTv.setText(body);
         Button closeBtn = dialogView.findViewById(R.id.success_dialog_close_btn);
-        closeBtn.setText(R.string.confirm);
         closeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                confirmDialog.dismiss();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
-                confirmDialog.dismiss();
                 finish();
             }
         });
     }
 
-    private void buildFailDialog() {
+    private void buildFailDialog(String title, String body) {
         final AlertDialog failDialog;
-        View dialogView = getLayoutInflater().inflate(R.layout.failed_dialog,null);
+        View dialogView = getLayoutInflater().inflate(R.layout.failed_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         failDialog = builder.setView(dialogView).show();
         failDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
         //dialog views
-        TextView msgTv = dialogView.findViewById(R.id.fail_body_tv);
-        String wrong = getString(R.string.went_wrong);
-        String body = getString(R.string.try_again);
-        msgTv.setText(wrong +". "+body);
+        TextView titleTv = dialogView.findViewById(R.id.failed_title_tv);
+        titleTv.setText(title);
+        TextView bodyTv = dialogView.findViewById(R.id.fail_body_tv);
+        bodyTv.setText(body);
         Button closeBtn = dialogView.findViewById(R.id.fail_dialog_close_btn);
         closeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -284,16 +279,18 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
         firebaseAuth.sendPasswordResetEmail(emailToSend).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
+                if (task.isSuccessful()) {
 
                     final AlertDialog confirmDialog;
-                    View dialogView = getLayoutInflater().inflate(R.layout.success_dialog,null);
+                    View dialogView = getLayoutInflater().inflate(R.layout.success_dialog, null);
                     AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                     confirmDialog = builder.setView(dialogView).show();
                     confirmDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-                    TextView mail = dialogView.findViewById(R.id.success_body_tv);
-                    mail.setText(getString(R.string.password_reset_sent_to) +" " + emailToSend);
+                    TextView titleTv = dialogView.findViewById(R.id.success_title_tv);
+                    titleTv.setText(R.string.email_sent);
+                    TextView bodyTv = dialogView.findViewById(R.id.success_body_tv);
+                    bodyTv.setText(getString(R.string.password_reset_sent_to) + " " + emailToSend);
                     Button closeBtn = dialogView.findViewById(R.id.success_dialog_close_btn);
                     closeBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -301,10 +298,9 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                             confirmDialog.dismiss();
                         }
                     });
-                }
-                else {
+                } else {
                     final AlertDialog failDialog;
-                    View dialogView = getLayoutInflater().inflate(R.layout.failed_dialog,null);
+                    View dialogView = getLayoutInflater().inflate(R.layout.failed_dialog, null);
                     AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                     failDialog = builder.setView(dialogView).show();
                     failDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -334,4 +330,11 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
             getSupportFragmentManager().popBackStack(); //remove from back stack
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Toast.makeText(this, "LoginActivity - Destroy", Toast.LENGTH_SHORT).show();
+    }
+
 }

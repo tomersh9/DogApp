@@ -44,10 +44,22 @@
     <string name="success">הצלחה!</string>
     <string name="close">סגור</string>
     <string name="failed">נכשל!</string>
-    <string name="invalid_email">אימייל לא תקין!</string>
     <string name="went_wrong">משהו השתבש</string>
     <string name="try_again">אנא נסה שוב</string>
     <string name="at_least_six">לפחות 6 תווים</string>
     <string name="reg_complete">ההרשמה בוצעה!</string>
     <string name="confirm">אישור</string>
+    <string name="login_hidden_text">אפליקציה חברתית להורדת כלבים, אימוץ, פרסום ועוד</string>
+    <string name="enter_loc_manual">הכנס מיקום ידנית</string>
+    <string name="adopt_board">לוח אימוץ</string>
+    <string name="dog_walkers">מוליכי כלבים</string>
+    <string name="loggin_in">מבצע התחברות</string>
+    <string name="create_new_acc">יוצר משתמש חדש</string>
+    <string name="fetch_location">מביאים את המיקום שלך</string>
+    <string name="invalid_email">כתובת אימייל לא נכונה</string>
+    <string name="login_failed">ההתחברות נכשלה</string>
+    <string name="email_sent">המייל נשלח!</string>
+    <string name="welcome">ברוכים הבאים</string>
+    <string name="reg_failed">ההרשמה נכשלה</string>
+    <string name="check_correct_details">אנא וודא שהפרטים נכונים</string>
 </resources>

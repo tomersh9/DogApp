@@ -65,16 +65,16 @@
                 android:layout_marginTop="10dp"
                 android:orientation="vertical">
 
-                <ImageButton
+                <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_btn"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="20dp"
-                    android:background="@null"
                     android:src="@drawable/account_icon" />
 
                 <TextView
+                    android:id="@+id/press_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -90,11 +90,11 @@
                     android:text="@string/not_required"
                     android:textSize="12sp" />
 
-                <View
+                <!--<View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="10dp"
-                    android:background="@android:color/darker_gray" />
+                    android:background="@android:color/darker_gray" />-->
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/date_input"
@@ -134,11 +134,11 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <View
+               <!-- <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="10dp"
-                    android:background="@android:color/darker_gray" />
+                    android:background="@android:color/darker_gray" />-->
 
                 <TextView
                     android:layout_width="wrap_content"

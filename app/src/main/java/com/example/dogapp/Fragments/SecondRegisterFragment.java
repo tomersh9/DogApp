@@ -1,33 +1,98 @@
 package com.example.dogapp.Fragments;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.ImageDecoder;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.location.LocationManagerCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.dogapp.Activities.LoginActivity;
 import com.example.dogapp.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SecondRegisterFragment extends Fragment {
+
+    // Activity requests
+    final int CAMERA_REQUEST = 1;
+    final int WRITE_PERMISSION_REQUEST = 2;
+    final int SELECT_IMAGE = 3;
+    final int LOCATION_PERMISSION_REQUEST = 4;
+    boolean isFromCamera;
+
+    Uri fileUri;
+    AlertDialog alertDialog;
+
+    //views
+    ImageButton locationBtn1;
+    TextView pressTv;
+    CircleImageView profileBtn;
+
+    //Location
+    FusedLocationProviderClient client;
+    //TextView locationTv;
+    Geocoder geocoder;
+    Handler handler = new Handler();
+    Timer timer;
+    private int counter;
+
+    // Firebase storage
+    StorageReference myStorageRef;
+
+    //private ProgressBar progressBar;
 
     private TextInputLayout dateEt, locationEt;
     private RadioGroup genderGroup, typeGroup;
@@ -39,10 +104,78 @@ public class SecondRegisterFragment extends Fragment {
 
     public interface OnSecondRegisterFragmentListener {
         void onRegister(String name, String email, String password, String date, String gender, String title, String location);
+
         void onBackSecond();
     }
 
     private OnSecondRegisterFragmentListener listener;
+
+    //location or images taken permissions
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == WRITE_PERMISSION_REQUEST) {
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getActivity(), "No permissions", Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+        }
+
+        if (requestCode == LOCATION_PERMISSION_REQUEST) {
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getActivity(), "No permissions", Toast.LENGTH_SHORT).show();
+            } else
+                startLocation();
+            Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CAMERA_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                Toast.makeText(getActivity(), fileUri.toString(), Toast.LENGTH_SHORT).show();
+                Bitmap bitmap1 = null;
+                try {
+                    bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                profileBtn.setImageBitmap(bitmap1);
+                //getActivity().getContentResolver().delete(fileUri,null, null); // have to transfer to register button
+                pressTv.setVisibility(View.GONE);
+                isFromCamera = true;
+                alertDialog.dismiss();
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_SHORT).show();
+                fileUri = null;
+            }
+
+        }
+
+        if (requestCode == SELECT_IMAGE) {
+            if (resultCode == Activity.RESULT_OK) {
+                fileUri = data.getData();
+                Bitmap bitmap2 = null;
+                try {
+                    bitmap2 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                profileBtn.setImageBitmap(bitmap2);
+                pressTv.setVisibility(View.GONE);
+                isFromCamera = false;
+                if (isFromCamera)
+                    getActivity().getContentResolver().delete(fileUri, null, null);
+                alertDialog.dismiss();
+            }
+        }
+
+
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -71,19 +204,74 @@ public class SecondRegisterFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.register_fragment_layout_2, container, false);
 
+        // storage instance
+        myStorageRef = FirebaseStorage.getInstance().getReference("Images");
+
+
         //get user data
         fullName = getArguments().getString("fullName");
         email = getArguments().getString("email");
         password = getArguments().getString("password");
 
-        ImageButton profileBtn = rootView.findViewById(R.id.profile_btn);
+        pressTv = rootView.findViewById(R.id.press_tv);
+        //progressBar = rootView.findViewById(R.id.reg_2_progress_bar);
+
+        profileBtn = rootView.findViewById(R.id.profile_btn);
         profileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 final View dialogView;
                 final AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
-                dialogView = getLayoutInflater().inflate(R.layout.picture_dialog_layout, null);
-                builder1.setTitle("Choose where").setView(dialogView).show();
+                dialogView = getLayoutInflater().inflate(R.layout.camera_dialog, null);
+                alertDialog = builder1.setView(dialogView).show();
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                ImageButton camBtn = dialogView.findViewById(R.id.cam_dialog_btn);
+                ImageButton galleryBtn = dialogView.findViewById(R.id.gallery_dialog_btn);
+
+                camBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+       /*                 file = new File(Environment.getExternalStorageDirectory(), email);
+
+
+                        if (file != null) {
+
+                            if (Build.VERSION.SDK_INT >= 24) {
+                                fileUri = FileProvider.getUriForFile(getContext(), "com.example.musicplayer.provider", file);
+                            }
+                            else
+                                fileUri = Uri.fromFile(file);
+                        }
+                         have to add FILEPROVIDER*/
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.Images.Media.TITLE, "Picture");
+                        values.put(MediaStore.Images.Media.DESCRIPTION, "from");
+                        fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                        startActivityForResult(intent, CAMERA_REQUEST);
+                    }
+                });
+
+                galleryBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        intent.setType("image/*");
+                        startActivityForResult(intent, SELECT_IMAGE);
+                    }
+                });
+
+                //check permissions
+                if (Build.VERSION.SDK_INT >= 23) {
+                    int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+                    if (hasWritePermission != PackageManager.PERMISSION_GRANTED && hasReadPermission != PackageManager.PERMISSION_GRANTED)
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
+                }
             }
         });
 
@@ -102,7 +290,7 @@ public class SecondRegisterFragment extends Fragment {
                         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                             //LocalDate myDate = LocalDate.of(year,month,dayOfMonth);
                             //age = calculateAge(myDate,LocalDate.of(globalYear,globalMonth,globalDay));
-                            dateOfBirth = dayOfMonth+"/"+(month+1)+"/"+year;
+                            dateOfBirth = dayOfMonth + "/" + (month + 1) + "/" + year;
                             dateEt.getEditText().setText(dateOfBirth);
                         }
                     }, globalYear, globalMonth, globalDay);
@@ -113,12 +301,38 @@ public class SecondRegisterFragment extends Fragment {
         });
 
         locationEt = rootView.findViewById(R.id.location_input);
+        geocoder = new Geocoder(getActivity());
         locationEt.getEditText().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //calculate location
-                location = "Holon, Israel";
-                locationEt.getEditText().setText(location);
+
+                final boolean isLocation = isLocationEnabled(getActivity());
+
+                if (Build.VERSION.SDK_INT >= 23) {
+                    int hasLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
+                    if (hasLocationPermission != PackageManager.PERMISSION_GRANTED)
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
+                    else {
+                        if(isLocation) {
+                            startLocation();
+                        }
+                        else {
+                            locationEt.setHint(getString(R.string.enter_loc_manual));
+                            locationEt.getEditText().setText("");
+                            locationEt.setFocusable(true);
+                        }
+
+                    }
+                } else {
+                    if(isLocation) {
+                        startLocation();
+                    }
+                    else {
+                        locationEt.setHint(getString(R.string.enter_loc_manual));
+                        locationEt.getEditText().setFocusable(true);
+                        locationEt.getEditText().setText("");
+                    }
+                }
             }
         });
 
@@ -160,10 +374,16 @@ public class SecondRegisterFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 isValid = validateFields();
-                if(isValid) {
+                if (isValid) {
+
+                    //upload image to the firebase storage
+                    FileUploader();
+                    if (isFromCamera) {
+                        getActivity().getContentResolver().delete(fileUri, null, null);
+                    }
                     listener.onRegister(fullName, email, password, dateOfBirth, gender, type, location);
-                }
-                else {
+
+                } else {
                     return;
                 }
             }
@@ -180,15 +400,105 @@ public class SecondRegisterFragment extends Fragment {
         return rootView;
     }
 
+    private void startLocation() {
+
+        final View dialogView;
+        final AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
+        dialogView = getLayoutInflater().inflate(R.layout.loader_dialog, null);
+        TextView body = dialogView.findViewById(R.id.loader_tv);
+        body.setText(R.string.fetch_location);
+        alertDialog = builder1.setView(dialogView).setCancelable(false).show();
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        client = LocationServices.getFusedLocationProviderClient(getActivity());
+        LocationCallback callback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+
+                Location lastLocation = locationResult.getLastLocation();
+                final double lat = lastLocation.getLatitude();
+                final double lng = lastLocation.getLongitude();
+
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+                            final Address bestAddress = addresses.get(0);
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    locationEt.getEditText().setText(bestAddress.getLocality() + ",  " + bestAddress.getCountryName());
+                                    location = locationEt.getEditText().getText().toString();
+                                    locationEt.getEditText().setFocusable(false);
+                                    locationEt.setHint(getString(R.string.your_location));
+                                    alertDialog.dismiss();
+                                }
+                            });
+                        } catch (IOException e) {
+                            alertDialog.dismiss();
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
+        };
+
+        LocationRequest request = LocationRequest.create();
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        if (Build.VERSION.SDK_INT >= 23 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            client.requestLocationUpdates(request, callback, null);
+        } else if (Build.VERSION.SDK_INT <= 22)
+            client.requestLocationUpdates(request, callback, null);
+    }
+
+    private boolean isLocationEnabled(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return LocationManagerCompat.isLocationEnabled(locationManager);
+    }
+
+    private String getExtension(Uri uri) {
+        ContentResolver cr = getActivity().getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(cr.getType(uri));
+    }
+
+    private void FileUploader() {
+        //StorageReference Ref = myStorageRef.child(System.currentTimeMillis() + '.' + getExtension(fileUri));
+        StorageReference storageRef = myStorageRef.child(email);
+        //upload file to firebase storage, if succeed or fail
+        if (fileUri != null) {
+            storageRef.putFile(fileUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Get a URL to the uploaded content
+                            //Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                            //Toast.makeText(getActivity(), "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            // ...
+                        }
+                    });
+        }
+
+    }
+
     private boolean validateFields() {
-        if(!validLocation() | !validDate() | !validGroups()) {
+        if (!validLocation() | !validDate() | !validGroups()) {
             return false;
         }
         return true;
     }
 
     private boolean validGroups() {
-        if(type.isEmpty() || gender.isEmpty()) {
+        if (type.isEmpty() || gender.isEmpty()) {
             Toast.makeText(getActivity(), R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -196,22 +506,20 @@ public class SecondRegisterFragment extends Fragment {
     }
 
     private boolean validLocation() {
-        if(locationEt.getEditText().getText().toString().isEmpty()) {
+        if (locationEt.getEditText().getText().toString().isEmpty()) {
             locationEt.setError(getString(R.string.field_empty_error));
             return false;
-        }
-        else {
+        } else {
             locationEt.setError(null);
             return true;
         }
     }
 
     private boolean validDate() {
-        if(dateEt.getEditText().getText().toString().isEmpty()) {
+        if (dateEt.getEditText().getText().toString().isEmpty()) {
             dateEt.setError(getString(R.string.field_empty_error));
             return false;
-        }
-        else {
+        } else {
             dateEt.setError(null);
             return true;
         }

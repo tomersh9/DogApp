@@ -8,13 +8,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.Toolbar
+ <!--       <androidx.appcompat.widget.Toolbar
             android:id="@+id/explore_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="fuck off" />
+            app:title="fuck off" />-->
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"

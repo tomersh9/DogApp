@@ -43,10 +43,22 @@
     <string name="success">Success!</string>
     <string name="close">Close</string>
     <string name="failed">Failed!</string>
-    <string name="invalid_email">Invalid email!</string>
+    <string name="invalid_email">Invalid email adress</string>
     <string name="went_wrong">Something went wrong</string>
     <string name="try_again">Please try again</string>
     <string name="at_least_six">At least 6 characters</string>
     <string name="reg_complete">Registration completed!</string>
     <string name="confirm">Confirm</string>
+    <string name="login_hidden_text">Find dog walkers, adopt, post and more</string>
+    <string name="enter_loc_manual">Enter location manually</string>
+    <string name="adopt_board">Adopt</string>
+    <string name="dog_walkers">Dog Walkers</string>
+    <string name="loggin_in">Logging in</string>
+    <string name="create_new_acc">Creating new account</string>
+    <string name="fetch_location">Fetching you location</string>
+    <string name="login_failed">Login failed</string>
+    <string name="email_sent">Email sent!</string>
+    <string name="welcome">Welcome</string>
+    <string name="reg_failed">Registration failed</string>
+    <string name="check_correct_details">Please check that the details are correct</string>
 </resources>

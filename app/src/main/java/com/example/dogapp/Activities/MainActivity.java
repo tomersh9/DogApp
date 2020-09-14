@@ -16,15 +16,20 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Fragments.ChatFragment;
 import com.example.dogapp.Fragments.ExploreFragment;
 import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
 import com.example.dogapp.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -37,12 +42,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
+    //User instance
+    User currUser;
+
     //UI Layout
     private Toolbar toolbar;
-    // private ViewPager viewPager;
     private BottomNavigationView bottomNavBar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -51,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton fab;
 
     //drawer header views
-    TextView fullNameTv,titleTv,locationTv;
+    TextView fullNameTv, titleTv, locationTv;
+    ImageView drawerProfilePic;
 
     //Main Fragments
     private HomeFragment homeFragment;
@@ -92,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //initial set up of referencing
-        //assign material design layout
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -116,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         fullNameTv = headerView.findViewById(R.id.drawer_full_name_tv);
         locationTv = headerView.findViewById(R.id.drawer_location_tv);
         titleTv = headerView.findViewById(R.id.drawer_title_tv);
+        drawerProfilePic = headerView.findViewById(R.id.drawer_profile_pic);
 
         //get data of current user from firebase
         users.child(firebaseAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -133,14 +147,15 @@ public class MainActivity extends AppCompatActivity {
                     fullNameTv.setText(fullName);
                     titleTv.setText(title);
                     locationTv.setText(location);
-                }
-                else {
+
+                } else {
                     Toast.makeText(MainActivity.this, "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {}
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
         });
 
         //assign fragments
@@ -153,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         setOnClickListeners();
 
         //set default home fragment
-        getSupportFragmentManager().beginTransaction().replace(R.id.coordinator_layout, homeFragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
 
         //listens to events of fire base instances
         authStateListener = new FirebaseAuth.AuthStateListener() {
@@ -163,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (user != null) {
-
+                } else { //sign out
                 }
             }
         };
@@ -188,28 +203,32 @@ public class MainActivity extends AppCompatActivity {
 
                     case R.id.bottom_home:
                         currFragment = homeFragment;
+                        toolbar.setTitle(getString(R.string.home));
                         fab.hide();
                         break;
 
                     case R.id.bottom_explore:
                         currFragment = exploreFragment;
+                        toolbar.setTitle(getString(R.string.explore));
                         fab.show();
                         break;
 
                     case R.id.bottom_chat:
                         currFragment = chatFragment;
+                        toolbar.setTitle(getString(R.string.chats));
                         fab.hide();
                         break;
 
                     case R.id.bottom_profile:
                         currFragment = profileFragment;
+                        toolbar.setTitle(getString(R.string.profile));
                         fab.hide();
                         break;
 
                     default:
                         return false;
                 }
-                getSupportFragmentManager().beginTransaction().replace(R.id.coordinator_layout, currFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, currFragment).commit();
                 return true;
             }
         });
@@ -222,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
 
                     case R.id.item_profile:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.coordinator_layout, new ProfileFragment()).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
                         bottomNavBar.setSelectedItemId(R.id.bottom_profile);
                         break;
 
@@ -240,7 +259,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         //fab event listener
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -255,19 +273,5 @@ public class MainActivity extends AppCompatActivity {
                         }).show();
             }
         });
-
-        //create adapter for the fragment view pager and set fragments
-        /*ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), 0);
-        adapter.addFragment(homeFragment, "Home");
-        adapter.addFragment(exploreFragment, "Explore");
-        adapter.addFragment(chatFragment, "Chat");
-        adapter.addFragment(profileFragment, "Profile");
-        viewPager.setAdapter(adapter);*/
-
-
-        /*tabLayout.getTabAt(0).setIcon(R.drawable.ic_home_black_24dp);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_explore_black_24dp);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_chat_black_24dp);
-        tabLayout.getTabAt(3).setIcon(R.drawable.person_icon_24);*/
     }
 }
