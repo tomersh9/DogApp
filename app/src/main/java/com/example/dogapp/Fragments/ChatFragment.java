@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 
 import androidx.annotation.NonNull;
@@ -30,6 +32,8 @@ public class ChatFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.chat_fragment, container, false);
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
         ListView listView = view.findViewById(R.id.my_list);
         List<String> myList = new ArrayList<>();
@@ -101,5 +105,11 @@ public class ChatFragment extends Fragment {
                 });
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 }
