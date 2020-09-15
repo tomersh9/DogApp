@@ -8,14 +8,42 @@ public class User {
     private String gender;
     private String title;
     private String location;
+    private String photoUri;
 
-    public User(String fullName, String dateOfBirth, String email, String gender, String title, String location) {
+    public User() {}
+
+    public User(String fullName, String dateOfBirth, String email, String gender, String title, String location, String photoUri) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
         this.gender = gender;
         this.title = title;
         this.location = location;
+        this.photoUri = photoUri;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getGender() {
@@ -42,27 +70,11 @@ public class User {
         this.location = location;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getPhotoUri() {
+        return photoUri;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(String dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setPhotoUri(String photoUri) {
+        this.photoUri = photoUri;
     }
 }

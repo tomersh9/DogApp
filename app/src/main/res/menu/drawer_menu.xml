@@ -9,7 +9,7 @@
             android:title="@string/profile" />
 
         <item
-            android:id="@+id/item_add_friend"
+            android:id="@+id/item_friends"
             android:icon="@drawable/friends_icon"
             android:title="@string/friends" />
 

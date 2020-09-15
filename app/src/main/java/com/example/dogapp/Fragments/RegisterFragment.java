@@ -58,7 +58,6 @@ public class RegisterFragment extends Fragment {
 
                 String name = fullNameEt.getEditText().getText().toString().trim();
                 String email = emailEt.getEditText().getText().toString().trim();
-                //String username = usernameEt.getEditText().getText().toString().trim();
                 String passValid = passwordValidEt.getEditText().getText().toString().trim();
                 String pass = passwordEt.getEditText().getText().toString().trim();
 

@@ -51,22 +51,17 @@ public class ChatFragment extends Fragment {
         myList.add("WEEE");
         myList.add("BBSS");
         myList.add("FFGGGGGGG");
-        myList.add("FF");
-        myList.add("Hello");
-        myList.add("WEEE");
-        myList.add("BBSS");
-        myList.add("FFGGGGGGG");
-        myList.add("FF");
-        myList.add("Hello");
-        myList.add("WEEE");
-        myList.add("BBSS");
-        myList.add("FFGGGGGGG");
-        myList.add("FF");
-        myList.add("Hello");
-        myList.add("WEEE");
-        myList.add("BBSS");
-        myList.add("FFGGGGGGG");
-        myList.add("FF");
+        myList.add("שתוק");
+        myList.add("שתוק");
+        myList.add("כלב");
+        myList.add("ערבי");
+        myList.add("בן אלף זונה");
+        myList.add("שרמוטנהה");
+        myList.add("דגכדגכ");
+        myList.add("כככ");
+        myList.add("כככ");
+        myList.add("עעעע");
+
         arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, myList);
         listView.setAdapter(arrayAdapter);
 

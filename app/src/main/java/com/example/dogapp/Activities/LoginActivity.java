@@ -189,24 +189,25 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     public void onRegister(final String name, final String email, String password, final String date, final String gender, final String title, final String location) {
         this.fullName = name; //for the auth listener
 
-        buildLoaderDialog(getString(R.string.create_new_acc));
+        //buildLoaderDialog(getString(R.string.create_new_acc));
 
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
 
-                progressDialog.dismiss();
-                closeFragment(REGISTER_FRAGMENT_2_TAG);
-                closeFragment(REGISTER_FRAGMENT_TAG);
+                //progressDialog.dismiss();
+                //closeFragment(REGISTER_FRAGMENT_2_TAG);
+                //closeFragment(REGISTER_FRAGMENT_TAG);
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, email, gender, title, location);
+                    User user = new User(name, date, email, gender, title, location,"uri");
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
-                    String welcome = getString(R.string.welcome) + " " + fullName;
-                    buildConfirmDialog(getString(R.string.reg_complete), welcome);
 
                 } else {
+                    progressDialog.dismiss();
+                    closeFragment(REGISTER_FRAGMENT_2_TAG);
+                    closeFragment(REGISTER_FRAGMENT_TAG);
                     buildFailDialog(getString(R.string.reg_failed), getString(R.string.try_again));
                     fullName = null;
                 }
@@ -247,6 +248,12 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                 finish();
             }
         });
+    }
+
+    @Override
+    public void createConfirmDialog() {
+        String welcome = getString(R.string.welcome) + " " + firebaseAuth.getCurrentUser().getDisplayName();
+        buildConfirmDialog(getString(R.string.reg_complete), welcome);
     }
 
     private void buildFailDialog(String title, String body) {
@@ -335,7 +342,6 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Toast.makeText(this, "LoginActivity - Destroy", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -345,9 +351,8 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
     @Override
     public void stopLoader() {
-
-        if (progressDialog != null)
+        if (progressDialog != null) {
             progressDialog.dismiss();
-
+        }
     }
 }

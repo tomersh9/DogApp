@@ -7,15 +7,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Fragments.ChatFragment;
 import com.example.dogapp.Fragments.ExploreFragment;
+import com.example.dogapp.Fragments.FriendsFragment;
 import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
 import com.example.dogapp.R;
@@ -38,7 +35,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -56,6 +52,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener {
 
@@ -88,10 +86,10 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(); //sign in/up auth instance
     FirebaseAuth.AuthStateListener authStateListener; //listens to login/out changes
     FirebaseDatabase database = FirebaseDatabase.getInstance(); //actual database
-    DatabaseReference users = database.getReference("users"); //create new table named "users" and we get a reference to it
-    StorageReference myStorageRef1;
+    DatabaseReference usersRef = database.getReference("users"); //create new table named "users" and we get a reference to it
+    StorageReference myStorageRef;
+    FirebaseUser fUser = firebaseAuth.getCurrentUser();
     File file;
-    FirebaseUser user = firebaseAuth.getCurrentUser();
 
     @Override
     protected void onStart() {
@@ -99,14 +97,11 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         firebaseAuth.addAuthStateListener(authStateListener);
     }
 
-
-
     @Override
     protected void onStop() {
         super.onStop();
         firebaseAuth.removeAuthStateListener(authStateListener);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -121,8 +116,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(user.getPhotoUrl() != null)
-                Toast.makeText(this, user.getPhotoUrl().toString(), Toast.LENGTH_SHORT).show();
+        if (fUser.getPhotoUrl() != null)
+            Toast.makeText(this, fUser.getPhotoUrl().toString(), Toast.LENGTH_SHORT).show();
 
         //myStorageRef1 = FirebaseStorage.getInstance().getReference().child("Images/deded");
 
@@ -190,9 +185,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         //set on click listeners
         setOnClickListeners();
 
-        //collapseAppBar();
-        //lockAppBar();
-
         //set default home fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
 
@@ -205,23 +197,17 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (user != null) {
 
-
-
-                    if (user.getPhotoUrl() != null)
-                    {
-                        Toast.makeText(MainActivity.this,  "ZZZZ", Toast.LENGTH_SHORT).show();
-                        Glide.with(MainActivity.this).asBitmap().load(user.getPhotoUrl()).into(drawerProfilePic);
-                    }
-
                 } else { //sign out
 
                 }
             }
         };
 
+        //update photo url field in User class
+        usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
 
         //get data of current user from firebase and update views
-        users.child(firebaseAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        usersRef.child(firebaseAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -229,10 +215,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     //get current user data
                     String fullName = dataSnapshot.child("fullName").getValue(String.class);
                     String email = dataSnapshot.child("email").getValue(String.class);
-                    Toast.makeText(MainActivity.this, email, Toast.LENGTH_SHORT).show();
                     String location = dataSnapshot.child("location").getValue(String.class);
                     String title = dataSnapshot.child("title").getValue(String.class);
-                    Uri uri = dataSnapshot.child("picUrl").getValue(Uri.class);
 
                     //update things from user data
                     fullNameTv.setText(fullName);
@@ -255,12 +239,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
         });
 
-        //Toast.makeText(MainActivity.this, email, Toast.LENGTH_SHORT).show();
-        //fileDownload("deded",drawerProfilePic);
-
-        if (user.getPhotoUrl() != null)
-        {
-            Glide.with(this).asBitmap().load(user.getPhotoUrl()).into(drawerProfilePic);
+        if (fUser.getPhotoUrl() != null) {
+            Glide.with(this).asBitmap().load(fUser.getPhotoUrl()).into(drawerProfilePic);
         }
     }
 
@@ -283,18 +263,10 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 switch (item.getItemId()) {
 
                     case R.id.bottom_home:
-//                        if(user.getPhotoUrl() != null) {
-//                            Toast.makeText(MainActivity.this, user.getPhotoUrl().toString(), Toast.LENGTH_SHORT).show();
-//                            Glide.with(MainActivity.this).asBitmap().load(user.getPhotoUrl()).into(drawerProfilePic);
-//                        }
                         currFragment = homeFragment;
                         toolbar.setTitle(getString(R.string.home));
                         fab.hide();
                         setSupportActionBar(toolbar);
-                        //collapseAppBar();
-                        //lockAppBar();
-                        //getSupportActionBar().show();
-                        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                         break;
 
                     case R.id.bottom_explore:
@@ -302,11 +274,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         toolbar.setTitle(getString(R.string.explore));
                         fab.show();
                         setSupportActionBar(toolbar);
-                        //collapseAppBar();
-                        //lockAppBar();
-                        //getSupportActionBar().show();
-                        //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                        //toolbar.setNavigationIcon(R.drawable.ic_explore_black_24dp);
                         break;
 
                     case R.id.bottom_chat:
@@ -314,25 +281,18 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         toolbar.setTitle(getString(R.string.chats));
                         fab.hide();
                         setSupportActionBar(toolbar);
-                        //collapseAppBar();
-                        //lockAppBar();
-                        /*getSupportActionBar().setDisplayHomeAsUpEnabled(false);*/
-                        //getSupportActionBar().show();
                         break;
 
                     case R.id.bottom_profile:
                         currFragment = profileFragment;
-                        //toolbar.setTitle(getString(R.string.profile));
                         fab.hide();
-                        //getSupportActionBar().hide();
-                        //unLockAppBar();
-                        //expandAppBar();
-                        //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                         break;
 
                     default:
                         return false;
                 }
+                item.setChecked(true);
+                //bottomNavBar.getMenu().setGroupCheckable(0,true,true);
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, currFragment).commit();
                 return true;
             }
@@ -348,6 +308,13 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     case R.id.item_profile:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
                         bottomNavBar.setSelectedItemId(R.id.bottom_profile);
+                        break;
+
+                    case R.id.item_friends:
+                        toolbar.setTitle("Friends");
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new FriendsFragment()).commit();
+                        fab.show();
+                        //bottomNavBar.getMenu().setGroupCheckable(0,false,true);
                         break;
 
                     case R.id.item_sign_out:
@@ -394,13 +361,12 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         }
     }
 
-    public void fileDownload(String fileName, final ImageView imageView)
-    {
+    public void fileDownload(String fileName, final ImageView imageView) {
         try {
-            file = File.createTempFile(fileName,"");
+            file = File.createTempFile(fileName, "");
             //myStorageRef1 = FirebaseStorage.getInstance().getReference().child("Images/"+fileName);
-            myStorageRef1 = FirebaseStorage.getInstance().getReference("Images").child(fileName);
-            myStorageRef1.getFile(file)
+            myStorageRef = FirebaseStorage.getInstance().getReference("Images").child(fileName);
+            myStorageRef.getFile(file)
                     .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
@@ -422,8 +388,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 }
             });
 
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         //return file;

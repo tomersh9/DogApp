@@ -111,7 +111,11 @@ public class SecondRegisterFragment extends Fragment {
 
     public interface OnSecondRegisterFragmentListener {
         void startLoader();
+
         void stopLoader();
+
+        void createConfirmDialog();
+
         void onRegister(String name, String email, String password, String date, String gender, String title, String location);
 
         void onBackSecond();
@@ -322,10 +326,9 @@ public class SecondRegisterFragment extends Fragment {
                     if (hasLocationPermission != PackageManager.PERMISSION_GRANTED)
                         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
                     else {
-                        if(isLocation) {
+                        if (isLocation) {
                             startLocation();
-                        }
-                        else {
+                        } else {
                             locationEt.setHint(getString(R.string.enter_loc_manual));
                             locationEt.getEditText().setText("");
                             locationEt.setFocusable(true);
@@ -333,10 +336,9 @@ public class SecondRegisterFragment extends Fragment {
 
                     }
                 } else {
-                    if(isLocation) {
+                    if (isLocation) {
                         startLocation();
-                    }
-                    else {
+                    } else {
                         locationEt.setHint(getString(R.string.enter_loc_manual));
                         locationEt.getEditText().setFocusable(true);
                         locationEt.getEditText().setText("");
@@ -351,13 +353,13 @@ public class SecondRegisterFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId) {
                     case R.id.male:
-                        gender = "Male";
+                        gender = getString(R.string.male);
                         break;
                     case R.id.female:
-                        gender = "Female";
+                        gender = getString(R.string.female);
                         break;
                     case R.id.other:
-                        gender = "Other";
+                        gender = getString(R.string.other);
                         break;
                 }
             }
@@ -385,21 +387,18 @@ public class SecondRegisterFragment extends Fragment {
                 isValid = validateFields();
                 if (isValid) {
 
-                    //upload image to the firebase storage
-                    //FileUploader();
+                    listener.startLoader();
+
                     if (bitmap1 != null)
                         handleUpload(bitmap1);
                     else if (bitmap2 != null)
                         handleUpload(bitmap2);
-                    //handleUpload();
-                    //Toast.makeText(getActivity(), FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() + "", Toast.LENGTH_SHORT).show();
+
                     if (isFromCamera) {
                         getActivity().getContentResolver().delete(fileUri, null, null);
                     }
 
                     listener.onRegister(fullName, email, password, dateOfBirth, gender, type, location);
-
-
 
                 } else {
                     return;
@@ -508,10 +507,9 @@ public class SecondRegisterFragment extends Fragment {
 
     }
 
-    private void handleUpload(Bitmap bitmap)
-    {
+    private void handleUpload(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Images").child(email + ".jpeg");
 
         storage.putBytes(baos.toByteArray())
@@ -519,7 +517,6 @@ public class SecondRegisterFragment extends Fragment {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         getDownloadUrl(storage);
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -531,8 +528,7 @@ public class SecondRegisterFragment extends Fragment {
 
     }
 
-    private void getDownloadUrl(StorageReference storage)
-    {
+    private void getDownloadUrl(StorageReference storage) {
         storage.getDownloadUrl()
                 .addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
@@ -548,35 +544,27 @@ public class SecondRegisterFragment extends Fragment {
         });
     }
 
-    private void setUserProfileUrl(Uri uri)
-    {
+    private void setUserProfileUrl(Uri uri) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        //Toast.makeText(getActivity(), "haha", Toast.LENGTH_SHORT).show();
-
 
         UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
                 .setPhotoUri(uri)
                 .build();
 
-
-            user.updateProfile(request)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            //Toast.makeText(getActivity(), "Profile Image Failed", Toast.LENGTH_SHORT).show();
-
-                        }
-                    });
-
-
-
+        user.updateProfile(request)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        listener.stopLoader();
+                        listener.createConfirmDialog();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        listener.stopLoader();
+                    }
+                });
     }
 
     private boolean validateFields() {
@@ -624,5 +612,4 @@ public class SecondRegisterFragment extends Fragment {
         }
         return 0;
     }
-
 }
