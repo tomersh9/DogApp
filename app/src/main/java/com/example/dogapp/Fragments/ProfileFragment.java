@@ -12,16 +12,29 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+//import static com.example.dogapp.Activities.MainActivity.email;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.R;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 
 public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
+
+    //Firebase
+
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    FirebaseUser user = firebaseAuth.getCurrentUser();
 
     ImageView profileIv;
     AppBarLayout appBarLayout;
@@ -51,9 +64,15 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         View rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
+
         profileIv = rootView.findViewById(R.id.profile_frag_iv);
         x = profileIv.getScaleX();
         y = profileIv.getScaleY();
+
+        if (user.getPhotoUrl() != null)
+        {
+            Glide.with(this).asBitmap().load(user.getPhotoUrl()).into(profileIv);
+        }
 
         toolbar = rootView.findViewById(R.id.toolbar_profile);
         listener.changeToolBar(toolbar);

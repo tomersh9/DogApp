@@ -11,6 +11,7 @@ import android.widget.Toolbar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -27,6 +28,7 @@ public class ExploreFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.explore_fragment,container,false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
         viewPager = rootView.findViewById(R.id.board_view_pager);
         tabLayout = rootView.findViewById(R.id.tab_layout);
         return rootView;
@@ -44,5 +46,11 @@ public class ExploreFragment extends Fragment {
         boardAdapter.addFragment(walkerBoardFragment,getString(R.string.dog_walkers));
         viewPager.setAdapter(boardAdapter);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 }

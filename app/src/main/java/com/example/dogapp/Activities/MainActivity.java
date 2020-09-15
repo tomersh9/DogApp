@@ -14,7 +14,10 @@ import androidx.fragment.app.Fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,6 +59,7 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener {
 
+
     //User instance
     User currUser;
 
@@ -85,12 +89,17 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     FirebaseAuth.AuthStateListener authStateListener; //listens to login/out changes
     FirebaseDatabase database = FirebaseDatabase.getInstance(); //actual database
     DatabaseReference users = database.getReference("users"); //create new table named "users" and we get a reference to it
+    StorageReference myStorageRef1;
+    File file;
+    FirebaseUser user = firebaseAuth.getCurrentUser();
 
     @Override
     protected void onStart() {
         super.onStart();
         firebaseAuth.addAuthStateListener(authStateListener);
     }
+
+
 
     @Override
     protected void onStop() {
@@ -111,6 +120,12 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(user.getPhotoUrl() != null)
+                Toast.makeText(this, user.getPhotoUrl().toString(), Toast.LENGTH_SHORT).show();
+
+        //myStorageRef1 = FirebaseStorage.getInstance().getReference().child("Images/deded");
+
 
         //initial set up of referencing
         toolbar = findViewById(R.id.toolbar);
@@ -140,6 +155,32 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         titleTv = headerView.findViewById(R.id.drawer_title_tv);
         drawerProfilePic = headerView.findViewById(R.id.drawer_profile_pic);
 
+        String name = "hhhhuuuu";
+//        myStorageRef1 = FirebaseStorage.getInstance().getReference("Images").child(name);
+//        try {
+//            file = File.createTempFile(name,"");
+//            myStorageRef1.getFile(file)
+//                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+//                        @Override
+//                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+//                            Toast.makeText(MainActivity.this, "OKAY", Toast.LENGTH_SHORT).show();
+//                            drawerProfilePic.setImageURI(Uri.fromFile(file));
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception e) {
+//                    Toast.makeText(MainActivity.this, "NOT OKAY", Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        //fileDownload("hhhggg@gmail.com", drawerProfilePic);
+
+        //File tempPic = fileDownload("deded");
+        //drawerProfilePic.setImageURI(Uri.fromFile(file));
+
         //assign fragments
         homeFragment = new HomeFragment();
         exploreFragment = new ExploreFragment();
@@ -164,11 +205,20 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (user != null) {
 
+
+
+                    if (user.getPhotoUrl() != null)
+                    {
+                        Toast.makeText(MainActivity.this,  "ZZZZ", Toast.LENGTH_SHORT).show();
+                        Glide.with(MainActivity.this).asBitmap().load(user.getPhotoUrl()).into(drawerProfilePic);
+                    }
+
                 } else { //sign out
 
                 }
             }
         };
+
 
         //get data of current user from firebase and update views
         users.child(firebaseAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -179,13 +229,20 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     //get current user data
                     String fullName = dataSnapshot.child("fullName").getValue(String.class);
                     String email = dataSnapshot.child("email").getValue(String.class);
+                    Toast.makeText(MainActivity.this, email, Toast.LENGTH_SHORT).show();
                     String location = dataSnapshot.child("location").getValue(String.class);
                     String title = dataSnapshot.child("title").getValue(String.class);
+                    Uri uri = dataSnapshot.child("picUrl").getValue(Uri.class);
 
                     //update things from user data
                     fullNameTv.setText(fullName);
                     titleTv.setText(title);
                     locationTv.setText(location);
+                    //Toast.makeText(MainActivity.this, uri.toString(), Toast.LENGTH_SHORT).show();
+                    //Glide.with(MainActivity.this).load(uri).into(drawerProfilePic);
+                    //Toast.makeText(MainActivity.this, email, Toast.LENGTH_SHORT).show();
+                    //fileDownload(email,drawerProfilePic);
+                    //drawerProfilePic.setImageResource(R.drawable.orange_dog_100);
 
                 } else {
                     Toast.makeText(MainActivity.this, "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
@@ -195,8 +252,18 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
+
         });
+
+        //Toast.makeText(MainActivity.this, email, Toast.LENGTH_SHORT).show();
+        //fileDownload("deded",drawerProfilePic);
+
+        if (user.getPhotoUrl() != null)
+        {
+            Glide.with(this).asBitmap().load(user.getPhotoUrl()).into(drawerProfilePic);
+        }
     }
+
 
     private void setUpActionBar() {
         ActionBar actionBar = getSupportActionBar(); //getting the ToolBar we made
@@ -216,6 +283,10 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 switch (item.getItemId()) {
 
                     case R.id.bottom_home:
+//                        if(user.getPhotoUrl() != null) {
+//                            Toast.makeText(MainActivity.this, user.getPhotoUrl().toString(), Toast.LENGTH_SHORT).show();
+//                            Glide.with(MainActivity.this).asBitmap().load(user.getPhotoUrl()).into(drawerProfilePic);
+//                        }
                         currFragment = homeFragment;
                         toolbar.setTitle(getString(R.string.home));
                         fab.hide();
@@ -251,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
                     case R.id.bottom_profile:
                         currFragment = profileFragment;
-                        toolbar.setTitle(getString(R.string.profile));
+                        //toolbar.setTitle(getString(R.string.profile));
                         fab.hide();
                         //getSupportActionBar().hide();
                         //unLockAppBar();
@@ -321,6 +392,41 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         } else {
             super.onBackPressed();
         }
+    }
+
+    public void fileDownload(String fileName, final ImageView imageView)
+    {
+        try {
+            file = File.createTempFile(fileName,"");
+            //myStorageRef1 = FirebaseStorage.getInstance().getReference().child("Images/"+fileName);
+            myStorageRef1 = FirebaseStorage.getInstance().getReference("Images").child(fileName);
+            myStorageRef1.getFile(file)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            Toast.makeText(MainActivity.this, "OKAY", Toast.LENGTH_SHORT).show();
+                            try {
+                                Bitmap bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), Uri.fromFile(file)));
+                                imageView.setImageBitmap(bitmap1);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                    Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        //return file;
     }
 
 /*    private void collapseAppBar() {

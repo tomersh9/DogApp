@@ -88,6 +88,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (user != null) {
 
+
                     if (fullName != null) { //sign up - update profile with full name
 
                         user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(fullName).build())
@@ -337,4 +338,16 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
         Toast.makeText(this, "LoginActivity - Destroy", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void startLoader() {
+        buildLoaderDialog(getString(R.string.create_new_acc));
+    }
+
+    @Override
+    public void stopLoader() {
+
+        if (progressDialog != null)
+            progressDialog.dismiss();
+
+    }
 }

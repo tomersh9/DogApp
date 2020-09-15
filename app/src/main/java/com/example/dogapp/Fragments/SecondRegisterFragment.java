@@ -213,7 +213,7 @@ public class SecondRegisterFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.register_fragment_layout_2, container, false);
 
-        // storage instance//
+        // storage instance///
         myStorageRef = FirebaseStorage.getInstance().getReference("Images");
 
 
