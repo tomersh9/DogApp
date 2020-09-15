@@ -41,6 +41,8 @@ import androidx.core.location.LocationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.dogapp.Activities.LoginActivity;
+import com.example.dogapp.Activities.MainActivity;
+import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -50,10 +52,14 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
@@ -75,6 +81,7 @@ public class SecondRegisterFragment extends Fragment {
 
     Uri fileUri;
     AlertDialog alertDialog;
+    Bitmap bitmap1, bitmap2;
 
     //views
     ImageButton locationBtn1;
@@ -103,6 +110,8 @@ public class SecondRegisterFragment extends Fragment {
     private String fullName, email, password, gender = "", location, type = "", dateOfBirth;
 
     public interface OnSecondRegisterFragmentListener {
+        void startLoader();
+        void stopLoader();
         void onRegister(String name, String email, String password, String date, String gender, String title, String location);
 
         void onBackSecond();
@@ -138,7 +147,7 @@ public class SecondRegisterFragment extends Fragment {
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 Toast.makeText(getActivity(), fileUri.toString(), Toast.LENGTH_SHORT).show();
-                Bitmap bitmap1 = null;
+                bitmap2 = null;
                 try {
                     bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
                 } catch (IOException e) {
@@ -159,7 +168,7 @@ public class SecondRegisterFragment extends Fragment {
         if (requestCode == SELECT_IMAGE) {
             if (resultCode == Activity.RESULT_OK) {
                 fileUri = data.getData();
-                Bitmap bitmap2 = null;
+                bitmap1 = null;
                 try {
                     bitmap2 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
                 } catch (IOException e) {
@@ -204,7 +213,7 @@ public class SecondRegisterFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.register_fragment_layout_2, container, false);
 
-        // storage instance
+        // storage instance//
         myStorageRef = FirebaseStorage.getInstance().getReference("Images");
 
 
@@ -377,11 +386,20 @@ public class SecondRegisterFragment extends Fragment {
                 if (isValid) {
 
                     //upload image to the firebase storage
-                    FileUploader();
+                    //FileUploader();
+                    if (bitmap1 != null)
+                        handleUpload(bitmap1);
+                    else if (bitmap2 != null)
+                        handleUpload(bitmap2);
+                    //handleUpload();
+                    //Toast.makeText(getActivity(), FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() + "", Toast.LENGTH_SHORT).show();
                     if (isFromCamera) {
                         getActivity().getContentResolver().delete(fileUri, null, null);
                     }
+
                     listener.onRegister(fullName, email, password, dateOfBirth, gender, type, location);
+
+
 
                 } else {
                     return;
@@ -487,6 +505,77 @@ public class SecondRegisterFragment extends Fragment {
                         }
                     });
         }
+
+    }
+
+    private void handleUpload(Bitmap bitmap)
+    {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
+        final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Images").child(email + ".jpeg");
+
+        storage.putBytes(baos.toByteArray())
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        getDownloadUrl(storage);
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+
+    }
+
+    private void getDownloadUrl(StorageReference storage)
+    {
+        storage.getDownloadUrl()
+                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        setUserProfileUrl(uri);
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
+
+    private void setUserProfileUrl(Uri uri)
+    {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        //Toast.makeText(getActivity(), "haha", Toast.LENGTH_SHORT).show();
+
+
+        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                .setPhotoUri(uri)
+                .build();
+
+
+            user.updateProfile(request)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //Toast.makeText(getActivity(), "Profile Image Failed", Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
+
+
 
     }
 
