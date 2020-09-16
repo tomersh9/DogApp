@@ -116,12 +116,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (fUser.getPhotoUrl() != null)
-            Toast.makeText(this, fUser.getPhotoUrl().toString(), Toast.LENGTH_SHORT).show();
-
-        //myStorageRef1 = FirebaseStorage.getInstance().getReference().child("Images/deded");
-
-
         //initial set up of referencing
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -135,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         coordinatorLayout = findViewById(R.id.coordinator_layout);
         bottomNavBar = findViewById(R.id.bottom_navbar);
         fab = findViewById(R.id.fab);
-        fab.hide();
+        //fab.hide();
 
         //hamburger
         setUpActionBar();
@@ -150,7 +144,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         titleTv = headerView.findViewById(R.id.drawer_title_tv);
         drawerProfilePic = headerView.findViewById(R.id.drawer_profile_pic);
 
-        String name = "hhhhuuuu";
 //        myStorageRef1 = FirebaseStorage.getInstance().getReference("Images").child(name);
 //        try {
 //            file = File.createTempFile(name,"");
@@ -235,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
 
         });
@@ -265,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     case R.id.bottom_home:
                         currFragment = homeFragment;
                         toolbar.setTitle(getString(R.string.home));
-                        fab.hide();
+                        fab.show();
                         setSupportActionBar(toolbar);
                         break;
 
@@ -352,6 +346,13 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         setSupportActionBar(toolbar);
     }
 
+    public FloatingActionButton getFab() {
+        if(fab!=null) {
+            return fab;
+        }
+        return null;
+    }
+
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -370,7 +371,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            Toast.makeText(MainActivity.this, "OKAY", Toast.LENGTH_SHORT).show();
                             try {
                                 Bitmap bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), Uri.fromFile(file)));
                                 imageView.setImageBitmap(bitmap1);
@@ -383,8 +383,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-
-                    Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                 }
             });
 

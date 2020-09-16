@@ -62,4 +62,8 @@
     <string name="reg_failed">Registration failed</string>
     <string name="check_correct_details">Please check that the details are correct</string>
     <string name="my_profile">My Profile</string>
+    <string name="display_profile_picture">Display profile picture</string>
+    <string name="choose_a_new_picture">Choose a new profile picture</string>
+    <string name="take_a_new_picture">Take a new profile picture</string>
+    <string name="failed_upload_image">Failed to upload the image</string>
 </resources>

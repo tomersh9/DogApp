@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:text="bla bla"
+            android:textStyle="bold"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textSize="25sp" />
 

@@ -551,20 +551,22 @@ public class SecondRegisterFragment extends Fragment {
                 .setPhotoUri(uri)
                 .build();
 
-        user.updateProfile(request)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        listener.stopLoader();
-                        listener.createConfirmDialog();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        listener.stopLoader();
-                    }
-                });
+        if (user != null) {
+            user.updateProfile(request)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            listener.stopLoader();
+                            listener.createConfirmDialog();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            listener.stopLoader();
+                        }
+                    });
+        }
     }
 
     private boolean validateFields() {
