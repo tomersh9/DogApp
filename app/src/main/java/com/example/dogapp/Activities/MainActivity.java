@@ -29,6 +29,7 @@ import com.example.dogapp.Fragments.ChatFragment;
 import com.example.dogapp.Fragments.ExploreFragment;
 import com.example.dogapp.Fragments.FriendsFragment;
 import com.example.dogapp.Fragments.HomeFragment;
+import com.example.dogapp.Fragments.InChatFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -55,7 +56,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener {
+public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, ChatFragment.OnChatClickListener, InChatFragment.OnInChatListener {
 
 
     //User instance
@@ -87,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     FirebaseAuth.AuthStateListener authStateListener; //listens to login/out changes
     FirebaseDatabase database = FirebaseDatabase.getInstance(); //actual database
     DatabaseReference usersRef = database.getReference("users"); //create new table named "users" and we get a reference to it
-    StorageReference myStorageRef;
     FirebaseUser fUser = firebaseAuth.getCurrentUser();
     File file;
 
@@ -144,31 +144,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         titleTv = headerView.findViewById(R.id.drawer_title_tv);
         drawerProfilePic = headerView.findViewById(R.id.drawer_profile_pic);
 
-//        myStorageRef1 = FirebaseStorage.getInstance().getReference("Images").child(name);
-//        try {
-//            file = File.createTempFile(name,"");
-//            myStorageRef1.getFile(file)
-//                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-//                        @Override
-//                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-//                            Toast.makeText(MainActivity.this, "OKAY", Toast.LENGTH_SHORT).show();
-//                            drawerProfilePic.setImageURI(Uri.fromFile(file));
-//                        }
-//                    }).addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception e) {
-//                    Toast.makeText(MainActivity.this, "NOT OKAY", Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        //fileDownload("hhhggg@gmail.com", drawerProfilePic);
-
-        //File tempPic = fileDownload("deded");
-        //drawerProfilePic.setImageURI(Uri.fromFile(file));
-
         //assign fragments
         homeFragment = new HomeFragment();
         exploreFragment = new ExploreFragment();
@@ -184,11 +159,9 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         //listens to events of fire base instances
         authStateListener = new FirebaseAuth.AuthStateListener() {
 
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (user != null) {
+                if (fUser != null) {
 
                 } else { //sign out
 
@@ -196,30 +169,25 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
             }
         };
 
-        //update photo url field in User class
-        usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
-
+        //************* UPDATE USER FIELDS RETROACTIVE TO CREATION IN DATABASE*******************//
+        //***************UPDATE DRAWER UI WITH USER FIELDS**************************//
         //get data of current user from firebase and update views
-        usersRef.child(firebaseAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        usersRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
 
-                    //get current user data
-                    String fullName = dataSnapshot.child("fullName").getValue(String.class);
-                    String email = dataSnapshot.child("email").getValue(String.class);
-                    String location = dataSnapshot.child("location").getValue(String.class);
-                    String title = dataSnapshot.child("title").getValue(String.class);
+                    //to prevent deleted users create real time things in the table
+                    //update photo url field in User class
+                    usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
+                    //update Unique ID field
+                    usersRef.child(fUser.getUid()).child("id").setValue(fUser.getUid());
 
                     //update things from user data
-                    fullNameTv.setText(fullName);
-                    titleTv.setText(title);
-                    locationTv.setText(location);
-                    //Toast.makeText(MainActivity.this, uri.toString(), Toast.LENGTH_SHORT).show();
-                    //Glide.with(MainActivity.this).load(uri).into(drawerProfilePic);
-                    //Toast.makeText(MainActivity.this, email, Toast.LENGTH_SHORT).show();
-                    //fileDownload(email,drawerProfilePic);
-                    //drawerProfilePic.setImageResource(R.drawable.orange_dog_100);
+                    User user = dataSnapshot.getValue(User.class);
+                    fullNameTv.setText(user.getFullName());
+                    titleTv.setText(user.getTitle());
+                    locationTv.setText(user.getLocation());
 
                 } else {
                     Toast.makeText(MainActivity.this, "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
@@ -230,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-
         });
 
         if (fUser.getPhotoUrl() != null) {
@@ -306,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
                     case R.id.item_friends:
                         toolbar.setTitle("Friends");
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new FriendsFragment()).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FriendsFragment()).commit();
                         fab.show();
                         //bottomNavBar.getMenu().setGroupCheckable(0,false,true);
                         break;
@@ -324,35 +291,9 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 return true; //done dealing with it
             }
         });
-
-        //fab event listener
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Hey").setMessage("msg").setIcon(R.drawable.person_icon_24)
-                        .setPositiveButton("press me", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Snackbar.make(coordinatorLayout, "OK", Snackbar.LENGTH_SHORT).show();
-                            }
-                        }).show();
-            }
-        });
     }
 
-    @Override
-    public void changeToolBar(Toolbar toolbar) {
-        setSupportActionBar(toolbar);
-    }
-
-    public FloatingActionButton getFab() {
-        if(fab!=null) {
-            return fab;
-        }
-        return null;
-    }
-
+    //close drawer
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -362,75 +303,31 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         }
     }
 
-    public void fileDownload(String fileName, final ImageView imageView) {
-        try {
-            file = File.createTempFile(fileName, "");
-            //myStorageRef1 = FirebaseStorage.getInstance().getReference().child("Images/"+fileName);
-            myStorageRef = FirebaseStorage.getInstance().getReference("Images").child(fileName);
-            myStorageRef.getFile(file)
-                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            try {
-                                Bitmap bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), Uri.fromFile(file)));
-                                imageView.setImageBitmap(bitmap1);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+    //*****************FRAGMENTS DATA TRANSFER**************************//
 
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                }
-            });
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    //get fab to specific fragments
+    public FloatingActionButton getFab() {
+        if (fab != null) {
+            return fab;
         }
-        //return file;
+        return null;
     }
 
-/*    private void collapseAppBar() {
-        // Collapse the AppBarLayout with animation
-        appBarLayout.setExpanded(false, true);
+    //change toolbar for profile fragment
+    @Override
+    public void changeProfileToolBar(Toolbar toolbar) {
+        setSupportActionBar(toolbar);
     }
 
-    private void expandAppBar() {
-        appBarLayout.setExpanded(true, false);
+    //In Chat Fragment
+    @Override
+    public void onChatClicked(String userID) {
+        InChatFragment inChatFragment = InChatFragment.getInstance(userID);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, inChatFragment).commit();
     }
 
-    private void lockAppBar() {
-    *//* Disable the nestedScrolling to disable expanding the
-     appBar with dragging the nestedScrollView below it *//*
-        ViewCompat.setNestedScrollingEnabled(frameLayout, false);
-
-    *//* But still appBar is expandable with dragging the appBar itself
-    and below code disables that too
-     *//*
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-        AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
-        behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
-            @Override
-            public boolean canDrag(AppBarLayout appBarLayout) {
-                return false;
-            }
-        });
+    @Override
+    public void changeInChatToolbar(Toolbar toolbar) {
+        setSupportActionBar(toolbar);
     }
-
-    private void unLockAppBar() {
-        ViewCompat.setNestedScrollingEnabled(frameLayout, true);
-
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-        AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
-        if (behavior != null) {
-            behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
-                @Override
-                public boolean canDrag(AppBarLayout appBarLayout) {
-                    return true;
-                }
-            });
-        }
-    }*/
 }

@@ -2,6 +2,7 @@ package com.example.dogapp.Enteties;
 
 public class User {
 
+    private String id;
     private String fullName;
     private String dateOfBirth;
     private String email;
@@ -20,6 +21,14 @@ public class User {
         this.title = title;
         this.location = location;
         this.photoUri = photoUri;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getFullName() {

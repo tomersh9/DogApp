@@ -47,7 +47,6 @@ public class RegisterFragment extends Fragment {
 
         fullNameEt = rootView.findViewById(R.id.full_name_input);
         emailEt = rootView.findViewById(R.id.email_input);
-        //usernameEt = rootView.findViewById(R.id.user_input);
         passwordEt = rootView.findViewById(R.id.pass_input);
         passwordValidEt = rootView.findViewById(R.id.pass_valid_input);
 

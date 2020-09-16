@@ -100,11 +100,13 @@ public class FriendsFragment extends Fragment implements UsersAdapter.MyUserList
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 users.clear();
                 if (snapshot.exists()) {
-                    for (DataSnapshot ds : snapshot.getChildren()) {
-                        User user = ds.getValue(User.class);
-                        //get all users except the logged in (you)
-                        if (!user.getEmail().equals(fUser.getEmail())) {
-                            users.add(user);
+                    if(snapshot.getChildrenCount() > 1) { //when no users registered
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            User user = ds.getValue(User.class);
+                            //get all users except the logged in (you)
+                            if (!user.getId().equals(fUser.getUid())) {
+                                users.add(user);
+                            }
                         }
                     }
                     //adapter

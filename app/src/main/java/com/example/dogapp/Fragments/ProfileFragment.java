@@ -61,7 +61,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private AlertDialog alertDialog;
 
     public interface OnProfileFragmentListener {
-        void changeToolBar(Toolbar toolbar);
+        void changeProfileToolBar(Toolbar toolbar);
     }
 
     OnProfileFragmentListener listener;
@@ -105,7 +105,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         //toolbar
         collapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar_layout);
         toolbar = rootView.findViewById(R.id.toolbar_profile);
-        listener.changeToolBar(toolbar);
+        listener.changeProfileToolBar(toolbar);
         appBarLayout = rootView.findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(this);
 
