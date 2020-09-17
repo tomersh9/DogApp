@@ -3,18 +3,12 @@ package com.example.dogapp.Fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,9 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.dogapp.ChatUsersAdapter;
+import com.example.dogapp.Enteties.ChatList;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
-import com.example.dogapp.UsersAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -37,7 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatFragment extends Fragment implements ChatUsersAdapter.MyChatUserListener {
+public class ChatsFragment extends Fragment implements ChatUsersAdapter.MyChatUserListener {
 
     public interface OnChatClickListener {
         void onChatClicked(String userID);
@@ -47,11 +41,13 @@ public class ChatFragment extends Fragment implements ChatUsersAdapter.MyChatUse
 
     //List
     private RecyclerView recyclerView;
-    private ChatUsersAdapter adapter;
+    private ChatUsersAdapter userAdapter;
     private List<User> users;
+    private List<ChatList> allChatsList;
 
     //firebase
     private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference databaseReference;
 
     //UI
     private ProgressBar progressBar;
@@ -72,7 +68,7 @@ public class ChatFragment extends Fragment implements ChatUsersAdapter.MyChatUse
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
-        View rootView = inflater.inflate(R.layout.chat_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.chats_page_fragment, container, false);
         progressBar = rootView.findViewById(R.id.chat_fragment_progress_bar);
 
         //init recyclerview
@@ -81,42 +77,64 @@ public class ChatFragment extends Fragment implements ChatUsersAdapter.MyChatUse
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         //init friends list
-        users = new ArrayList<>();
-        getAllUsers(); //get all users and create the adapter and assign to recyclerview
+        allChatsList = new ArrayList<>();
+        //load all users with whom i chatted
+        loadAllMyChats();
 
         return rootView;
     }
 
-    private void getAllUsers() {
+    //pulling all the users id's that i chatted with and then create user list with recyclerview of those users in the chats page
+    private void loadAllMyChats() {
         progressBar.setVisibility(View.VISIBLE);
-        //get path of database named "users" contains users info
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
-        //get all data from path
+        databaseReference = FirebaseDatabase.getInstance().getReference("chatList").child(fUser.getUid());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                allChatsList.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    ChatList chatList = ds.getValue(ChatList.class);
+                    allChatsList.add(chatList);
+                }
+                createChatList(); //create users list with recyclerview
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    private void createChatList() {
+        users = new ArrayList<>();
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                 users.clear();
-                if (snapshot.exists()) {
-                    for (DataSnapshot ds : snapshot.getChildren()) {
-                        User user = ds.getValue(User.class);
-                        //get all users except the logged in (you)
-                        if (!user.getEmail().equals(fUser.getEmail())) {
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    User user = ds.getValue(User.class);
+                    for (ChatList chatList : allChatsList) {
+                        if (user.getId().equals(chatList.getId())) {
                             users.add(user);
                         }
                     }
-                    //adapter
-                    adapter = new ChatUsersAdapter(users);
-                    //set adapter to recyclerview
-                    recyclerView.setAdapter(adapter);
-                    //adapter click events
-                    adapter.setMyChatUserListener(ChatFragment.this);
-                    adapter.notifyDataSetChanged();
                 }
+                //Toast.makeText(getActivity(), users.size()+"", Toast.LENGTH_SHORT).show();
+                userAdapter = new ChatUsersAdapter(users, getActivity());
+                userAdapter.setMyChatUserListener(ChatsFragment.this);
+                recyclerView.setAdapter(userAdapter);
                 progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                progressBar.setVisibility(View.GONE);
+                //Toast.makeText(getActivity(), "cancel", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -124,12 +142,6 @@ public class ChatFragment extends Fragment implements ChatUsersAdapter.MyChatUse
     @Override
     public void onChatUserClicked(int pos, View v) {
         listener.onChatClicked(users.get(pos).getId());
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        //setHasOptionsMenu(true);
-        super.onCreate(savedInstanceState);
     }
 
 

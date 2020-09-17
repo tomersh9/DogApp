@@ -9,8 +9,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
+
+import androidx.appcompat.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,8 +23,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
-import com.example.dogapp.UsersAdapter;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.dogapp.FriendsAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,11 +35,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendsFragment extends Fragment implements UsersAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
+public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
 
     //List
     private RecyclerView recyclerView;
-    private UsersAdapter adapter;
+    private FriendsAdapter adapter;
     private List<User> users;
 
     //firebase
@@ -49,24 +49,27 @@ public class FriendsFragment extends Fragment implements UsersAdapter.MyUserList
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    public interface MyFriendsFragmentListener {
+        void onMyFriendClicked(String userID);
+    }
+
+    private MyFriendsFragmentListener listener;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            listener = (MyFriendsFragmentListener) context;
+        } catch (ClassCastException ex) {
+            throw new ClassCastException("Must implement MyFriendsFragmentListener");
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
-
-    /*private void filter(String textFilter) {
-        List<User> newList = new ArrayList<>();
-        for(User user : users) {
-            if(user.getFullName().toLowerCase().contains(textFilter.toLowerCase())) {
-                newList.add(user);
-            }
-        }
-        adapter = new UsersAdapter(newList);
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-    }*/
 
     @Nullable
     @Override
@@ -100,7 +103,7 @@ public class FriendsFragment extends Fragment implements UsersAdapter.MyUserList
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 users.clear();
                 if (snapshot.exists()) {
-                    if(snapshot.getChildrenCount() > 1) { //when no users registered
+                    if (snapshot.getChildrenCount() > 1) { //when no users registered
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             User user = ds.getValue(User.class);
                             //get all users except the logged in (you)
@@ -110,7 +113,7 @@ public class FriendsFragment extends Fragment implements UsersAdapter.MyUserList
                         }
                     }
                     //adapter
-                    adapter = new UsersAdapter(users);
+                    adapter = new FriendsAdapter(users);
                     //set adapter to recyclerview
                     recyclerView.setAdapter(adapter);
                     //adapter click events
@@ -123,32 +126,33 @@ public class FriendsFragment extends Fragment implements UsersAdapter.MyUserList
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
 
     @Override
-    public void onUserClicked(int pos, View v) {
-        final User user = users.get(pos);
-        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), user.getFullName(), Snackbar.LENGTH_SHORT).show();
+    public void onFriendClicked(int pos, View v) {
+        listener.onMyFriendClicked(users.get(pos).getId());
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.search_menu,menu);
+        inflater.inflate(R.menu.search_menu, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if(item.getItemId() == R.id.menu_item_search) {
+        if (item.getItemId() == R.id.menu_item_search) {
             SearchView searchView = (SearchView) item.getActionView();
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     return false;
                 }
+
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     adapter.getFilter().filter(newText);
@@ -169,4 +173,16 @@ public class FriendsFragment extends Fragment implements UsersAdapter.MyUserList
     public void onRefresh() {
         getAllUsers();
     }
+
+     /*private void filter(String textFilter) {
+        List<User> newList = new ArrayList<>();
+        for(User user : users) {
+            if(user.getFullName().toLowerCase().contains(textFilter.toLowerCase())) {
+                newList.add(user);
+            }
+        }
+        adapter = new UsersAdapter(newList);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }*/
 }

@@ -66,4 +66,12 @@
     <string name="choose_a_new_picture">Choose a new profile picture</string>
     <string name="take_a_new_picture">Take a new profile picture</string>
     <string name="failed_upload_image">Failed to upload the image</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="place_holder">Place Holder</string>
+    <string name="_11_hr">11 hrs</string>
+    <string name="status_place_holder">This is status</string>
+    <string name="_5_comments">5 comments</string>
+    <string name="like">Like</string>
+    <string name="comment">Comment</string>
 </resources>

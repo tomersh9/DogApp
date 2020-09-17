@@ -1,26 +1,24 @@
-package com.example.dogapp.Fragments;
+package com.example.dogapp.Activities;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.widget.Toolbar;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.Chat;
 import com.example.dogapp.Enteties.User;
+import com.example.dogapp.Fragments.InChatFragment;
 import com.example.dogapp.MessageAdapter;
 import com.example.dogapp.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,9 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InChatFragment extends Fragment {
+public class InChatActivity extends AppCompatActivity {
 
-    /*
     //Views
     private ImageView profileIv;
     private TextView usernameTv;
@@ -55,58 +52,40 @@ public class InChatFragment extends Fragment {
     private DatabaseReference databaseReference;
     private String userID; //to whom i send messages
 
-    public interface OnInChatListener {
-        void changeInChatToolbar(Toolbar toolbar);
-        void onBackInChat();
-    }
-
-    private OnInChatListener listener;
-
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        try {
-            listener = (OnInChatListener) context; //the activity is the callback
-        } catch (ClassCastException ex) {
-            throw new ClassCastException("The Activity must implement OnInChatListener interface");
-        }
-    }
-
-    //to get data from activity
-    public static InChatFragment getInstance(String userID) {
-        InChatFragment chatFragment = new InChatFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("userID", userID);
-        chatFragment.setArguments(bundle);
-        return chatFragment;
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.in_chat_layout, container, false);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.in_chat_layout);
 
         //setup chat toolbar
-        Toolbar toolbar = rootView.findViewById(R.id.in_chat_toolbar);
+        Toolbar toolbar = findViewById(R.id.in_chat_toolbar);
         toolbar.setTitle("");
-        listener.changeInChatToolbar(toolbar); //change toolbar when fragment created
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         //init views
-        profileIv = rootView.findViewById(R.id.in_chat_profile_img);
-        usernameTv = rootView.findViewById(R.id.in_chat_username);
-        messageEt = rootView.findViewById(R.id.in_chat_et);
-        sendBtn = rootView.findViewById(R.id.chat_send_btn);
+        profileIv = findViewById(R.id.in_chat_profile_img);
+        usernameTv = findViewById(R.id.in_chat_username);
+        messageEt = findViewById(R.id.in_chat_et);
+        sendBtn = findViewById(R.id.chat_send_btn);
 
         //init recyclerview
-        recyclerView = rootView.findViewById(R.id.in_chat_recycler_view);
+        recyclerView = findViewById(R.id.in_chat_recycler_view);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setStackFromEnd(true); //show last first
         recyclerView.setLayoutManager(manager);
 
         //sender and receiver
         fUser = FirebaseAuth.getInstance().getCurrentUser();
-        userID = getArguments().getString("userID");
+        userID = getIntent().getStringExtra("userID");
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,8 +100,6 @@ public class InChatFragment extends Fragment {
 
         //load user conversation
         loadUserMessages();
-
-        return rootView;
     }
 
     private void loadUserMessages() {
@@ -136,12 +113,45 @@ public class InChatFragment extends Fragment {
                 usernameTv.setText(user.getFullName());
                 //set icon image of user
                 try {
-                    Glide.with(InChatFragment.this).load(user.getPhotoUri()).placeholder(R.drawable.account_icon).into(profileIv);
+                    Glide.with(InChatActivity.this).load(user.getPhotoUri()).placeholder(R.drawable.account_icon).into(profileIv);
                 } catch (Exception ex) {
 
                 }
                 //reading messages with the Sender details to populate
                 readMessages(fUser.getUid(), userID, user.getPhotoUri());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void readMessages(final String myID, final String userID, final String imgUrl) {
+
+        chats = new ArrayList<>();
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("chats");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+
+                    chats.clear(); //clear first, then load
+
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+
+                        Chat chat = ds.getValue(Chat.class);
+                        //cover all logical cases
+                        if (chat.getReceiver().equals(myID) && chat.getSender().equals(userID)
+                                || chat.getReceiver().equals(userID) && chat.getSender().equals(myID)) {
+                            chats.add(chat); //add the message to chat
+                        }
+                    }
+                    messageAdapter = new MessageAdapter(chats, imgUrl); //create new adapter with loaded list
+                    recyclerView.setAdapter(messageAdapter);
+                }
             }
 
             @Override
@@ -198,47 +208,4 @@ public class InChatFragment extends Fragment {
             }
         });
     }
-
-    private void readMessages(final String myID, final String userID, final String imgUrl) {
-
-        chats = new ArrayList<>();
-
-        databaseReference = FirebaseDatabase.getInstance().getReference("chats");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-
-                    chats.clear(); //clear first, then load
-
-                    for (DataSnapshot ds : snapshot.getChildren()) {
-
-                        Chat chat = ds.getValue(Chat.class);
-                        //cover all logical cases
-                        if (chat.getReceiver().equals(myID) && chat.getSender().equals(userID)
-                                || chat.getReceiver().equals(userID) && chat.getSender().equals(myID)) {
-                            chats.add(chat); //add the message to chat
-                        }
-                    }
-                    messageAdapter = new MessageAdapter(chats, imgUrl); //create new adapter with loaded list
-                    recyclerView.setAdapter(messageAdapter);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        listener.changeInChatToolbar(null); //return original toolbar
-        listener.onBackInChat();
-    }
-
-     */
 }

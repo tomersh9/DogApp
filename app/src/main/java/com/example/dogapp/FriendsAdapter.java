@@ -7,7 +7,6 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,21 +17,21 @@ import com.example.dogapp.Enteties.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder> implements Filterable {
+public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserViewHolder> implements Filterable {
 
     private List<User> users;
     private List<User> usersFull;
     private MyUserListener listener;
 
     public interface MyUserListener {
-        void onUserClicked(int pos, View v);
+        void onFriendClicked(int pos, View v);
     }
 
     public void setMyUserListener(MyUserListener listener) {
         this.listener = listener;
     }
 
-    public UsersAdapter(List<User> users) {
+    public FriendsAdapter(List<User> users) {
         this.users = users;
         usersFull = new ArrayList<>(users); //for filtering (copy of list)
     }
@@ -62,7 +61,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
                 public void onClick(View v) {
                     if(listener!=null)
                     {
-                        listener.onUserClicked(getAdapterPosition(),v);
+                        listener.onFriendClicked(getAdapterPosition(),v);
                     }
                 }
             });

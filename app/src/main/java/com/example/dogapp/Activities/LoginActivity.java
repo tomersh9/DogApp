@@ -201,7 +201,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, email, gender, title, location,"uri");
+                    User user = new User(name, date, email, gender, title, location,"uri","id","default");
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {

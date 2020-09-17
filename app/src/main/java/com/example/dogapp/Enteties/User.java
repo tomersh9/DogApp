@@ -2,7 +2,6 @@ package com.example.dogapp.Enteties;
 
 public class User {
 
-    private String id;
     private String fullName;
     private String dateOfBirth;
     private String email;
@@ -10,10 +9,12 @@ public class User {
     private String title;
     private String location;
     private String photoUri;
+    private String id;
+    private String status;
 
     public User() {}
 
-    public User(String fullName, String dateOfBirth, String email, String gender, String title, String location, String photoUri) {
+    public User(String fullName, String dateOfBirth, String email, String gender, String title, String location, String photoUri, String id, String status) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
@@ -21,14 +22,8 @@ public class User {
         this.title = title;
         this.location = location;
         this.photoUri = photoUri;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
         this.id = id;
+        this.status = status;
     }
 
     public String getFullName() {
@@ -85,5 +80,21 @@ public class User {
 
     public void setPhotoUri(String photoUri) {
         this.photoUri = photoUri;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -2,19 +2,15 @@ package com.example.dogapp.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.ImageDecoder;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,21 +21,18 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.User;
-import com.example.dogapp.Fragments.ChatFragment;
+import com.example.dogapp.Fragments.ChatsFragment;
 import com.example.dogapp.Fragments.ExploreFragment;
 import com.example.dogapp.Fragments.FriendsFragment;
 import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.InChatFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
 import com.example.dogapp.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -47,20 +40,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, ChatFragment.OnChatClickListener, InChatFragment.OnInChatListener {
+public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, FriendsFragment.MyFriendsFragmentListener, ChatsFragment.OnChatClickListener {
 
-
-    //User instance
-    User currUser;
+    //Fragments TAGs
+    final String IN_CHAT_FRAGMENT_TAG = "in_chat_fragment_tag";
 
     //UI Layout
     private Toolbar toolbar;
@@ -71,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private CoordinatorLayout coordinatorLayout;
-    private FloatingActionButton fab;
+    //private FloatingActionButton fab;
 
     //drawer header views
     TextView fullNameTv, titleTv, locationTv;
@@ -80,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     //Main Fragments
     private HomeFragment homeFragment;
     private ExploreFragment exploreFragment;
-    private ChatFragment chatFragment;
+    private ChatsFragment chatsFragment;
     private ProfileFragment profileFragment;
 
     //firebase stuff
@@ -128,8 +116,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         navigationView = findViewById(R.id.navigation_view);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
         bottomNavBar = findViewById(R.id.bottom_navbar);
-        fab = findViewById(R.id.fab);
-        //fab.hide();
+       /* fab = findViewById(R.id.fab);
+        fab.hide();*/
 
         //hamburger
         setUpActionBar();
@@ -147,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         //assign fragments
         homeFragment = new HomeFragment();
         exploreFragment = new ExploreFragment();
-        chatFragment = new ChatFragment();
+        chatsFragment = new ChatsFragment();
         profileFragment = new ProfileFragment();
 
         //set on click listeners
@@ -171,18 +159,17 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
         //************* UPDATE USER FIELDS RETROACTIVE TO CREATION IN DATABASE*******************//
         //***************UPDATE DRAWER UI WITH USER FIELDS**************************//
+        //to prevent deleted users create real time things in the table
+        //update photo url field in User class
+        usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
+        //update Unique ID field
+        usersRef.child(fUser.getUid()).child("id").setValue(fUser.getUid());
+
         //get data of current user from firebase and update views
         usersRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-
-                    //to prevent deleted users create real time things in the table
-                    //update photo url field in User class
-                    usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
-                    //update Unique ID field
-                    usersRef.child(fUser.getUid()).child("id").setValue(fUser.getUid());
-
                     //update things from user data
                     User user = dataSnapshot.getValue(User.class);
                     fullNameTv.setText(user.getFullName());
@@ -205,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         }
     }
 
-
     private void setUpActionBar() {
         ActionBar actionBar = getSupportActionBar(); //getting the ToolBar we made
         actionBar.setDisplayHomeAsUpEnabled(true); //setting home button in top left
@@ -226,34 +212,34 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     case R.id.bottom_home:
                         currFragment = homeFragment;
                         toolbar.setTitle(getString(R.string.home));
-                        fab.show();
+                        //fab.show();
                         setSupportActionBar(toolbar);
                         break;
 
                     case R.id.bottom_explore:
                         currFragment = exploreFragment;
                         toolbar.setTitle(getString(R.string.explore));
-                        fab.show();
+                        //fab.show();
                         setSupportActionBar(toolbar);
                         break;
 
                     case R.id.bottom_chat:
-                        currFragment = chatFragment;
+                        currFragment = chatsFragment;
                         toolbar.setTitle(getString(R.string.chats));
-                        fab.hide();
+                        //fab.hide();
                         setSupportActionBar(toolbar);
                         break;
 
                     case R.id.bottom_profile:
                         currFragment = profileFragment;
-                        fab.hide();
+                        //fab.hide();
                         break;
 
                     default:
                         return false;
                 }
+
                 item.setChecked(true);
-                //bottomNavBar.getMenu().setGroupCheckable(0,true,true);
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, currFragment).commit();
                 return true;
             }
@@ -272,15 +258,16 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         break;
 
                     case R.id.item_friends:
-                        toolbar.setTitle("Friends");
+                        toolbar.setTitle(getString(R.string.friends));
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FriendsFragment()).commit();
-                        fab.show();
+                        //fab.show();
                         //bottomNavBar.getMenu().setGroupCheckable(0,false,true);
                         break;
 
                     case R.id.item_sign_out:
                         firebaseAuth.signOut();
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                        setUserStatus(getString(R.string.offline));
+                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                         finish();
                         break;
@@ -303,15 +290,16 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         }
     }
 
-    //*****************FRAGMENTS DATA TRANSFER**************************//
-
-    //get fab to specific fragments
-    public FloatingActionButton getFab() {
-        if (fab != null) {
-            return fab;
+    //close fragments by tag
+    private void closeFragment(String tag) {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            getSupportFragmentManager().popBackStack(); //remove from back stack
         }
-        return null;
     }
+
+    //*****************FRAGMENTS DATA TRANSFER**************************//
 
     //change toolbar for profile fragment
     @Override
@@ -319,15 +307,38 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         setSupportActionBar(toolbar);
     }
 
-    //In Chat Fragment
+    //2 cases to reach chat
     @Override
-    public void onChatClicked(String userID) {
-        InChatFragment inChatFragment = InChatFragment.getInstance(userID);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, inChatFragment).commit();
+    public void onMyFriendClicked(String userID) {
+        Intent intent = new Intent(MainActivity.this, InChatActivity.class);
+        intent.putExtra("userID", userID);
+        startActivity(intent);
     }
 
     @Override
-    public void changeInChatToolbar(Toolbar toolbar) {
-        setSupportActionBar(toolbar);
+    public void onChatClicked(String userID) {
+        Intent intent = new Intent(MainActivity.this, InChatActivity.class);
+        intent.putExtra("userID", userID);
+        startActivity(intent);
+    }
+
+    //*******************UPDATE USERS STATUS************************//
+    private void setUserStatus(String status) {
+        usersRef = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        usersRef.updateChildren(hashMap);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setUserStatus(getString(R.string.online));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        setUserStatus(getString(R.string.offline));
     }
 }

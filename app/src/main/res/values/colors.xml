@@ -7,7 +7,9 @@
     <color name="dark_orange">#E88102</color>
     <color name="darker_orange">#D67600</color>
     <color name="dialog_btn_color">#FAA840</color>
+    <color name="chat_light_orange">#FFE5BE</color>
     <color name="whitish">#F4F4F4</color>
+    <color name="chat_color_box">#E3E3E3</color>
     <color name="nav_bar_item_color">#BCB3B3B3</color>
     <color name="tab_unselected_text">#D8EAE8E8</color>
     <color name="red">#e3342f</color>

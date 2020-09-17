@@ -68,4 +68,12 @@
     <string name="choose_a_new_picture">בחר תמונת פרופיל  חדשה</string>
     <string name="take_a_new_picture">צלם תמונת פרופיל  חדשה</string>
     <string name="failed_upload_image">העלאת התמונה נכשלה</string>
+    <string name="online">מחובר</string>
+    <string name="offline">מנותק</string>
+    <string name="place_holder">שומר מקום</string>
+    <string name="_11_hr">לפני 11 שעות</string>
+    <string name="status_place_holder">זה סטטוס מגניב</string>
+    <string name="_5_comments">5 תגובות</string>
+    <string name="like">לייק</string>
+    <string name="comment">תגובה</string>
 </resources>

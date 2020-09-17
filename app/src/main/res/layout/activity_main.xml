@@ -53,7 +53,7 @@
 
             </com.google.android.material.appbar.AppBarLayout>
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
+          <!--  <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,13 +63,13 @@
                 app:backgroundTint="@color/colorPrimary"
                 app:elevation="5dp"
                 app:maxImageSize="35dp"
-                app:tint="@color/whitish" />
+                app:tint="@color/whitish" />-->
 
             <FrameLayout
                 android:id="@+id/fragment_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"/>
+                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -95,7 +95,6 @@
         app:headerLayout="@layout/header_drawer_layout"
         app:itemIconTint="@null"
         app:menu="@menu/drawer_menu" />
-
 
 
 </androidx.drawerlayout.widget.DrawerLayout>
