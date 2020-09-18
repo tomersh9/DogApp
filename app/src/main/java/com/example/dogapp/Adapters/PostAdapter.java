@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +43,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     String myUid;
 
 
+    public interface OnPostListener {
+        void onCommentClicked();
+        void onLikeClicked();
+    }
+    private OnPostListener listener;
+
+    public void setOnPostListener(OnPostListener listener) {
+        this.listener = listener;
+    }
 
     public PostAdapter(Context context, List<ModelPost> postList) {
         this.context = context;
@@ -84,11 +94,24 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
 
         //Toast.makeText(context, postList.get(position).getuLoc(), Toast.LENGTH_SHORT).show();
 
-
         holder.moreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showMoreOptions(holder.moreBtn, uId, myUid,pId);
+            }
+        });
+
+        holder.commentsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onCommentClicked();
+            }
+        });
+
+        holder.likesLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onLikeClicked();
             }
         });
 
@@ -115,8 +138,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                 {
                     //delete is clicked
                     beginDelete(pId);
-
-
                 }
                 return false;
             }
@@ -170,6 +191,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         ImageView postIv;
         TextView nameTv, timeTv, descTv, likesTv, comTv;
         ImageButton moreBtn;
+        LinearLayout commentsLayout, likesLayout;
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
@@ -181,7 +203,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             likesTv = itemView.findViewById(R.id.tv_likes);
             comTv = itemView.findViewById(R.id.tv_comments);
             moreBtn = itemView.findViewById(R.id.more_btn);
-
+            commentsLayout = itemView.findViewById(R.id.comment_btn_layout);
+            likesLayout = itemView.findViewById(R.id.like_btn_layout);
         }
     }
 }

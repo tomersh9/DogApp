@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -30,7 +31,6 @@ import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class HomeFragment extends Fragment implements PostBottomSheetDialog.PostBottomSheetDialogListener {
+public class HomeFragment extends Fragment implements PostAdapter.OnPostListener {
 
     private FloatingActionButton fab;
 
@@ -63,13 +63,19 @@ public class HomeFragment extends Fragment implements PostBottomSheetDialog.Post
     private ProgressDialog progressDialog;
 
 
-    //post bottom sheet
+    //posts and comments bottom sheet
     private TextInputLayout postEt;
-    private RelativeLayout bottomSheet;
-    private BottomSheetBehavior bottomSheetBehavior;
+    private TextInputLayout commentEt;
+    private RelativeLayout bottomSheetPost;
+    private BottomSheetBehavior bottomSheetPostBehavior;
+    private RelativeLayout bottomSheetComment;
+    private BottomSheetBehavior bottomSheetCommentBehavior;
     private Button postBtn;
-    private ImageButton arrowBtn;
+    private Button commentBtn;
+    private ImageButton arrowPostBtn;
+    private ImageButton arrowCommentBtn;
     private ProgressBar progressBar;
+
 
     @Nullable
     @Override
@@ -86,9 +92,8 @@ public class HomeFragment extends Fragment implements PostBottomSheetDialog.Post
         layoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(layoutManager);
 
-        progressBar = rootView.findViewById(R.id.home_progress_bar);
-
         //init post list
+        progressBar = rootView.findViewById(R.id.home_progress_bar);
         postList = new ArrayList<>();
         loadPosts();
 
@@ -121,21 +126,55 @@ public class HomeFragment extends Fragment implements PostBottomSheetDialog.Post
             }
         });
 
+        //post bottom sheet
         postEt = rootView.findViewById(R.id.post_et);
-        bottomSheet = rootView.findViewById(R.id.bottom_sheet_post);
+        bottomSheetPost = rootView.findViewById(R.id.bottom_sheet_post);
         postBtn = rootView.findViewById(R.id.post_btn);
-        arrowBtn = rootView.findViewById(R.id.arrow_post);
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheetBehavior.setHideable(true);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        arrowPostBtn = rootView.findViewById(R.id.arrow_post);
+        bottomSheetPostBehavior = BottomSheetBehavior.from(bottomSheetPost);
+        bottomSheetPostBehavior.setHideable(true);
+        bottomSheetPostBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
+
+        //comment bottom sheet
+        commentEt = rootView.findViewById(R.id.comment_et);
+        commentBtn = rootView.findViewById(R.id.comment_btn);
+        arrowCommentBtn = rootView.findViewById(R.id.arrow_comment);
+        bottomSheetComment = rootView.findViewById(R.id.bottom_sheet_comment);
+        bottomSheetCommentBehavior = BottomSheetBehavior.from(bottomSheetComment);
+        bottomSheetCommentBehavior.setHideable(true);
+        bottomSheetCommentBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        //add new comment
+        commentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), commentEt.getEditText().getText().toString(), Toast.LENGTH_SHORT).show();
+                commentEt.getEditText().setText("");
+                bottomSheetCommentBehavior.setHideable(true);
+                bottomSheetCommentBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                fab.show();
+            }
+        });
+
+        arrowCommentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetCommentBehavior.setHideable(true);
+                bottomSheetCommentBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                commentEt.getEditText().setText("");
+                fab.show();
+            }
+        });
+
+        //add new post
         fab = rootView.findViewById(R.id.home_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                bottomSheetPostBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 fab.hide();
-                bottomSheetBehavior.setHideable(false);
+                bottomSheetPostBehavior.setHideable(false);
             }
         });
 
@@ -145,23 +184,35 @@ public class HomeFragment extends Fragment implements PostBottomSheetDialog.Post
                 String description = postEt.getEditText().getText().toString();
                 uploadPost(description);
                 postEt.getEditText().setText("");
-                bottomSheetBehavior.setHideable(true);
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                bottomSheetPostBehavior.setHideable(true);
+                bottomSheetPostBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 fab.show();
             }
         });
 
-        arrowBtn.setOnClickListener(new View.OnClickListener() {
+        arrowPostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bottomSheetBehavior.setHideable(true);
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                bottomSheetPostBehavior.setHideable(true);
+                bottomSheetPostBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 postEt.getEditText().setText("");
                 fab.show();
             }
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onCommentClicked() {
+        bottomSheetCommentBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        fab.hide();
+        bottomSheetCommentBehavior.setHideable(false);
+    }
+
+    @Override
+    public void onLikeClicked() {
+        Toast.makeText(getActivity(), "Like!", Toast.LENGTH_SHORT).show();
     }
 
     private void loadPosts()
@@ -176,9 +227,9 @@ public class HomeFragment extends Fragment implements PostBottomSheetDialog.Post
                 {
                     ModelPost modelPost = ds.getValue(ModelPost.class);
                     postList.add(modelPost);
-                    //Toast.makeText(getActivity(), postList.get(0).getuId() + "ZZZZ", Toast.LENGTH_SHORT).show();
 
                     postAdapter = new PostAdapter(getActivity(),postList);
+                    postAdapter.setOnPostListener(HomeFragment.this);
                     recyclerView.setAdapter(postAdapter);
 
                 }
@@ -308,8 +359,4 @@ public class HomeFragment extends Fragment implements PostBottomSheetDialog.Post
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
-    @Override
-    public void onPostClicked() {
-
-    }
 }

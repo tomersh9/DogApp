@@ -36,6 +36,7 @@
             android:layout_height="match_parent"/>
 
         <include layout="@layout/bottom_sheet_add_post" />
+        <include layout="@layout/bottom_sheet_add_comment"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

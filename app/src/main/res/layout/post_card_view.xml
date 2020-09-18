@@ -178,7 +178,6 @@
                 android:clickable="true"
                 android:focusable="true">
 
-
                 <ImageView
                     android:layout_width="18dp"
                     android:layout_height="18dp"

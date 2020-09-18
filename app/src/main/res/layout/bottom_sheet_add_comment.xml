@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/bottom_sheet_post"
+    android:id="@+id/bottom_sheet_comment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_shape"
@@ -10,7 +10,7 @@
     app:layout_behavior="@string/bottom_sheet_behavior">
 
     <ImageButton
-        android:id="@+id/arrow_post"
+        android:id="@+id/arrow_comment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="22dp"
@@ -24,15 +24,66 @@
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:text="Add Comment"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <RelativeLayout
+        android:id="@+id/post_owner_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/comment_tv"
-        android:paddingVertical="5dp"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="7dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/owner_post_img"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/shutterstock_648907024" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/owner_post_img"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/owner_post_name_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="yafa yarkoni"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/owner_post_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="skdnfkafgksbdfgjafnksjdfngjksfdngkjdfg" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="11:55 PM" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bottom_comments_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_owner_layout"
+        android:layout_marginTop="5dp"
         android:paddingHorizontal="15dp"
-        android:id="@+id/bottom_comments_recycler"/>
+        android:paddingVertical="5dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,7 +101,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="what's on your mind?" />
+                android:hint="write comment" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
