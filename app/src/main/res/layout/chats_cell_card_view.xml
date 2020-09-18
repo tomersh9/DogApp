@@ -65,17 +65,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="יפרח מגייף גונסון"
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/chat_cell_msg"
+                android:id="@+id/chat_cell_last_msg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:gravity="center"
-                android:maxLines="1"
-                android:text="סבבה אחפש עוד מעט" />
+                android:maxLines="1" />
 
         </LinearLayout>
 

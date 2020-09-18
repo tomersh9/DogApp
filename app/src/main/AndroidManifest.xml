@@ -11,7 +11,7 @@
         android:icon="@drawable/orange_dog_100"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="false"
+        android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Activities.SplashScreen">
             <intent-filter>

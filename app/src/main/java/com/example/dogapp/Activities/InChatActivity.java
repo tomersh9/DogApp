@@ -18,8 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.Chat;
 import com.example.dogapp.Enteties.User;
-import com.example.dogapp.Fragments.InChatFragment;
-import com.example.dogapp.MessageAdapter;
+import com.example.dogapp.Adapters.MessageAdapter;
 import com.example.dogapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -43,14 +42,15 @@ public class InChatActivity extends AppCompatActivity {
     private EditText messageEt;
 
     //chat messages
-    MessageAdapter messageAdapter;
-    List<Chat> chats;
-    RecyclerView recyclerView;
+    private MessageAdapter messageAdapter;
+    private List<Chat> chats;
+    private RecyclerView recyclerView;
 
     //firebase
     private FirebaseUser fUser;
     private DatabaseReference databaseReference;
     private String userID; //to whom i send messages
+    private ValueEventListener isSeenListener;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -126,6 +126,8 @@ public class InChatActivity extends AppCompatActivity {
 
             }
         });
+        //update if user seen message
+        seenMessage(userID);
     }
 
     private void readMessages(final String myID, final String userID, final String imgUrl) {
@@ -161,15 +163,40 @@ public class InChatActivity extends AppCompatActivity {
         });
     }
 
+    private void seenMessage(final String userID) {
+        databaseReference = FirebaseDatabase.getInstance().getReference("chats");
+        isSeenListener = databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Chat chat = ds.getValue(Chat.class);
+
+                    //if i (fUser) seen the message and the other user (sender) sent me, so iv'e seen it
+                    if (chat.getReceiver().equals(fUser.getUid()) && chat.getSender().equals(userID)) {
+                        Map<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("isSeen", "true");
+                        ds.getRef().updateChildren(hashMap); //update children with field
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     //collect data to send and push to the database in table "chats"
     private void sendMessage(String sender, String receiver, String message) {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-
+        //is seen default to false
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
         hashMap.put("message", message);
+        hashMap.put("isSeen", "false");
         reference.child("chats").push().setValue(hashMap);
 
         //add user to the ChatFragment (new table of "chatList")
@@ -207,5 +234,25 @@ public class InChatActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //setUserStatus(getString(R.string.online));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        databaseReference.removeEventListener(isSeenListener);
+        //setUserStatus(getString(R.string.offline));
+    }
+
+    private void setUserStatus(String status) {
+        databaseReference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        databaseReference.updateChildren(hashMap);
     }
 }

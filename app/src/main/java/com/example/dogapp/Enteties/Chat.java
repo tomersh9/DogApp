@@ -1,14 +1,17 @@
 package com.example.dogapp.Enteties;
 
 public class Chat {
+
     private String sender;
     private String receiver;
     private String message;
+    private String isSeen;
 
-    public Chat(String sender, String receiver, String message) {
+    public Chat(String sender, String receiver, String message, String isSeen) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
+        this.isSeen = isSeen;
     }
 
     public Chat() {
@@ -36,5 +39,13 @@ public class Chat {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getIsSeen() {
+        return isSeen;
+    }
+
+    public void setIsSeen(String isSeen) {
+        this.isSeen = isSeen;
     }
 }

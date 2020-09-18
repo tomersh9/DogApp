@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
 
@@ -23,7 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
-import com.example.dogapp.FriendsAdapter;
+import com.example.dogapp.Adapters.FriendsAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;

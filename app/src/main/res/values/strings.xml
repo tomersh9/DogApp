@@ -74,4 +74,6 @@
     <string name="_5_comments">5 comments</string>
     <string name="like">Like</string>
     <string name="comment">Comment</string>
+    <string name="no_msgs">No messages</string>
+    <string name="sending_email">We\'re sending you an email</string>
 </resources>

@@ -116,8 +116,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         navigationView = findViewById(R.id.navigation_view);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
         bottomNavBar = findViewById(R.id.bottom_navbar);
-       /* fab = findViewById(R.id.fab);
-        fab.hide();*/
 
         //hamburger
         setUpActionBar();

@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.dogapp.ChatUsersAdapter;
+import com.example.dogapp.Adapters.ChatUsersAdapter;
 import com.example.dogapp.Enteties.ChatList;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;

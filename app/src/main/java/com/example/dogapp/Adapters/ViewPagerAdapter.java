@@ -1,21 +1,21 @@
-package com.example.dogapp;
+package com.example.dogapp.Adapters;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class BoardAdapter extends FragmentPagerAdapter {
+public class ViewPagerAdapter extends FragmentPagerAdapter {
 
-    List<Fragment> fragments = new ArrayList<>();
-    List<String> titles = new ArrayList<>();
+    private List<Fragment> fragments = new ArrayList<>();
+    private List<String> titles = new ArrayList<>();
 
-    public BoardAdapter(@NonNull FragmentManager fm, int behavior) {
+    public ViewPagerAdapter(@NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
     }
 
@@ -38,6 +38,6 @@ public class BoardAdapter extends FragmentPagerAdapter {
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
-        return titles.get(position);
+        return titles.get(position); //return current tab title
     }
 }

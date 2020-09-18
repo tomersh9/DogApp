@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -22,8 +23,8 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/post_img"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/post_img"
             android:orientation="vertical">
 
             <TextView
@@ -45,6 +46,14 @@
                 android:textSize="13sp" />
 
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/more_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:background="@null"
+            android:src="@drawable/ic_more_vert_black_24dp" />
 
     </RelativeLayout>
 
@@ -71,8 +80,11 @@
         android:layout_marginEnd="15dp">
 
         <LinearLayout
+            android:id="@+id/tv_likes_layout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageView
                 android:layout_width="15dp"
@@ -83,7 +95,7 @@
                 android:id="@+id/tv_likes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:text="18"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
@@ -92,9 +104,11 @@
 
         <TextView
             android:id="@+id/tv_comments"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:text="@string/_5_comments"
             android:textColor="@color/black"
             android:textSize="13sp" />
@@ -106,10 +120,12 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_below="@id/relative2"
+        android:layout_marginHorizontal="10dp"
         android:layout_marginTop="10dp"
-        android:background="@color/cardview_light_background" />
+        android:background="@android:color/darker_gray" />
 
     <LinearLayout
+        android:id="@+id/like_comm_btns_layout"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_below="@id/im_line">
@@ -120,9 +136,12 @@
             android:layout_weight="1">
 
             <LinearLayout
+                android:id="@+id/like_btn_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true">
+                android:layout_centerInParent="true"
+                android:clickable="true"
+                android:focusable="true">
 
 
                 <ImageView
@@ -135,11 +154,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/like"
                     android:textColor="@color/black"
                     android:textSize="13sp" />
+
             </LinearLayout>
 
 
@@ -151,9 +171,12 @@
             android:layout_weight="1">
 
             <LinearLayout
+                android:id="@+id/comment_btn_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true">
+                android:layout_centerInParent="true"
+                android:clickable="true"
+                android:focusable="true">
 
 
                 <ImageView
@@ -166,17 +189,22 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/comment"
                     android:textColor="@color/black"
                     android:textSize="13sp" />
             </LinearLayout>
 
-
         </RelativeLayout>
 
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/line_2"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_below="@id/like_comm_btns_layout"
+        android:background="@android:color/darker_gray" />
 
 </RelativeLayout>

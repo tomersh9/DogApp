@@ -1,4 +1,4 @@
-package com.example.dogapp;
+package com.example.dogapp.Adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.Chat;
+import com.example.dogapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -36,12 +37,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ChatView
 
         TextView messageTv;
         ImageView userProfileIv;
+        ImageView isSeenIv;
 
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
             //generics views (can be changes to right or left)
             messageTv = itemView.findViewById(R.id.chat_message);
             userProfileIv = itemView.findViewById(R.id.chat_item_profile);
+            isSeenIv = itemView.findViewById(R.id.chat_seen_iv);
         }
     }
 
@@ -68,6 +71,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ChatView
             Glide.with(holder.itemView).load(imgUrl).placeholder(R.drawable.account_icon).into(holder.userProfileIv);
         } catch (Exception ex) {
 
+        }
+
+        //is seen indicator
+        System.out.println(chat.getMessage()+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + chat.getIsSeen());
+        if (chat.getIsSeen().equals("true")) {
+            holder.isSeenIv.setImageResource(R.drawable.blue_vv);
+        } else {
+            holder.isSeenIv.setImageResource(R.drawable.grey_vv);
         }
     }
 

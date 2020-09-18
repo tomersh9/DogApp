@@ -220,7 +220,6 @@ public class SecondRegisterFragment extends Fragment {
         // storage instance///
         myStorageRef = FirebaseStorage.getInstance().getReference("Images");
 
-
         //get user data
         fullName = getArguments().getString("fullName");
         email = getArguments().getString("email");
@@ -230,6 +229,12 @@ public class SecondRegisterFragment extends Fragment {
         //progressBar = rootView.findViewById(R.id.reg_2_progress_bar);
 
         profileBtn = rootView.findViewById(R.id.profile_btn);
+        profileBtn.animate().scaleX(1.3f).scaleY(1.3f).setDuration(1000).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                profileBtn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(700).start();
+            }
+        }).start();
         profileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -246,18 +251,6 @@ public class SecondRegisterFragment extends Fragment {
                 camBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-       /*                 file = new File(Environment.getExternalStorageDirectory(), email);
-
-
-                        if (file != null) {
-
-                            if (Build.VERSION.SDK_INT >= 24) {
-                                fileUri = FileProvider.getUriForFile(getContext(), "com.example.musicplayer.provider", file);
-                            }
-                            else
-                                fileUri = Uri.fromFile(file);
-                        }
-                         have to add FILEPROVIDER*/
                         ContentValues values = new ContentValues();
                         values.put(MediaStore.Images.Media.TITLE, "Picture");
                         values.put(MediaStore.Images.Media.DESCRIPTION, "from");
@@ -331,7 +324,7 @@ public class SecondRegisterFragment extends Fragment {
                         } else {
                             locationEt.setHint(getString(R.string.enter_loc_manual));
                             locationEt.getEditText().setText("");
-                            locationEt.setFocusable(true);
+                            locationEt.getEditText().setFocusable(true);
                         }
 
                     }

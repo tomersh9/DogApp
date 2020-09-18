@@ -2,7 +2,11 @@ package com.example.dogapp.Fragments;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -14,17 +18,19 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.dogapp.Adapters.PostAdapter;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Models.ModelPost;
-import com.example.dogapp.PostAdapter;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,7 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements PostBottomSheetDialog.PostBottomSheetDialogListener {
 
     private FloatingActionButton fab;
 
@@ -58,9 +64,9 @@ public class HomeFragment extends Fragment {
 
 
     //post bottom sheet
+    private TextInputLayout postEt;
     private RelativeLayout bottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;
-    private TextInputLayout postEt;
     private Button postBtn;
     private ImageButton arrowBtn;
     private ProgressBar progressBar;
@@ -69,6 +75,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+        setHasOptionsMenu(true);
 
         View rootView =  inflater.inflate(R.layout.home_fragment,container,false);
 
@@ -88,7 +95,7 @@ public class HomeFragment extends Fragment {
         progressDialog = new ProgressDialog(getContext());
         firebaseAuth = FirebaseAuth.getInstance();
         fUser = firebaseAuth.getCurrentUser();
-        uid = firebaseAuth.getUid();
+        uid = fUser.getUid();
         userDbRef = FirebaseDatabase.getInstance().getReference("users");
 
         userDbRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -96,7 +103,7 @@ public class HomeFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
 
-                    Toast.makeText(getActivity(), "Succeed!!!!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "Succeed!!!!", Toast.LENGTH_SHORT).show();
 
                     //update things from user data
                     User user = dataSnapshot.getValue(User.class);
@@ -114,11 +121,10 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        bottomSheet = rootView.findViewById(R.id.bottom_sheet_post);
         postEt = rootView.findViewById(R.id.post_et);
+        bottomSheet = rootView.findViewById(R.id.bottom_sheet_post);
         postBtn = rootView.findViewById(R.id.post_btn);
         arrowBtn = rootView.findViewById(R.id.arrow_post);
-
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setHideable(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -136,14 +142,11 @@ public class HomeFragment extends Fragment {
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), postEt.getEditText().getText().toString(), Toast.LENGTH_SHORT).show();
                 String description = postEt.getEditText().getText().toString();
                 uploadPost(description);
+                postEt.getEditText().setText("");
                 bottomSheetBehavior.setHideable(true);
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                postEt.getEditText().setText("");
-                //postAdapter.notifyDataSetChanged();
-                Toast.makeText(getActivity(), postList.size() + "", Toast.LENGTH_SHORT).show();
                 fab.show();
             }
         });
@@ -173,6 +176,7 @@ public class HomeFragment extends Fragment {
                 {
                     ModelPost modelPost = ds.getValue(ModelPost.class);
                     postList.add(modelPost);
+                    //Toast.makeText(getActivity(), postList.get(0).getuId() + "ZZZZ", Toast.LENGTH_SHORT).show();
 
                     postAdapter = new PostAdapter(getActivity(),postList);
                     recyclerView.setAdapter(postAdapter);
@@ -188,6 +192,38 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    private void searchPosts(final String searchQuery)
+    {
+        progressBar.setVisibility(View.VISIBLE);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                postList.clear();
+                for(DataSnapshot ds: snapshot.getChildren())
+                {
+                    ModelPost modelPost = ds.getValue(ModelPost.class);
+
+                    if(modelPost.getpDesc().toLowerCase().contains(searchQuery.toLowerCase()))
+                    {
+                        postList.add(modelPost);
+                    }
+
+
+                    postAdapter = new PostAdapter(getActivity(),postList);
+                    recyclerView.setAdapter(postAdapter);
+
+                }
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                progressBar.setVisibility(View.GONE);
+            }
+        });
+
+    }
     private void uploadPost(String description)
     {
         progressDialog.setMessage("Publishing post...");
@@ -199,12 +235,12 @@ public class HomeFragment extends Fragment {
 
         HashMap<Object,String> hashMap = new HashMap<>();
 
-        hashMap.put("uid", uid);
+        hashMap.put("uLoc", location);
         hashMap.put("uName", name);
-        hashMap.put("pid",timeStamp);
+        hashMap.put("pId", timeStamp);
         hashMap.put("pDesc", description);
         hashMap.put("pTime", timeStamp);
-        hashMap.put("uLoc", location);
+        hashMap.put("uId", uid);
         hashMap.put("uPic", firebaseAuth.getCurrentUser().getPhotoUrl().toString());
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
@@ -228,8 +264,52 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.search_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.menu_item_search) {
+            SearchView searchView = (SearchView) item.getActionView();
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query)
+                {
+                    if(!TextUtils.isEmpty(query)) {
+                        searchPosts(query);
+                    }
+                    else {
+                        loadPosts();
+                    }
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    if(!TextUtils.isEmpty(newText)) {
+                        searchPosts(newText);
+                    }
+                    else {
+                        loadPosts();
+                    }
+                    return false;
+                }
+            });
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+    }
+
+    @Override
+    public void onPostClicked() {
+
     }
 }

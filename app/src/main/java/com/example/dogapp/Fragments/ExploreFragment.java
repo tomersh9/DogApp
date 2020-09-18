@@ -1,21 +1,17 @@
 package com.example.dogapp.Fragments;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.dogapp.BoardAdapter;
+import com.example.dogapp.Adapters.BoardAdapter;
 import com.example.dogapp.R;
 import com.google.android.material.tabs.TabLayout;
 

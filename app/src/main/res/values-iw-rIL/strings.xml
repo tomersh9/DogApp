@@ -74,6 +74,8 @@
     <string name="_11_hr">לפני 11 שעות</string>
     <string name="status_place_holder">זה סטטוס מגניב</string>
     <string name="_5_comments">5 תגובות</string>
-    <string name="like">לייק</string>
     <string name="comment">תגובה</string>
+    <string name="no_msgs">אין הודעה</string>
+    <string name="like">אהבתי</string>
+    <string name="sending_email">אנחנו שולחים אליך מייל</string>
 </resources>

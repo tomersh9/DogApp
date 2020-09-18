@@ -284,11 +284,12 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
     @Override
     public void sendEmail(final String emailToSend) {
+        buildLoaderDialog(getString(R.string.sending_email));
         firebaseAuth.sendPasswordResetEmail(emailToSend).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
 
+                if (task.isSuccessful()) {
                     final AlertDialog confirmDialog;
                     View dialogView = getLayoutInflater().inflate(R.layout.success_dialog, null);
                     AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
@@ -321,6 +322,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                         }
                     });
                 }
+                progressDialog.dismiss();
                 closeFragment(FORGOT_PASS_TAG);
             }
         });

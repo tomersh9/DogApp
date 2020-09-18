@@ -6,7 +6,8 @@
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/chat_item_profile"
@@ -21,13 +22,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:background="@drawable/background_chat_right"
             android:padding="8dp"
             android:text="i'm good thanks for asking"
             android:textColor="@color/white"
             android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/chat_seen_iv"
+            android:layout_width="17dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/chat_message"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/grey_vv"
+            android:layout_marginEnd="2dp"/>
     </RelativeLayout>
 
 

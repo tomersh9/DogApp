@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:text="@string/about_you"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
@@ -70,7 +70,8 @@
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_gravity="center"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="10dp"
+                    android:padding="5dp"
                     android:src="@drawable/account_icon" />
 
                 <TextView
@@ -78,7 +79,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="10dp"
                     android:text="@string/select_profile_pic"
                     android:textSize="15sp" />
 
