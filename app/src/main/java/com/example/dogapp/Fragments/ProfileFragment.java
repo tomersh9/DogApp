@@ -12,9 +12,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 //import static com.example.dogapp.Activities.MainActivity.email;
 
@@ -33,7 +35,9 @@ import com.example.dogapp.R;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -50,12 +54,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private float x, y;
-
-    //bottom sheet
-    LinearLayout bottomSheet;
-    BottomSheetBehavior bottomSheetBehavior;
-    //options inside
-    LinearLayout showPic, takePic, selectPic;
 
     //Dialogs
     private AlertDialog alertDialog;
@@ -80,17 +78,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        final View rootView = inflater.inflate(R.layout.profile_fragment, container, false);
-
-        //bottom sheet behavior
-        bottomSheet = rootView.findViewById(R.id.bottom_sheet);
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheetBehavior.setHideable(true);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        //options inside
-        showPic = rootView.findViewById(R.id.select_display);
-        selectPic = rootView.findViewById(R.id.select_choose_pic);
-        takePic = rootView.findViewById(R.id.select_take_pic);
+        View rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
         //profile scaling animations
         profileIv = rootView.findViewById(R.id.profile_frag_iv);
@@ -112,15 +100,28 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         //profile pic click event
         profileIv.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);}
+            public void onClick(View v) {
+                buildProfileSheetDialog();
+            }
         });
 
-        //bottom sheet listeners
+        return rootView;
+    }
+
+    private void buildProfileSheetDialog() {
+
+        final BottomSheetDialog bottomDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+        View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_profile, null);
+
+        LinearLayout showPic, takePic, selectPic;
+        showPic = bottomSheetView.findViewById(R.id.select_display);
+        takePic = bottomSheetView.findViewById(R.id.select_take_pic);
+        selectPic = bottomSheetView.findViewById(R.id.select_choose_pic);
+
         showPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                View dialogView = getLayoutInflater().inflate(R.layout.image_display_dialog,null);
+                View dialogView = getLayoutInflater().inflate(R.layout.image_display_dialog, null);
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 alertDialog = builder.setView(dialogView).show();
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -133,10 +134,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     Glide.with(dialogView).load(fUser.getPhotoUrl()).listener(new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_upload_image,Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_upload_image, Snackbar.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
                             return false;
                         }
+
                         @Override
                         public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                             progressBar.setVisibility(View.GONE);
@@ -147,22 +149,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 } catch (Exception e) {
 
                 }
+                bottomDialog.dismiss();
             }
         });
-        selectPic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //open gallery
-            }
-        });
-        takePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //open camera
-            }
-        });
-
-        return rootView;
+        bottomDialog.setContentView(bottomSheetView);
+        bottomDialog.show();
     }
 
     //profile pic animation transition

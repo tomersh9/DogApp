@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Fragments.ChatsFragment;
+import com.example.dogapp.Fragments.DiscoverFriendsFragment;
 import com.example.dogapp.Fragments.ExploreFragment;
 import com.example.dogapp.Fragments.FriendsFragment;
 import com.example.dogapp.Fragments.HomeFragment;
@@ -33,6 +35,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -45,10 +48,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, FriendsFragment.MyFriendsFragmentListener, ChatsFragment.OnChatClickListener {
-
-    //Fragments TAGs
-    final String IN_CHAT_FRAGMENT_TAG = "in_chat_fragment_tag";
+public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, ChatsFragment.OnChatClickListener {
 
     //UI Layout
     private Toolbar toolbar;
@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private CoordinatorLayout coordinatorLayout;
-    //private FloatingActionButton fab;
 
     //drawer header views
     TextView fullNameTv, titleTv, locationTv;
@@ -210,27 +209,23 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     case R.id.bottom_home:
                         currFragment = homeFragment;
                         toolbar.setTitle(getString(R.string.home));
-                        //fab.show();
                         setSupportActionBar(toolbar);
                         break;
 
                     case R.id.bottom_explore:
                         currFragment = exploreFragment;
                         toolbar.setTitle(getString(R.string.explore));
-                        //fab.show();
                         setSupportActionBar(toolbar);
                         break;
 
                     case R.id.bottom_chat:
                         currFragment = chatsFragment;
                         toolbar.setTitle(getString(R.string.chats));
-                        //fab.hide();
                         setSupportActionBar(toolbar);
                         break;
 
                     case R.id.bottom_profile:
                         currFragment = profileFragment;
-                        //fab.hide();
                         break;
 
                     default:
@@ -238,6 +233,9 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 }
 
                 item.setChecked(true);
+                if (navigationView.getCheckedItem() != null) {
+                    navigationView.getCheckedItem().setChecked(false);
+                }
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, currFragment).commit();
                 return true;
             }
@@ -258,8 +256,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     case R.id.item_friends:
                         toolbar.setTitle(getString(R.string.friends));
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FriendsFragment()).commit();
-                        //fab.show();
-                        //bottomNavBar.getMenu().setGroupCheckable(0,false,true);
                         break;
 
                     case R.id.item_sign_out:
@@ -305,16 +301,29 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         setSupportActionBar(toolbar);
     }
 
-    //2 cases to reach chat
-    @Override
+
+    //*********FRIENDS ADAPTER EVENTS**************//
+    /*@Override
     public void onMyFriendClicked(String userID) {
-        Intent intent = new Intent(MainActivity.this, InChatActivity.class);
-        intent.putExtra("userID", userID);
-        startActivity(intent);
+        //TODO Open profile activity
     }
 
     @Override
+    public void onFriendChatClicked(String userID) {
+    }
+
+    @Override
+    public void onFriendFollowClicked(final String userID) {
+
+    }
+
+    @Override
+    public void onFriendDeleteClicked(final String userID) {
+    }*/
+
+    @Override
     public void onChatClicked(String userID) {
+        //TODO Check first if is in following list, else, notice user if(userID is in list)
         Intent intent = new Intent(MainActivity.this, InChatActivity.class);
         intent.putExtra("userID", userID);
         startActivity(intent);

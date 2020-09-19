@@ -1,6 +1,9 @@
 package com.example.dogapp.Fragments;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -11,19 +14,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.dogapp.Activities.LoginActivity;
 import com.example.dogapp.Adapters.PostAdapter;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Models.ModelPost;
@@ -31,7 +37,9 @@ import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,37 +52,31 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class HomeFragment extends Fragment implements PostAdapter.OnPostListener {
+public class HomeFragment extends Fragment implements PostAdapter.OnPostListener, SwipeRefreshLayout.OnRefreshListener {
 
-    private FloatingActionButton fab;
-
+    //list of posts
     private RecyclerView recyclerView;
     private List<ModelPost> postList;
     private PostAdapter postAdapter;
-
+    private List<String> followingList = new ArrayList<>();
 
     //Firebase
     private FirebaseAuth firebaseAuth;
-    private FirebaseUser fUser;
-    private DatabaseReference userDbRef;
+    private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference userDbRef = FirebaseDatabase.getInstance().getReference("users");
+    private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
+    private DatabaseReference postsRef = FirebaseDatabase.getInstance().getReference("Posts");
 
     private String uid, name, location;
-    private ProgressDialog progressDialog;
-
 
     //posts and comments bottom sheet
-    private TextInputLayout postEt;
-    private TextInputLayout commentEt;
-    private RelativeLayout bottomSheetPost;
-    private BottomSheetBehavior bottomSheetPostBehavior;
-    private RelativeLayout bottomSheetComment;
-    private BottomSheetBehavior bottomSheetCommentBehavior;
-    private Button postBtn;
-    private Button commentBtn;
-    private ImageButton arrowPostBtn;
-    private ImageButton arrowCommentBtn;
+    private CoordinatorLayout coordinatorLayout;
+    private FloatingActionButton fab;
     private ProgressBar progressBar;
+    private AlertDialog progressDialog;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     @Nullable
@@ -83,7 +85,13 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
         setHasOptionsMenu(true);
 
-        View rootView =  inflater.inflate(R.layout.home_fragment,container,false);
+        final View rootView = inflater.inflate(R.layout.home_fragment, container, false);
+
+        //views
+        progressBar = rootView.findViewById(R.id.home_progress_bar);
+        coordinatorLayout = rootView.findViewById(R.id.home_frag_coordinator_layout);
+        swipeRefreshLayout = rootView.findViewById(R.id.home_swiper);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         //init recyclerview
         recyclerView = rootView.findViewById(R.id.home_recycler);
@@ -93,23 +101,16 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         recyclerView.setLayoutManager(layoutManager);
 
         //init post list
-        progressBar = rootView.findViewById(R.id.home_progress_bar);
         postList = new ArrayList<>();
-        loadPosts();
+        //loadPosts();
+        loadFollowing();
 
-        progressDialog = new ProgressDialog(getContext());
-        firebaseAuth = FirebaseAuth.getInstance();
-        fUser = firebaseAuth.getCurrentUser();
+        //get my own details to put on the post
         uid = fUser.getUid();
-        userDbRef = FirebaseDatabase.getInstance().getReference("users");
-
         userDbRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-
-                    //Toast.makeText(getActivity(), "Succeed!!!!", Toast.LENGTH_SHORT).show();
-
                     //update things from user data
                     User user = dataSnapshot.getValue(User.class);
                     name = user.getFullName();
@@ -126,144 +127,134 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
             }
         });
 
-        //post bottom sheet
-        postEt = rootView.findViewById(R.id.post_et);
-        bottomSheetPost = rootView.findViewById(R.id.bottom_sheet_post);
-        postBtn = rootView.findViewById(R.id.post_btn);
-        arrowPostBtn = rootView.findViewById(R.id.arrow_post);
-        bottomSheetPostBehavior = BottomSheetBehavior.from(bottomSheetPost);
-        bottomSheetPostBehavior.setHideable(true);
-        bottomSheetPostBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-
-
-        //comment bottom sheet
-        commentEt = rootView.findViewById(R.id.comment_et);
-        commentBtn = rootView.findViewById(R.id.comment_btn);
-        arrowCommentBtn = rootView.findViewById(R.id.arrow_comment);
-        bottomSheetComment = rootView.findViewById(R.id.bottom_sheet_comment);
-        bottomSheetCommentBehavior = BottomSheetBehavior.from(bottomSheetComment);
-        bottomSheetCommentBehavior.setHideable(true);
-        bottomSheetCommentBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-
-        //add new comment
-        commentBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getActivity(), commentEt.getEditText().getText().toString(), Toast.LENGTH_SHORT).show();
-                commentEt.getEditText().setText("");
-                bottomSheetCommentBehavior.setHideable(true);
-                bottomSheetCommentBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                fab.show();
-            }
-        });
-
-        arrowCommentBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bottomSheetCommentBehavior.setHideable(true);
-                bottomSheetCommentBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                commentEt.getEditText().setText("");
-                fab.show();
-            }
-        });
-
-        //add new post
+        //******************ADD NEW POST BUTTONS****************************//
         fab = rootView.findViewById(R.id.home_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bottomSheetPostBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                fab.hide();
-                bottomSheetPostBehavior.setHideable(false);
-            }
-        });
-
-        postBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String description = postEt.getEditText().getText().toString();
-                uploadPost(description);
-                postEt.getEditText().setText("");
-                bottomSheetPostBehavior.setHideable(true);
-                bottomSheetPostBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                fab.show();
-            }
-        });
-
-        arrowPostBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bottomSheetPostBehavior.setHideable(true);
-                bottomSheetPostBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                postEt.getEditText().setText("");
-                fab.show();
+                buildPostSheetDialog();
             }
         });
 
         return rootView;
     }
 
+    private void buildPostSheetDialog() {
+
+        final BottomSheetDialog dialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+        View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_add_post, null);
+
+        final TextInputLayout postEt = bottomSheetView.findViewById(R.id.post_et);
+        Button postBtn = bottomSheetView.findViewById(R.id.post_btn);
+        postBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String description = postEt.getEditText().getText().toString();
+                uploadPost(description);
+                postEt.getEditText().setText("");
+                dialog.dismiss();
+            }
+        });
+        dialog.setContentView(bottomSheetView);
+        dialog.show();
+    }
+
     @Override
     public void onCommentClicked() {
-        bottomSheetCommentBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        fab.hide();
-        bottomSheetCommentBehavior.setHideable(false);
+        buildCommentSheetDialog();
+    }
+
+    private void buildCommentSheetDialog() {
+        final BottomSheetDialog dialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+        View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_add_comment, null);
+
+        final TextInputLayout commentEt = bottomSheetView.findViewById(R.id.comment_et);
+        Button commentBtn = bottomSheetView.findViewById(R.id.comment_btn);
+        commentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), commentEt.getEditText().getText().toString(), Toast.LENGTH_SHORT).show();
+                commentEt.getEditText().setText("");
+                dialog.dismiss();
+            }
+        });
+        dialog.setContentView(bottomSheetView);
+        dialog.show();
     }
 
     @Override
     public void onLikeClicked() {
-        Toast.makeText(getActivity(), "Like!", Toast.LENGTH_SHORT).show();
     }
 
-    private void loadPosts()
-    {
+    //get all of your followers
+    private void loadFollowing() {
         progressBar.setVisibility(View.VISIBLE);
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
-        ref.addValueEventListener(new ValueEventListener() {
+        followingRef.child(fUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                postList.clear();
-                for(DataSnapshot ds: snapshot.getChildren())
-                {
-                    ModelPost modelPost = ds.getValue(ModelPost.class);
-                    postList.add(modelPost);
-
-                    postAdapter = new PostAdapter(getActivity(),postList);
-                    postAdapter.setOnPostListener(HomeFragment.this);
-                    recyclerView.setAdapter(postAdapter);
-
+                if (snapshot.exists()) {
+                    followingList.clear();
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        followingList.add(ds.getValue(String.class));
+                    }
                 }
-                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                progressBar.setVisibility(View.GONE);
+
             }
         });
+        loadPosts();
     }
 
-    private void searchPosts(final String searchQuery)
-    {
-        progressBar.setVisibility(View.VISIBLE);
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
-        ref.addValueEventListener(new ValueEventListener() {
+    //load posts of your followers
+    private void loadPosts() {
+        postsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 postList.clear();
-                for(DataSnapshot ds: snapshot.getChildren())
-                {
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     ModelPost modelPost = ds.getValue(ModelPost.class);
-
-                    if(modelPost.getpDesc().toLowerCase().contains(searchQuery.toLowerCase()))
-                    {
+                    if (followingList.contains(modelPost.getuId()) || modelPost.getuId().equals(fUser.getUid())) {
                         postList.add(modelPost);
                     }
-
-
-                    postAdapter = new PostAdapter(getActivity(),postList);
+                    postAdapter = new PostAdapter(getActivity(), postList);
+                    postAdapter.setOnPostListener(HomeFragment.this);
                     recyclerView.setAdapter(postAdapter);
+                }
+                progressBar.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                progressBar.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    @Override
+    public void onRefresh() {
+        loadFollowing();
+    }
+
+    private void searchPosts(final String searchQuery) {
+        progressBar.setVisibility(View.VISIBLE);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                postList.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    ModelPost modelPost = ds.getValue(ModelPost.class);
+
+                    if (modelPost.getpDesc().toLowerCase().contains(searchQuery.toLowerCase())) {
+                        postList.add(modelPost);
+                    }
+                    postAdapter = new PostAdapter(getActivity(), postList);
+                    recyclerView.setAdapter(postAdapter);
                 }
                 progressBar.setVisibility(View.GONE);
             }
@@ -275,16 +266,16 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         });
 
     }
-    private void uploadPost(String description)
-    {
-        progressDialog.setMessage("Publishing post...");
-        progressDialog.show();
+
+    private void uploadPost(String description) {
+
+        buildLoaderDialog(getString(R.string.upload_post));
 
         String timeStamp = String.valueOf(System.currentTimeMillis());
 
         String filePathAndName = "Posts/" + "post_" + timeStamp;
 
-        HashMap<Object,String> hashMap = new HashMap<>();
+        HashMap<Object, String> hashMap = new HashMap<>();
 
         hashMap.put("uLoc", location);
         hashMap.put("uName", name);
@@ -292,7 +283,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         hashMap.put("pDesc", description);
         hashMap.put("pTime", timeStamp);
         hashMap.put("uId", uid);
-        hashMap.put("uPic", firebaseAuth.getCurrentUser().getPhotoUrl().toString());
+        hashMap.put("uPic", fUser.getPhotoUrl().toString());
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
         ref.child(timeStamp).setValue(hashMap)
@@ -300,9 +291,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     @Override
                     public void onSuccess(Void aVoid) {
                         progressDialog.dismiss();
-                        Toast.makeText(getActivity(), "Post Published", Toast.LENGTH_SHORT).show();
-
-
+                        Snackbar.make(coordinatorLayout, R.string.post_published, Snackbar.LENGTH_SHORT).show();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -312,6 +301,16 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
             }
         });
+    }
+
+    private void buildLoaderDialog(String body) {
+        final View dialogView;
+        final AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
+        dialogView = getLayoutInflater().inflate(R.layout.loader_dialog, null);
+        TextView bodyTv = dialogView.findViewById(R.id.loader_tv);
+        bodyTv.setText(body);
+        progressDialog = builder1.setView(dialogView).setCancelable(false).show();
+        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
     @Override
@@ -327,12 +326,10 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
             SearchView searchView = (SearchView) item.getActionView();
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
-                public boolean onQueryTextSubmit(String query)
-                {
-                    if(!TextUtils.isEmpty(query)) {
+                public boolean onQueryTextSubmit(String query) {
+                    if (!TextUtils.isEmpty(query)) {
                         searchPosts(query);
-                    }
-                    else {
+                    } else {
                         loadPosts();
                     }
                     return false;
@@ -340,10 +337,9 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
-                    if(!TextUtils.isEmpty(newText)) {
+                    if (!TextUtils.isEmpty(newText)) {
                         searchPosts(newText);
-                    }
-                    else {
+                    } else {
                         loadPosts();
                     }
                     return false;
@@ -358,5 +354,4 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         super.onDestroyView();
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
-
 }

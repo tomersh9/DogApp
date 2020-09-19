@@ -5,28 +5,20 @@
     android:background="@color/nav_bar_item_color">
 
     <ProgressBar
-        android:id="@+id/friends_fragment_progress_bar"
+        android:id="@+id/discover_friends_progress_bar"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerInParent="true"
         android:indeterminateTint="@color/colorPrimary"
         android:visibility="gone" />
 
-    <!--<TextView
-        android:id="@+id/no_friends_msg_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="No current friends"
-        android:textSize="40sp" />-->
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/friends_swiper"
+        android:id="@+id/discover_friends_swiper"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/friends_recycler"
+            android:id="@+id/discover_friends_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

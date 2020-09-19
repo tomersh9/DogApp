@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,28 +24,38 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
     private List<User> users;
     private List<User> usersFull;
     private MyUserListener listener;
+    private boolean isMyFriend;
 
     public interface MyUserListener {
         void onFriendClicked(int pos, View v);
+
+        void onFriendChatClicked(int pos, View v);
+
+        void onFriendFollowClicked(int pos, View v);
+
+        void onFriendDeleteClicked(int pos, View v);
     }
 
     public void setMyUserListener(MyUserListener listener) {
         this.listener = listener;
     }
 
-    public FriendsAdapter(List<User> users) {
+    public FriendsAdapter(List<User> users, boolean isMyFriend) {
         this.users = users;
+        this.isMyFriend = isMyFriend;
         usersFull = new ArrayList<>(users); //for filtering (copy of list)
     }
 
     //inner class
-    public class UserViewHolder extends RecyclerView.ViewHolder
-    {
+    public class UserViewHolder extends RecyclerView.ViewHolder {
         TextView usernameTv;
         TextView typeTv;
         TextView ageGenderTv;
         TextView locationTv;
         ImageView profileIv;
+        ImageButton followBtn;
+        ImageButton chatBtn;
+        ImageView deleteBtn;
 
         //constructor
         public UserViewHolder(@NonNull View itemView) {
@@ -55,17 +66,45 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
             ageGenderTv = itemView.findViewById(R.id.friend_cell_age_gender);
             locationTv = itemView.findViewById(R.id.friend_cell_location);
             profileIv = itemView.findViewById(R.id.friend_cell_img);
+            followBtn = itemView.findViewById(R.id.friend_cell_add_btn);
+            chatBtn = itemView.findViewById(R.id.friend_cell_chat_btn);
+            deleteBtn = itemView.findViewById(R.id.friend_cell_delete_btn);
 
             //on on cell click event
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(listener!=null)
-                    {
-                        listener.onFriendClicked(getAdapterPosition(),v);
+                    if (listener != null) {
+                        listener.onFriendClicked(getAdapterPosition(), v);
                     }
                 }
             });
+
+            chatBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.onFriendChatClicked(getAdapterPosition(), v);
+                    }
+                }
+            });
+
+            if (isMyFriend) {
+                deleteBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onFriendDeleteClicked(getAdapterPosition(), v);
+                    }
+                });
+            } else {
+                followBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onFriendFollowClicked(getAdapterPosition(), v);
+                        followBtn.setImageResource(R.drawable.friend_checked);
+                    }
+                });
+            }
         }
     }
 
@@ -73,9 +112,15 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_card_view,parent,false);
-        UserViewHolder userViewHolder = new UserViewHolder(view);
-        return userViewHolder;
+        if (!isMyFriend) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_card_view, parent, false);
+            UserViewHolder userViewHolder = new UserViewHolder(view);
+            return userViewHolder;
+        } else {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.following_card_view, parent, false);
+            UserViewHolder userViewHolder = new UserViewHolder(view);
+            return userViewHolder;
+        }
     }
 
     @Override
@@ -109,13 +154,12 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
             List<User> filteredList = new ArrayList<>(); //only filtered items
 
             System.out.println(usersFull.toString() + " !!!!!!!!!!!!!!!");
-            if(constraint == null || constraint.length() == 0) {
+            if (constraint == null || constraint.length() == 0) {
                 filteredList.addAll(usersFull); //return full list if has no filter!
-            }
-            else {
+            } else {
                 String filterPattern = constraint.toString().toLowerCase().trim(); //the filter
                 for (User user : usersFull) { //adding matching items to the filtered list
-                    if(user.getFullName().toLowerCase().contains(filterPattern)) {
+                    if (user.getFullName().toLowerCase().contains(filterPattern)) {
                         filteredList.add(user);
                     }
                 }
@@ -129,7 +173,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         @Override //publish results on the UI
         protected void publishResults(CharSequence constraint, FilterResults results) {
             users.clear();
-            users.addAll((List)results.values); //changing original list
+            users.addAll((List) results.values); //changing original list
             notifyDataSetChanged();
         }
     };

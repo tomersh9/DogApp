@@ -40,6 +40,7 @@ public class InChatActivity extends AppCompatActivity {
     private TextView usernameTv;
     private ImageButton sendBtn;
     private EditText messageEt;
+    private TextView statusTv;
 
     //chat messages
     private MessageAdapter messageAdapter;
@@ -75,6 +76,7 @@ public class InChatActivity extends AppCompatActivity {
         usernameTv = findViewById(R.id.in_chat_username);
         messageEt = findViewById(R.id.in_chat_et);
         sendBtn = findViewById(R.id.chat_send_btn);
+        statusTv = findViewById(R.id.in_chat_status_tv);
 
         //init recyclerview
         recyclerView = findViewById(R.id.in_chat_recycler_view);
@@ -239,7 +241,7 @@ public class InChatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //setUserStatus(getString(R.string.online));
+        setUserStatus(getString(R.string.online));
     }
 
     @Override

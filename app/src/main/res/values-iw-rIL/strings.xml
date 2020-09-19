@@ -56,7 +56,7 @@
     <string name="loggin_in">מבצע התחברות</string>
     <string name="create_new_acc">יוצר משתמש חדש</string>
     <string name="fetch_location">מביאים את המיקום שלך</string>
-    <string name="invalid_email">כתובת אימייל לא נכונה</string>
+    <string name="invalid_email">כתובת המייל לא נמצאה</string>
     <string name="login_failed">ההתחברות נכשלה</string>
     <string name="email_sent">המייל נשלח!</string>
     <string name="welcome">ברוכים הבאים</string>
@@ -78,4 +78,17 @@
     <string name="no_msgs">אין הודעה</string>
     <string name="like">אהבתי</string>
     <string name="sending_email">אנחנו שולחים אליך מייל</string>
+    <string name="delete_post">מחק פוסט</string>
+    <string name="upload_post">מעלים את הפוסט שלך</string>
+    <string name="post_published">הפוסט פורסם</string>
+    <string name="add_a_comment">הוסף תגובה</string>
+    <string name="write_a_comment">כתוב תגובה</string>
+    <string name="commit">הגב</string>
+    <string name="post">פרסם</string>
+    <string name="publish_new_post">פרסם פוסט חדש</string>
+    <string name="what_s_on_your_mind">על מה אתה חושב?</string>
+    <string name="choose_action">בחר פעולה</string>
+    <string name="discover_friends">גלה חברים חדשים</string>
+    <string name="unfollow_from">הסרת עוקב מ</string>
+    <string name="you_now_follow">אתה כעת עוקב אחר</string>
 </resources>

@@ -25,7 +25,7 @@
                 android:layout_marginStart="10dp"
                 android:gravity="start"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="18sp"/>
 
 
             <de.hdodenhof.circleimageview.CircleImageView
@@ -33,6 +33,12 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="20dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:id="@+id/in_chat_status_tv"/>
 
         </androidx.appcompat.widget.Toolbar>
 
@@ -76,7 +82,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="10dp"
-            android:background="@null"
+            android:background="?attr/selectableItemBackground"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_send_black_24dp"
             android:tint="@color/colorPrimary" />

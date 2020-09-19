@@ -80,13 +80,14 @@
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:id="@+id/friend_cell_add_btn"
+                    android:id="@+id/friend_cell_delete_btn"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
                     android:layout_weight="1"
                     android:background="?attr/selectableItemBackground"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/add_friend_selector" />
+                    android:src="@drawable/ic_delete_black_24dp"
+                    android:tint="@color/red" />
 
                 <ImageButton
                     android:id="@+id/friend_cell_chat_btn"

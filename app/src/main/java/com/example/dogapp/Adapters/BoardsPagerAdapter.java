@@ -10,12 +10,12 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BoardAdapter extends FragmentPagerAdapter {
+public class BoardsPagerAdapter extends FragmentPagerAdapter {
 
     List<Fragment> fragments = new ArrayList<>();
     List<String> titles = new ArrayList<>();
 
-    public BoardAdapter(@NonNull FragmentManager fm, int behavior) {
+    public BoardsPagerAdapter(@NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
     }
 

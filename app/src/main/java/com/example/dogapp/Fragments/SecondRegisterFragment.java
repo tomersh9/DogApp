@@ -217,7 +217,7 @@ public class SecondRegisterFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.register_fragment_layout_2, container, false);
 
-        // storage instance///
+        // storage instance
         myStorageRef = FirebaseStorage.getInstance().getReference("Images");
 
         //get user data
@@ -229,10 +229,10 @@ public class SecondRegisterFragment extends Fragment {
         //progressBar = rootView.findViewById(R.id.reg_2_progress_bar);
 
         profileBtn = rootView.findViewById(R.id.profile_btn);
-        profileBtn.animate().scaleX(1.3f).scaleY(1.3f).setDuration(1000).withEndAction(new Runnable() {
+        profileBtn.animate().scaleX(1.3f).scaleY(1.3f).setDuration(500).withEndAction(new Runnable() {
             @Override
             public void run() {
-                profileBtn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(700).start();
+                profileBtn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(500).start();
             }
         }).start();
         profileBtn.setOnClickListener(new View.OnClickListener() {

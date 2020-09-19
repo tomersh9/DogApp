@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.dogapp.R;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class PostBottomSheetDialog extends BottomSheetDialogFragment {
@@ -21,6 +22,8 @@ public class PostBottomSheetDialog extends BottomSheetDialogFragment {
     }
 
     private PostBottomSheetDialogListener listener;
+
+    public PostBottomSheetDialog() {} //empty ctor
 
     @Override
     public void onAttach(@NonNull Context context) {

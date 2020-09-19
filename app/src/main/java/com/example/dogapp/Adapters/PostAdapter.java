@@ -45,8 +45,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
 
     public interface OnPostListener {
         void onCommentClicked();
+
         void onLikeClicked();
     }
+
     private OnPostListener listener;
 
     public void setOnPostListener(OnPostListener listener) {
@@ -63,7 +65,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(context).inflate(R.layout.post_card_view,parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.post_card_view, parent, false);
         return new MyHolder(view);
     }
 
@@ -86,18 +88,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         holder.nameTv.setText(uName);
         holder.timeTv.setText(pTime);
         holder.descTv.setText(pDesc);
-        //holder.postIv.setImageURI(Uri.parse(uPic));
         Glide.with(holder.itemView).asBitmap().load(Uri.parse(uPic)).placeholder(R.drawable.account_icon).into(holder.postIv);
-        //holder.likesTv.setText(pLikes);
-        //holder.comTv.setText(pCom);
-        //holder.locTv.setText(pLoc);
-
-        //Toast.makeText(context, postList.get(position).getuLoc(), Toast.LENGTH_SHORT).show();
 
         holder.moreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showMoreOptions(holder.moreBtn, uId, myUid,pId);
+                showMoreOptions(holder.moreBtn, uId, myUid, pId);
             }
         });
 
@@ -117,25 +113,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
 
     }
 
-    private void showMoreOptions(ImageButton moreBtn, String uId, String myUid, final String pId)
-    {
-        PopupMenu popupMenu = new PopupMenu(context,moreBtn, Gravity.END);
+    private void showMoreOptions(ImageButton moreBtn, String uId, String myUid, final String pId) {
+        PopupMenu popupMenu = new PopupMenu(context, moreBtn, Gravity.END);
 
         //show delete option only in the posts of the current user
-        if(uId.equals(myUid))
-        {
+        if (uId.equals(myUid)) {
             // adding items in the menu
-            popupMenu.getMenu().add(Menu.NONE,0,0,"Delete");
+            popupMenu.getMenu().add(Menu.NONE, 0, 0, R.string.delete_post);
         }
-
 
         //item click listener
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 int id = item.getItemId();
-                if (id == 0)
-                {
+                if (id == 0) {
                     //delete is clicked
                     beginDelete(pId);
                 }
@@ -157,9 +149,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Toast.makeText(context, pId, Toast.LENGTH_SHORT).show();
 
-                for(DataSnapshot ds : snapshot.getChildren())
-                {
-                    if(ds.child("pId").getValue() == pId)
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    if (ds.child("pId").getValue() == pId)
                         ds.getRef().removeValue();
                     //Toast.makeText(context, ds.child("pId").getValue() + "", Toast.LENGTH_SHORT).show();
                     //if(ds.child("pId").getKey() == pId)
@@ -185,8 +176,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         return postList.size();
     }
 
-    class MyHolder extends RecyclerView.ViewHolder
-    {
+    class MyHolder extends RecyclerView.ViewHolder {
 
         ImageView postIv;
         TextView nameTv, timeTv, descTv, likesTv, comTv;

@@ -52,7 +52,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:background="@null"
+            android:background="?attr/selectableItemBackground"
+            android:tint="@color/more_options"
             android:src="@drawable/ic_more_vert_black_24dp" />
 
     </RelativeLayout>
@@ -104,11 +105,11 @@
 
         <TextView
             android:id="@+id/tv_comments"
-            android:clickable="true"
-            android:focusable="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:clickable="true"
+            android:focusable="true"
             android:text="@string/_5_comments"
             android:textColor="@color/black"
             android:textSize="13sp" />
@@ -137,9 +138,11 @@
 
             <LinearLayout
                 android:id="@+id/like_btn_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_centerInParent="true"
+                android:gravity="center"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true">
 
@@ -172,9 +175,11 @@
 
             <LinearLayout
                 android:id="@+id/comment_btn_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_centerInParent="true"
+                android:gravity="center"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true">
 

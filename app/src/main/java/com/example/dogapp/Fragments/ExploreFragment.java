@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.dogapp.Adapters.BoardAdapter;
+import com.example.dogapp.Adapters.BoardsPagerAdapter;
 import com.example.dogapp.R;
 import com.google.android.material.tabs.TabLayout;
 
@@ -35,12 +35,12 @@ public class ExploreFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         //setting pager and adapter
-        BoardAdapter boardAdapter = new BoardAdapter(getChildFragmentManager(),0);
-        AdoptBoardFragment adoptBoardFragment = new AdoptBoardFragment();
+        BoardsPagerAdapter boardsPagerAdapter = new BoardsPagerAdapter(getChildFragmentManager(),0);
+        DiscoverFriendsFragment discoverFriendsFragment = new DiscoverFriendsFragment();
         WalkerBoardFragment walkerBoardFragment = new WalkerBoardFragment();
-        boardAdapter.addFragment(adoptBoardFragment,getString(R.string.adopt_board));
-        boardAdapter.addFragment(walkerBoardFragment,getString(R.string.dog_walkers));
-        viewPager.setAdapter(boardAdapter);
+        boardsPagerAdapter.addFragment(discoverFriendsFragment,getString(R.string.discover_friends));
+        boardsPagerAdapter.addFragment(walkerBoardFragment,getString(R.string.dog_walkers));
+        viewPager.setAdapter(boardsPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
     }
 

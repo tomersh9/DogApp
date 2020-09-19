@@ -1,6 +1,5 @@
 package com.example.dogapp.Fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,24 +9,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.appcompat.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.dogapp.Activities.InChatActivity;
-import com.example.dogapp.Activities.MainActivity;
+import com.example.dogapp.Adapters.FriendsAdapter;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
-import com.example.dogapp.Adapters.FriendsAdapter;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -40,8 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
-
+public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
     //List
     private RecyclerView recyclerView;
     private FriendsAdapter adapter;
@@ -57,6 +51,25 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserLi
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    /*public interface DiscoverFriendsListener {
+        void onMyFriendClicked(String userID);
+
+        void onFriendChatClicked(String userID);
+
+        void onFriendFollowClicked(String userID);
+    }
+
+    private DiscoverFriendsListener listener;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            listener = (DiscoverFriendsListener) context;
+        } catch (ClassCastException ex) {
+            throw new ClassCastException("Must implement DiscoverFriendsListener");
+        }
+    }*/
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,31 +77,29 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserLi
         setHasOptionsMenu(true);
     }
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
-        View rootView = inflater.inflate(R.layout.friends_fragment_layout, container, false);
-
-        progressBar = rootView.findViewById(R.id.friends_fragment_progress_bar);
-        swipeRefreshLayout = rootView.findViewById(R.id.friends_swiper);
+        View rootView = inflater.inflate(R.layout.discover_friends_fragment_layout, container, false);
+        progressBar = rootView.findViewById(R.id.discover_friends_progress_bar);
+        swipeRefreshLayout = rootView.findViewById(R.id.discover_friends_swiper);
         swipeRefreshLayout.setOnRefreshListener(this);
 
         //init recyclerview
-        recyclerView = rootView.findViewById(R.id.friends_recycler);
+        recyclerView = rootView.findViewById(R.id.discover_friends_recycler);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         //init friends list
         users = new ArrayList<>();
-        getAllFollowing(); //get all users and create the adapter and assign to recyclerview
+        getFollowingList(); //get all users and create the adapter and assign to recyclerview
 
         return rootView;
     }
 
-    private void getAllFollowing() {
+    private void getFollowingList() {
         progressBar.setVisibility(View.VISIBLE);
 
         followingRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -109,7 +120,7 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserLi
     }
 
     private void getUsers() {
-
+        //get all data from path
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -117,16 +128,17 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserLi
                 if (snapshot.exists()) {
                     for (DataSnapshot ds : snapshot.getChildren()) {
                         User user = ds.getValue(User.class);
-                        if (followingList.contains(user.getId())) {
+                        //get all users except the logged in (you)
+                        if (!followingList.contains(user.getId()) && !fUser.getUid().equals(user.getId())) {
                             users.add(user);
                         }
                     }
                     //adapter
-                    adapter = new FriendsAdapter(users, true);
+                    adapter = new FriendsAdapter(users, false);
                     //set adapter to recyclerview
                     recyclerView.setAdapter(adapter);
                     //adapter click events
-                    adapter.setMyUserListener(FriendsFragment.this);
+                    adapter.setMyUserListener(DiscoverFriendsFragment.this);
                     adapter.notifyDataSetChanged();
                 }
                 progressBar.setVisibility(View.GONE);
@@ -136,12 +148,11 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserLi
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
 
-    //Adapter events to handle outside
+    //*************ADAPTER EVENTS***************//
     @Override
     public void onFriendClicked(int pos, View v) {
         //go to profile (activity)
@@ -157,19 +168,19 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserLi
 
     @Override
     public void onFriendFollowClicked(int pos, View v) {
-        //nothing
-    }
-
-    @Override
-    public void onFriendDeleteClicked(int pos, View v) {
-        //remove from following list
-        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.unfollow_from) + " " + users.get(pos).getFullName(), Snackbar.LENGTH_SHORT).show();
-        followingList.remove(users.get(pos).getId());
+        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout),getString(R.string.you_now_follow) + " " + users.get(pos).getFullName(),Snackbar.LENGTH_SHORT).show();
+        followingList.add(users.get(pos).getId());
         users.remove(pos);
         adapter.notifyItemRemoved(pos);
         followingRef.child(fUser.getUid()).setValue(followingList);
     }
 
+    @Override
+    public void onFriendDeleteClicked(int pos, View v) {
+        //nothing
+    }
+
+    //*************OPTIONS MENU**********************//
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -205,6 +216,7 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserLi
 
     @Override
     public void onRefresh() {
-        getAllFollowing();
+        getFollowingList();
     }
+
 }

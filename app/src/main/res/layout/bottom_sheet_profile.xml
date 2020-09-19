@@ -1,91 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_shape"
-    android:orientation="vertical"
-    android:paddingVertical="30dp"
     app:behavior_hideable="true"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
-    <LinearLayout
-        android:id="@+id/select_display"
+    <ImageView
+        android:id="@+id/profile_sheet_thumb"
+        android:layout_width="50dp"
+        android:layout_height="5dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/sheet_thumb_shape" />
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:orientation="horizontal">
+        android:layout_below="@id/profile_sheet_thumb"
+        android:paddingVertical="30dp">
 
-        <ImageView
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/select_display"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingVertical="15dp"
-            android:src="@drawable/ic_person_black_24dp"
-            android:tint="@color/nav_bar_item_color" />
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="0dp"
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_person_black_24dp"
+                android:tint="@color/nav_bar_item_color" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="4"
+                android:text="@string/display_profile_picture"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/select_take_pic"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="4"
-            android:text="@string/display_profile_picture"
-            android:textSize="17sp" />
-    </LinearLayout>
+            android:layout_below="@id/select_display"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/select_take_pic"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:orientation="horizontal">
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_camera_alt_black_24dp"
+                android:tint="@color/nav_bar_item_color" />
 
-        <ImageView
-            android:layout_width="0dp"
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="4"
+                android:text="@string/take_a_new_picture"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/select_choose_pic"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingVertical="15dp"
-            android:src="@drawable/ic_camera_alt_black_24dp"
-            android:tint="@color/nav_bar_item_color" />
+            android:layout_below="@id/select_take_pic"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="4"
-            android:text="@string/take_a_new_picture"
-            android:textSize="17sp" />
-    </LinearLayout>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingVertical="15dp"
+                android:src="@drawable/ic_photo_black_24dp"
+                android:tint="@color/nav_bar_item_color" />
 
-    <LinearLayout
-        android:id="@+id/select_choose_pic"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingVertical="15dp"
-            android:src="@drawable/ic_photo_black_24dp"
-            android:tint="@color/nav_bar_item_color" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="4"
-            android:text="@string/choose_a_new_picture"
-            android:textSize="17sp" />
-    </LinearLayout>
-
-</LinearLayout>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="4"
+                android:text="@string/choose_a_new_picture"
+                android:textSize="17sp" />
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

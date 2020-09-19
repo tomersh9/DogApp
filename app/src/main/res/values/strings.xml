@@ -43,7 +43,7 @@
     <string name="success">Success!</string>
     <string name="close">Close</string>
     <string name="failed">Failed!</string>
-    <string name="invalid_email">Invalid email adress</string>
+    <string name="invalid_email">Email address not found</string>
     <string name="went_wrong">Something went wrong</string>
     <string name="try_again">Please try again</string>
     <string name="at_least_six">At least 6 characters</string>
@@ -55,7 +55,7 @@
     <string name="dog_walkers">Dog Walkers</string>
     <string name="loggin_in">Logging in</string>
     <string name="create_new_acc">Creating new account</string>
-    <string name="fetch_location">Fetching you location</string>
+    <string name="fetch_location">Fetching your location</string>
     <string name="login_failed">Login failed</string>
     <string name="email_sent">Email sent!</string>
     <string name="welcome">Welcome</string>
@@ -76,4 +76,17 @@
     <string name="comment">Comment</string>
     <string name="no_msgs">No messages</string>
     <string name="sending_email">We\'re sending you an email</string>
+    <string name="delete_post">Delete post</string>
+    <string name="upload_post">Uploading your post</string>
+    <string name="post_published">Post published</string>
+    <string name="add_a_comment">Add a comment</string>
+    <string name="write_a_comment">Write a comment</string>
+    <string name="commit">Comment</string>
+    <string name="post">Post</string>
+    <string name="publish_new_post">Publish new post</string>
+    <string name="what_s_on_your_mind">What\'s on your mind?</string>
+    <string name="choose_action">Choose action</string>
+    <string name="discover_friends">Discover new friends</string>
+    <string name="unfollow_from">\"Unfollowed from \"</string>
+    <string name="you_now_follow">\"You now follow \"</string>
 </resources>
