@@ -2,6 +2,7 @@ package com.example.dogapp.Fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 //import static com.example.dogapp.Activities.MainActivity.email;
 
@@ -31,6 +33,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -40,16 +43,30 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
 
     //Firebase
-    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-    private FirebaseUser fUser = firebaseAuth.getCurrentUser();
+    private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+    private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
+    private DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers");
+    private List<String> followersList = new ArrayList<>();
 
     //views
-    private ImageView profileIv;
+    private ImageView profileIv, locationIv, genderIv, typeIv;
+    private TextView nameTv, followingTv, followersTv, criticsTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
+
+
     private AppBarLayout appBarLayout;
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
@@ -62,7 +79,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         void changeProfileToolBar(Toolbar toolbar);
     }
 
-    OnProfileFragmentListener listener;
+    private OnProfileFragmentListener listener;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -80,15 +97,22 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         View rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
-        //profile scaling animations
+        //assign views
         profileIv = rootView.findViewById(R.id.profile_frag_iv);
-        x = profileIv.getScaleX();
-        y = profileIv.getScaleY();
+        nameTv = rootView.findViewById(R.id.profile_frag_name_tv);
+        genderAgeTv = rootView.findViewById(R.id.profile_item_gender_age_tv);
+        locationTv = rootView.findViewById(R.id.profile_item_location_tv);
+        typeTv = rootView.findViewById(R.id.profile_item_type_tv);
+        aboutMeTv = rootView.findViewById(R.id.profile_item_about_me_tv);
+        followersTv = rootView.findViewById(R.id.followers_count_tv);
+        followingTv = rootView.findViewById(R.id.following_count_tv);
+        locationIv = rootView.findViewById(R.id.profile_location_iv);
+        typeIv = rootView.findViewById(R.id.profile_type_iv);
+        genderIv = rootView.findViewById(R.id.profile_gender_iv);
 
-        //assign profile image
-        if (fUser.getPhotoUrl() != null) {
-            Glide.with(this).asBitmap().load(fUser.getPhotoUrl()).into(profileIv);
-        }
+
+        //profile assign
+        loadProfileViews();
 
         //toolbar
         collapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar_layout);
@@ -96,6 +120,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         listener.changeProfileToolBar(toolbar);
         appBarLayout = rootView.findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(this);
+        toolbar.setTitle("");
 
         //profile pic click event
         profileIv.setOnClickListener(new View.OnClickListener() {
@@ -106,6 +131,68 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         });
 
         return rootView;
+    }
+
+    private void loadProfileViews() {
+
+        nameTv.setText(fUser.getDisplayName()); //display name
+
+        x = profileIv.getScaleX();
+        y = profileIv.getScaleY();
+        if (fUser.getPhotoUrl() != null) { //profile image
+            Glide.with(this).asBitmap().load(fUser.getPhotoUrl()).into(profileIv);
+        }
+
+        //followers count
+        followingRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    followingTv.setText(snapshot.getChildrenCount() + "");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        usersRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+
+                    User user = snapshot.getValue(User.class);
+
+                    //setting icons
+                    if (user.getGender().equals(getString(R.string.male))) {
+                        genderIv.setImageResource(R.drawable.man_icon);
+                    } else if (user.getGender().equals(getString(R.string.female))) {
+                        genderIv.setImageResource(R.drawable.woman_icon);
+                    } else {
+                        genderIv.setImageResource(R.drawable.other_icon);
+                    }
+
+                    if (user.getTitle().equals(getString(R.string.dog_owner))) {
+                        typeIv.setImageResource(R.drawable.dog_owner_icon);
+                    } else {
+                        typeIv.setImageResource(R.drawable.dog_walker_icon);
+                    }
+
+                    //set text
+                    genderAgeTv.setText(user.getGender());
+                    locationTv.setText(user.getLocation());
+                    typeTv.setText(user.getTitle());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     private void buildProfileSheetDialog() {
@@ -162,12 +249,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
             // Collapsed
-            profileIv.animate().scaleX(0).scaleY(0).setDuration(300).start();
-            collapsingToolbarLayout.setTitle(getString(R.string.my_profile));
+
+
         } else if (verticalOffset == 0) {
             // Expanded
-            profileIv.animate().scaleX(x).scaleY(y).setDuration(200).start();
-            collapsingToolbarLayout.setTitle(fUser.getDisplayName());
+
         }
     }
 

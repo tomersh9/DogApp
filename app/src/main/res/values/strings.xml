@@ -89,4 +89,6 @@
     <string name="discover_friends">Discover new friends</string>
     <string name="unfollow_from">\"Unfollowed from \"</string>
     <string name="you_now_follow">\"You now follow \"</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
 </resources>

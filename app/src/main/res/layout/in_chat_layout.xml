@@ -17,28 +17,39 @@
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/in_chat_username"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:gravity="start"
-                android:textColor="@color/white"
-                android:textSize="18sp"/>
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/in_chat_profile_img"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/account_icon" />
 
+                <TextView
+                    android:id="@+id/in_chat_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="7dp"
+                    android:layout_toEndOf="@id/in_chat_profile_img"
+                    android:text="Omer ifrach"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/in_chat_profile_img"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="20dp" />
+                <TextView
+                    android:id="@+id/in_chat_status_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/in_chat_username"
+                    android:layout_marginStart="7dp"
+                    android:layout_toEndOf="@id/in_chat_profile_img"
+                    android:text="@string/online"
+                    android:visibility="gone"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:id="@+id/in_chat_status_tv"/>
+            </RelativeLayout>
 
         </androidx.appcompat.widget.Toolbar>
 

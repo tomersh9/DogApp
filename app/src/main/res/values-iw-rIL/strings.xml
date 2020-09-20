@@ -91,4 +91,6 @@
     <string name="discover_friends">גלה חברים חדשים</string>
     <string name="unfollow_from">הסרת עוקב מ</string>
     <string name="you_now_follow">אתה כעת עוקב אחר</string>
+    <string name="followers">עוקבים</string>
+    <string name="following">במעקב</string>
 </resources>

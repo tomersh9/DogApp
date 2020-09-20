@@ -13,12 +13,48 @@
         android:indeterminateTint="@color/colorPrimary"
         android:visibility="gone" />
 
+    <LinearLayout
+        android:id="@+id/home_header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="5dp"
+        android:paddingVertical="10dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/home_profile_img"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="1" />
+
+        <EditText
+            android:id="@+id/home_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="5"
+            android:background="@drawable/et_shape"
+            android:clickable="true"
+            android:focusable="false"
+            android:hint="@string/what_s_on_your_mind"
+            android:paddingHorizontal="7dp"
+            android:paddingVertical="4dp" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/home_header_layout"
+        android:src="@color/nav_bar_item_color" />
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/home_frag_coordinator_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@id/home_header_layout">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/home_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,25 +63,21 @@
             android:src="@drawable/ic_add_black_24dp"
             app:backgroundTint="@color/colorPrimary"
             app:elevation="5dp"
+            app:layout_behavior="com.google.android.material.floatingactionbutton.FloatingActionButton$Behavior"
             app:maxImageSize="35dp"
-            app:tint="@color/whitish"
-            app:layout_behavior="com.google.android.material.floatingactionbutton.FloatingActionButton$Behavior"/>
+            app:tint="@color/whitish" />-->
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/home_swiper"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/home_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/home_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-<!--
-        <include layout="@layout/bottom_sheet_add_post" />
-        <include layout="@layout/bottom_sheet_add_comment"/>-->
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
 
 </RelativeLayout>

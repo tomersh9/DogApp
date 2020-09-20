@@ -13,7 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,6 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.bumptech.glide.Glide;
 import com.example.dogapp.Activities.LoginActivity;
 import com.example.dogapp.Adapters.PostAdapter;
 import com.example.dogapp.Enteties.User;
@@ -72,6 +75,8 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     private String uid, name, location;
 
     //posts and comments bottom sheet
+    private EditText homeEt;
+    private ImageView homeIv;
     private CoordinatorLayout coordinatorLayout;
     private FloatingActionButton fab;
     private ProgressBar progressBar;
@@ -90,8 +95,18 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         //views
         progressBar = rootView.findViewById(R.id.home_progress_bar);
         coordinatorLayout = rootView.findViewById(R.id.home_frag_coordinator_layout);
+        homeEt = rootView.findViewById(R.id.home_et);
+        homeIv = rootView.findViewById(R.id.home_profile_img);
         swipeRefreshLayout = rootView.findViewById(R.id.home_swiper);
         swipeRefreshLayout.setOnRefreshListener(this);
+
+        //listeners
+        homeEt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buildPostSheetDialog();
+            }
+        });
 
         //init recyclerview
         recyclerView = rootView.findViewById(R.id.home_recycler);
@@ -115,6 +130,11 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     User user = dataSnapshot.getValue(User.class);
                     name = user.getFullName();
                     location = user.getLocation();
+                    try {
+                        Glide.with(rootView).load(user.getPhotoUri()).placeholder(R.drawable.account_icon).into(homeIv);
+                    } catch (Exception ex) {
+
+                    }
 
                 } else {
                     Toast.makeText(getActivity(), "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
@@ -128,13 +148,13 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         });
 
         //******************ADD NEW POST BUTTONS****************************//
-        fab = rootView.findViewById(R.id.home_fab);
+        /*fab = rootView.findViewById(R.id.home_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 buildPostSheetDialog();
             }
-        });
+        });*/
 
         return rootView;
     }
@@ -184,6 +204,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
     @Override
     public void onLikeClicked() {
+        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "LIKE", Snackbar.LENGTH_LONG).show();
     }
 
     //get all of your followers
@@ -192,8 +213,8 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         followingRef.child(fUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                followingList.clear();
                 if (snapshot.exists()) {
-                    followingList.clear();
                     for (DataSnapshot ds : snapshot.getChildren()) {
                         followingList.add(ds.getValue(String.class));
                     }
@@ -291,7 +312,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     @Override
                     public void onSuccess(Void aVoid) {
                         progressDialog.dismiss();
-                        Snackbar.make(coordinatorLayout, R.string.post_published, Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.post_published, Snackbar.LENGTH_SHORT).show();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override

@@ -4,6 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <ImageView
+        android:id="@+id/line_top"
+        android:layout_width="match_parent"
+        android:layout_height="7dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/nav_bar_item_color" />
+
     <RelativeLayout
         android:id="@+id/relative1"
         android:layout_width="match_parent"
@@ -125,6 +132,14 @@
         android:layout_marginTop="10dp"
         android:background="@android:color/darker_gray" />
 
+    <ImageView
+        android:id="@+id/line_end"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/like_comm_btns_layout"
+        android:layout_marginHorizontal="10dp"
+        android:background="@android:color/darker_gray" />
+
     <LinearLayout
         android:id="@+id/like_comm_btns_layout"
         android:layout_width="match_parent"
@@ -204,11 +219,11 @@
 
     </LinearLayout>
 
-    <ImageView
+   <!-- <ImageView
         android:id="@+id/line_2"
         android:layout_width="match_parent"
         android:layout_height="5dp"
         android:layout_below="@id/like_comm_btns_layout"
-        android:background="@android:color/darker_gray" />
+        android:background="@android:color/darker_gray" />-->
 
 </RelativeLayout>

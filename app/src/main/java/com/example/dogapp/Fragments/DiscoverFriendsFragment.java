@@ -51,26 +51,6 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    /*public interface DiscoverFriendsListener {
-        void onMyFriendClicked(String userID);
-
-        void onFriendChatClicked(String userID);
-
-        void onFriendFollowClicked(String userID);
-    }
-
-    private DiscoverFriendsListener listener;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        try {
-            listener = (DiscoverFriendsListener) context;
-        } catch (ClassCastException ex) {
-            throw new ClassCastException("Must implement DiscoverFriendsListener");
-        }
-    }*/
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,11 +148,12 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
 
     @Override
     public void onFriendFollowClicked(int pos, View v) {
-        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout),getString(R.string.you_now_follow) + " " + users.get(pos).getFullName(),Snackbar.LENGTH_SHORT).show();
-        followingList.add(users.get(pos).getId());
-        users.remove(pos);
+        User user = users.get(pos);
+        followingList.add(user.getId());
+        users.remove(user);
         adapter.notifyItemRemoved(pos);
         followingRef.child(fUser.getUid()).setValue(followingList);
+        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
