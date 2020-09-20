@@ -1,6 +1,5 @@
 package com.example.dogapp.Fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,8 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
 
@@ -24,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.dogapp.Activities.InChatActivity;
-import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
 import com.example.dogapp.Adapters.FriendsAdapter;
@@ -40,17 +36,19 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
+public class FollowingFragment extends Fragment implements FriendsAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
 
     //List
     private RecyclerView recyclerView;
     private FriendsAdapter adapter;
     private List<User> users;
     private List<String> followingList = new ArrayList<>();
+    private List<String> followersList = new ArrayList<>();
 
     //firebase
     private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
     private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
+    private DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers");
     private DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
 
     //UI
@@ -126,7 +124,7 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserLi
                     //set adapter to recyclerview
                     recyclerView.setAdapter(adapter);
                     //adapter click events
-                    adapter.setMyUserListener(FriendsFragment.this);
+                    adapter.setMyUserListener(FollowingFragment.this);
                     adapter.notifyDataSetChanged();
                 }
                 progressBar.setVisibility(View.GONE);
@@ -162,12 +160,34 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.MyUserLi
 
     @Override
     public void onFriendDeleteClicked(int pos, View v) {
+        User user = users.get(pos);
         //remove from following list
-        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.unfollow_from) + " " + users.get(pos).getFullName(), Snackbar.LENGTH_SHORT).show();
-        followingList.remove(users.get(pos).getId());
-        users.remove(pos);
+        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.unfollow_from) + " " + user.getFullName(), Snackbar.LENGTH_SHORT).show();
+        followingList.remove(user.getId());
+        users.remove(user);
         adapter.notifyItemRemoved(pos);
         followingRef.child(fUser.getUid()).setValue(followingList);
+
+        //remove myself from his followers
+        followersRef.child(user.getId()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                followersList.clear();
+                if(snapshot.exists()) {
+                    for(DataSnapshot ds : snapshot.getChildren()) {
+                        followersList.add(ds.getValue(String.class));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        //remove myself from his followers list
+        followersList.remove(fUser.getUid());
+        followersRef.child(user.getId()).setValue(followersList);
     }
 
     @Override

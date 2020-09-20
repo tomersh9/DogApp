@@ -65,6 +65,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     //views
     private ImageView profileIv, locationIv, genderIv, typeIv;
     private TextView nameTv, followingTv, followersTv, criticsTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
+    private LinearLayout followersLayoutBtn, followingLayoutBtn;
 
 
     private AppBarLayout appBarLayout;
@@ -77,6 +78,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     public interface OnProfileFragmentListener {
         void changeProfileToolBar(Toolbar toolbar);
+        void onProfileFollowingsClick();
+        void onProfileFollowersClick();
     }
 
     private OnProfileFragmentListener listener;
@@ -109,6 +112,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         locationIv = rootView.findViewById(R.id.profile_location_iv);
         typeIv = rootView.findViewById(R.id.profile_type_iv);
         genderIv = rootView.findViewById(R.id.profile_gender_iv);
+        followersLayoutBtn = rootView.findViewById(R.id.followers_layout);
+        followingLayoutBtn = rootView.findViewById(R.id.following_layout);
 
 
         //profile assign
@@ -127,6 +132,20 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             @Override
             public void onClick(View v) {
                 buildProfileSheetDialog();
+            }
+        });
+
+        //followers listeners
+        followingLayoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onProfileFollowingsClick();
+            }
+        });
+        followersLayoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onProfileFollowersClick();
             }
         });
 
@@ -166,18 +185,21 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     User user = snapshot.getValue(User.class);
 
                     //setting icons
-                    if (user.getGender().equals(getString(R.string.male))) {
-                        genderIv.setImageResource(R.drawable.man_icon);
-                    } else if (user.getGender().equals(getString(R.string.female))) {
-                        genderIv.setImageResource(R.drawable.woman_icon);
-                    } else {
-                        genderIv.setImageResource(R.drawable.other_icon);
-                    }
+                    if (getActivity() != null) {
 
-                    if (user.getTitle().equals(getString(R.string.dog_owner))) {
-                        typeIv.setImageResource(R.drawable.dog_owner_icon);
-                    } else {
-                        typeIv.setImageResource(R.drawable.dog_walker_icon);
+                        if (user.getGender().equals(getString(R.string.male))) {
+                            genderIv.setImageResource(R.drawable.man_icon);
+                        } else if (user.getGender().equals(getString(R.string.female))) {
+                            genderIv.setImageResource(R.drawable.woman_icon);
+                        } else {
+                            genderIv.setImageResource(R.drawable.other_icon);
+                        }
+
+                        if (user.getTitle().equals(getString(R.string.dog_owner))) {
+                            typeIv.setImageResource(R.drawable.dog_owner_icon);
+                        } else {
+                            typeIv.setImageResource(R.drawable.dog_walker_icon);
+                        }
                     }
 
                     //set text

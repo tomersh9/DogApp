@@ -8,10 +8,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,19 +21,15 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Fragments.ChatsFragment;
-import com.example.dogapp.Fragments.DiscoverFriendsFragment;
 import com.example.dogapp.Fragments.ExploreFragment;
-import com.example.dogapp.Fragments.FriendsFragment;
+import com.example.dogapp.Fragments.FollowingFragment;
 import com.example.dogapp.Fragments.HomeFragment;
-import com.example.dogapp.Fragments.InChatFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
 import com.example.dogapp.R;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -254,8 +248,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         break;
 
                     case R.id.item_friends:
-                        toolbar.setTitle(getString(R.string.friends));
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FriendsFragment()).commit();
+                        /*toolbar.setTitle(getString(R.string.friends));
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FriendsFragment()).commit();*/
                         break;
 
                     case R.id.item_sign_out:
@@ -295,31 +289,23 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
     //*****************FRAGMENTS DATA TRANSFER**************************//
 
-    //change toolbar for profile fragment
+    //Profile fragment events
     @Override
     public void changeProfileToolBar(Toolbar toolbar) {
         setSupportActionBar(toolbar);
     }
 
-
-    //*********FRIENDS ADAPTER EVENTS**************//
-    /*@Override
-    public void onMyFriendClicked(String userID) {
-        //TODO Open profile activity
+    @Override
+    public void onProfileFollowingsClick() {
+        setSupportActionBar(toolbar);
+        toolbar.setTitle(getString(R.string.following));
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FollowingFragment()).commit();
     }
 
     @Override
-    public void onFriendChatClicked(String userID) {
-    }
-
-    @Override
-    public void onFriendFollowClicked(final String userID) {
+    public void onProfileFollowersClick() {
 
     }
-
-    @Override
-    public void onFriendDeleteClicked(final String userID) {
-    }*/
 
     @Override
     public void onChatClicked(String userID) {

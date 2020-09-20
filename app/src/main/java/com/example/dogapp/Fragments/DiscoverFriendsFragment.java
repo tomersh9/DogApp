@@ -41,10 +41,12 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
     private FriendsAdapter adapter;
     private List<User> users;
     private List<String> followingList = new ArrayList<>();
+    private List<String> followersList = new ArrayList<>();
 
     //firebase
     private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
     private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
+    private DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers");
     private DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
 
     //UI
@@ -154,6 +156,28 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
         adapter.notifyItemRemoved(pos);
         followingRef.child(fUser.getUid()).setValue(followingList);
         Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_SHORT).show();
+
+        //get user's followers list
+        followersRef.child(user.getId()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                followersList.clear();
+                if(snapshot.exists()) {
+                    for(DataSnapshot ds : snapshot.getChildren()) {
+                        followersList.add(ds.getValue(String.class));
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        //add myself as a user
+        followersList.add(fUser.getUid());
+        followersRef.child(user.getId()).setValue(followersList);
+
     }
 
     @Override
