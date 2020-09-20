@@ -2,7 +2,6 @@ package com.example.dogapp.Fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -13,19 +12,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-//import static com.example.dogapp.Activities.MainActivity.email;
-
-import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -37,10 +32,8 @@ import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -49,11 +42,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
+//import static com.example.dogapp.Activities.MainActivity.email;
 
 
-public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
+public class OtherProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
 
     //Firebase
     private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -66,6 +58,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private ImageView profileIv, genderIv, typeIv;
     private TextView nameTv, followingTv, followersTv, criticsTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
     private LinearLayout followersLayoutBtn, followingLayoutBtn;
+    private String userID;
 
 
     private AppBarLayout appBarLayout;
@@ -75,23 +68,32 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     //Dialogs
     private AlertDialog alertDialog;
 
-    public interface OnProfileFragmentListener {
-        void changeProfileToolBar(Toolbar toolbar);
+    public interface OnOtherProfileListener {
 
-        void onProfileFollowingsClick();
+        void changeOtherProfileToolBar(Toolbar toolbar);
 
-        void onProfileFollowersClick();
+        void onOtherProfileFollowingsClick();
+
+        void onOtherProfileFollowersClick();
     }
 
-    private OnProfileFragmentListener listener;
+    private OnOtherProfileListener listener;
+
+    public static OtherProfileFragment newInstance(String userID) {
+        OtherProfileFragment fragment = new OtherProfileFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("userID", userID);
+        fragment.setArguments(bundle);
+        return fragment; //holds the bundle
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         try {
-            listener = (OnProfileFragmentListener) context; //the activity is the callback
+            listener = (OnOtherProfileListener) context; //the activity is the callback
         } catch (ClassCastException ex) {
-            throw new ClassCastException("The Activity must implement OnProfileFragmentListener interface");
+            throw new ClassCastException("The Activity must implement OnOtherProfileListener interface");
         }
     }
 
@@ -115,6 +117,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         followersLayoutBtn = rootView.findViewById(R.id.followers_layout);
         followingLayoutBtn = rootView.findViewById(R.id.following_layout);
 
+        //other user UID
+        userID = getArguments().getString("userID");
 
         //profile assign
         loadProfileViews();
@@ -122,7 +126,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         //toolbar
         collapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar_layout);
         toolbar = rootView.findViewById(R.id.toolbar_profile);
-        listener.changeProfileToolBar(toolbar);
+        listener.changeOtherProfileToolBar(toolbar);
         appBarLayout = rootView.findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(this);
         toolbar.setTitle("");
@@ -139,13 +143,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         followingLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onProfileFollowingsClick();
+                listener.onOtherProfileFollowingsClick();
             }
         });
         followersLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onProfileFollowersClick();
+                listener.onOtherProfileFollowersClick();
             }
         });
 
@@ -154,13 +158,50 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     private void loadProfileViews() {
 
-        nameTv.setText(fUser.getDisplayName()); //display name
-        if (fUser.getPhotoUrl() != null) { //profile image
-            Glide.with(this).asBitmap().load(fUser.getPhotoUrl()).into(profileIv);
-        }
+        usersRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                User user = snapshot.getValue(User.class);
+
+                //assign profile details
+                nameTv.setText(user.getFullName());
+                genderAgeTv.setText(user.getGender());
+                locationTv.setText(user.getLocation());
+                typeTv.setText(user.getTitle());
+                try {
+                    Glide.with(getActivity()).asBitmap().load(user.getPhotoUri()).into(profileIv);
+                } catch (Exception ex) {
+                    ex.getMessage();
+                }
+
+                //setting icons
+                if (getActivity() != null) {
+
+                    if (user.getGender().equals(getString(R.string.male))) {
+                        genderIv.setImageResource(R.drawable.man_icon);
+                    } else if (user.getGender().equals(getString(R.string.female))) {
+                        genderIv.setImageResource(R.drawable.woman_icon);
+                    } else {
+                        genderIv.setImageResource(R.drawable.other_icon);
+                    }
+
+                    if (user.getTitle().equals(getString(R.string.dog_owner))) {
+                        typeIv.setImageResource(R.drawable.dog_owner_icon);
+                    } else {
+                        typeIv.setImageResource(R.drawable.dog_walker_icon);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         //following count
-        followingRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        followingRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -175,50 +216,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         });
 
         //followers count
-        followersRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        followersRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     followersTv.setText(snapshot.getChildrenCount() + "");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        //assign personal details
-        usersRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-
-                    User user = snapshot.getValue(User.class);
-
-                    //setting icons
-                    if (getActivity() != null) {
-
-                        if (user.getGender().equals(getString(R.string.male))) {
-                            genderIv.setImageResource(R.drawable.man_icon);
-                        } else if (user.getGender().equals(getString(R.string.female))) {
-                            genderIv.setImageResource(R.drawable.woman_icon);
-                        } else {
-                            genderIv.setImageResource(R.drawable.other_icon);
-                        }
-
-                        if (user.getTitle().equals(getString(R.string.dog_owner))) {
-                            typeIv.setImageResource(R.drawable.dog_owner_icon);
-                        } else {
-                            typeIv.setImageResource(R.drawable.dog_walker_icon);
-                        }
-                    }
-
-                    //set text
-                    genderAgeTv.setText(user.getGender());
-                    locationTv.setText(user.getLocation());
-                    typeTv.setText(user.getTitle());
                 }
             }
 

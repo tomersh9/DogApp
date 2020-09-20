@@ -21,6 +21,9 @@ import java.util.List;
 
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserViewHolder> implements Filterable {
 
+    private final int FRIEND_TYPE = 0;
+    private final int NON_FRIEND_TYPE = 1;
+
     private List<User> users;
     private List<User> usersFull;
     private MyUserListener listener;

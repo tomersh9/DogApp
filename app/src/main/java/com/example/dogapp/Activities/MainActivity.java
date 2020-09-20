@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Fragments.ChatsFragment;
 import com.example.dogapp.Fragments.ExploreFragment;
+import com.example.dogapp.Fragments.FollowersFragment;
 import com.example.dogapp.Fragments.FollowingFragment;
 import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
@@ -304,7 +305,9 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
     @Override
     public void onProfileFollowersClick() {
-
+        setSupportActionBar(toolbar);
+        toolbar.setTitle(getString(R.string.followers));
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FollowersFragment()).commit();
     }
 
     @Override
