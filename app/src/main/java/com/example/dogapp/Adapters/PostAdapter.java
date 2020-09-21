@@ -3,6 +3,7 @@ package com.example.dogapp.Adapters;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.text.format.DateFormat;
 import android.view.Gravity;
@@ -27,6 +28,7 @@ import com.example.dogapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -42,9 +44,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     List<ModelPost> postList;
     String myUid;
 
+    private DatabaseReference likesRef;
+    private DatabaseReference postsRef;
+
+    boolean mProcessLike = false;
+
 
     public interface OnPostListener {
-        void onCommentClicked();
+        void onCommentClicked(String pId);
 
         void onLikeClicked();
     }
@@ -59,6 +66,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         this.context = context;
         this.postList = postList;
         myUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        likesRef = FirebaseDatabase.getInstance().getReference().child("Likes");
+        postsRef = FirebaseDatabase.getInstance().getReference().child("Posts");
     }
 
     @NonNull
@@ -70,7 +79,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MyHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final MyHolder holder, final int position) {
 
         final String uId = postList.get(position).getuId();
         String uName = postList.get(position).getuName();
@@ -79,6 +88,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         String pTimeStamp = postList.get(position).getpTime();
         String pLoc = postList.get(position).getuLoc();
         String uPic = postList.get(position).getuPic();
+        String pLikes = postList.get(position).getpLikes();
+        String pComments = postList.get(position).getpComments();
 
 
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
@@ -89,6 +100,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         holder.timeTv.setText(pTime);
         holder.descTv.setText(pDesc);
         Glide.with(holder.itemView).asBitmap().load(Uri.parse(uPic)).placeholder(R.drawable.account_icon).into(holder.postIv);
+        holder.likesTv.setText(pLikes + " " + "Likes");
+        holder.comTv.setText(pComments + " " + "Comments");
+
+        setLikes(holder, pId);
 
         holder.moreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,16 +115,77 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         holder.commentsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onCommentClicked();
+                listener.onCommentClicked(pId);
             }
         });
 
         holder.likesLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onLikeClicked();
+                //listener.onLikeClicked();
+
+                final int pLikes = Integer.parseInt(postList.get(position).getpLikes());
+                mProcessLike = true;
+                final String postId = postList.get(position).getpId();
+                likesRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(mProcessLike)
+                        {
+                            if(snapshot.child(postId).hasChild(myUid))
+                            {
+                                postsRef.child(postId).child("pLikes").setValue("" + (pLikes-1));
+                                likesRef.child(postId).child(myUid).removeValue();
+                                mProcessLike = false;
+                            }
+                            else
+                            {
+                                postsRef.child(postId).child("pLikes").setValue("" + (pLikes+1));
+                                likesRef.child(postId).child(myUid).setValue("Liked");
+                                mProcessLike = false;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
+
+    }
+
+    private void setLikes(final MyHolder holder, final String postKey) {
+
+        likesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.child(postKey).hasChild(myUid))
+                {
+                    //holder.likeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_baseline_thumb_up_blue_24,0,0,0);
+                    holder.likeBtn.setImageResource(R.drawable.ic_baseline_thumb_up_black_24);
+                    holder.likeBtn.setColorFilter(Color.parseColor("#fe8c00"));
+                    holder.likeBtnTv.setText("Liked");
+                    holder.likeBtnTv.setTextColor(Color.parseColor("#fe8c00"));
+                }
+                else
+                {
+                    //holder.likeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_baseline_thumb_up_black_24,0,0,0);
+                    holder.likeBtn.setImageResource(R.drawable.ic_baseline_thumb_up_black_24);
+                    holder.likeBtnTv.setText("Like");
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
     }
 
@@ -178,8 +254,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
 
     class MyHolder extends RecyclerView.ViewHolder {
 
-        ImageView postIv;
-        TextView nameTv, timeTv, descTv, likesTv, comTv;
+        ImageView postIv, likeBtn;
+        TextView nameTv, timeTv, descTv, likesTv, comTv,likeBtnTv;
         ImageButton moreBtn;
         LinearLayout commentsLayout, likesLayout;
 
@@ -195,6 +271,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             moreBtn = itemView.findViewById(R.id.more_btn);
             commentsLayout = itemView.findViewById(R.id.comment_btn_layout);
             likesLayout = itemView.findViewById(R.id.like_btn_layout);
+            likeBtn = itemView.findViewById(R.id.like_btn);
+            likeBtnTv = itemView.findViewById(R.id.like_btn_tv);
         }
     }
 }

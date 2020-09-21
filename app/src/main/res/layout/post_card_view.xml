@@ -167,12 +167,14 @@
                     android:layout_height="18dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/like" />
+                    android:id="@+id/like_btn"
+                    android:src="@drawable/ic_baseline_thumb_up_black_24" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
+                    android:id="@+id/like_btn_tv"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/like"
                     android:textColor="@color/black"

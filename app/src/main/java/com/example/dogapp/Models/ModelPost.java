@@ -2,16 +2,18 @@ package com.example.dogapp.Models;
 
 public class ModelPost {
 
-    private String pId, uName, uId, pDesc, pTime, uLoc, uPic;
+    private String pId, uName, uId, pDesc, pLikes, pComments, pTime, uLoc, uPic;
 
     public ModelPost() {
     }
 
-    public ModelPost(String pId, String uName, String uId, String pDesc, String pTime, String uLoc, String uPic) {
+    public ModelPost(String pId, String uName, String uId, String pDesc, String pLikes, String pComments, String pTime, String uLoc, String uPic) {
         this.pId = pId;
         this.uName = uName;
         this.uId = uId;
         this.pDesc = pDesc;
+        this.pLikes = pLikes;
+        this.pComments = pComments;
         this.pTime = pTime;
         this.uLoc = uLoc;
         this.uPic = uPic;
@@ -47,6 +49,22 @@ public class ModelPost {
 
     public void setpDesc(String pDesc) {
         this.pDesc = pDesc;
+    }
+
+    public String getpLikes() {
+        return pLikes;
+    }
+
+    public void setpLikes(String pLikes) {
+        this.pLikes = pLikes;
+    }
+
+    public String getpComments() {
+        return pComments;
+    }
+
+    public void setpComments(String pComments) {
+        this.pComments = pComments;
     }
 
     public String getpTime() {

@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,8 +35,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Activities.LoginActivity;
+import com.example.dogapp.Adapters.CommentAdapter;
 import com.example.dogapp.Adapters.PostAdapter;
 import com.example.dogapp.Enteties.User;
+import com.example.dogapp.Models.ModelComment;
 import com.example.dogapp.Models.ModelPost;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -50,11 +54,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class HomeFragment extends Fragment implements PostAdapter.OnPostListener, SwipeRefreshLayout.OnRefreshListener {
@@ -82,6 +89,19 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     private ProgressBar progressBar;
     private AlertDialog progressDialog;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    //comment references
+    TextView name_comment;
+    TextView description_comment;
+    TextView time_comment;
+    TextInputLayout commentEt;
+    ImageView picture_comment;
+    View bottomSheetView1;
+    ProgressDialog progressBarComment;
+    RecyclerView recyclerViewComments;
+    List<ModelComment> commentList;
+    CommentAdapter commentAdapter;
+
 
 
     @Nullable
@@ -180,26 +200,166 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     }
 
     @Override
-    public void onCommentClicked() {
-        buildCommentSheetDialog();
+    public void onCommentClicked(String pId) {
+        buildCommentSheetDialog(pId);
     }
 
-    private void buildCommentSheetDialog() {
-        final BottomSheetDialog dialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
-        View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_add_comment, null);
+    private void buildCommentSheetDialog(final String pId) {
 
-        final TextInputLayout commentEt = bottomSheetView.findViewById(R.id.comment_et);
-        Button commentBtn = bottomSheetView.findViewById(R.id.comment_btn);
+
+
+        final BottomSheetDialog dialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+        bottomSheetView1 = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_add_comment, null);
+
+        recyclerViewComments = bottomSheetView1.findViewById(R.id.bottom_comments_recycler);
+
+        commentEt = bottomSheetView1.findViewById(R.id.comment_et);
+        Button commentBtn = bottomSheetView1.findViewById(R.id.comment_btn);
+        name_comment = bottomSheetView1.findViewById(R.id.owner_post_name_tv);
+        description_comment = bottomSheetView1.findViewById(R.id.owner_post_tv);
+        time_comment = bottomSheetView1.findViewById(R.id.owner_time);
+        picture_comment  = bottomSheetView1.findViewById(R.id.owner_post_img);
+
+        loadPostInfo(pId);
+
+        //users info - already exists;
+
+        loadComments(pId);
+
+//        commentAdapter = new CommentAdapter(getActivity(),commentList);
+//
+//        recyclerViewComments.setAdapter(commentAdapter);
+
+
         commentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                postComment(pId);
                 Toast.makeText(getActivity(), commentEt.getEditText().getText().toString(), Toast.LENGTH_SHORT).show();
                 commentEt.getEditText().setText("");
                 dialog.dismiss();
             }
         });
-        dialog.setContentView(bottomSheetView);
+        dialog.setContentView(bottomSheetView1);
         dialog.show();
+    }
+
+    private void loadComments(String pId) {
+
+        //recyclerViewComments = getActivity().findViewById(R.id.bottom_comments_recycler);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerViewComments.setLayoutManager(layoutManager);
+        commentList = new ArrayList<>();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts").child(pId).child("Comments");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                commentList.clear();
+                for (DataSnapshot ds: snapshot.getChildren())
+                {
+                    ModelComment modelComment = ds.getValue(ModelComment.class);
+
+                    commentList.add(modelComment);
+
+                    commentAdapter = new CommentAdapter(bottomSheetView1.getContext(),commentList);
+
+                    recyclerViewComments.setAdapter(commentAdapter);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void postComment(final String pId)
+    {
+        progressBarComment = new ProgressDialog(getActivity());
+        progressBarComment.setMessage("Adding Comment...");
+
+        String comment = commentEt.getEditText().getText().toString();
+
+        if(TextUtils.isEmpty(comment))
+        {
+            Toast.makeText(getActivity(), "Comment is empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String myUid = fUser.getUid();
+        String myUserPic = fUser.getPhotoUrl().toString();
+        String myName = fUser.getDisplayName();
+
+        String timeStamp = String.valueOf(System.currentTimeMillis());
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Posts").child(pId).child("Comments");
+
+        HashMap<String,Object> hashMap = new HashMap<>();
+
+        hashMap.put("cId", timeStamp);
+        hashMap.put("comment", comment);
+        hashMap.put("timeStamp", timeStamp);
+        hashMap.put("uId", myUid);
+        hashMap.put("uPic", myUserPic);
+        hashMap.put("uName", myName);
+
+        ref.child(timeStamp).setValue(hashMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        
+                        progressBarComment.dismiss();
+                        Toast.makeText(getActivity(), "Comment Added...", Toast.LENGTH_SHORT).show();
+                        commentEt.getEditText().setText("");
+                        updateCommentCount(pId);
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressBarComment.dismiss();
+                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+
+
+
+
+    }
+    boolean mProcessComment = false;
+
+    private void updateCommentCount(String pId) {
+
+        mProcessComment = true;
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts").child(pId);
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(mProcessComment)
+                {
+                    String comments = "" + snapshot.child("pComments").getValue();
+                    int newCommentVal = Integer.parseInt(comments) + 1;
+                    ref.child("pComments").setValue(""+newCommentVal);
+                    mProcessComment = false;
+
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
@@ -305,6 +465,8 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         hashMap.put("pTime", timeStamp);
         hashMap.put("uId", uid);
         hashMap.put("uPic", fUser.getPhotoUrl().toString());
+        hashMap.put("pLikes","0");
+        hashMap.put("pComments","0");
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
         ref.child(timeStamp).setValue(hashMap)
@@ -368,6 +530,50 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
             });
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadPostInfo(String pId)
+    {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+        Query query = ref.orderByChild("pId").equalTo(pId);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for(DataSnapshot ds: snapshot.getChildren())
+                {
+                    //get data
+                    String pDesc = "" + ds.child("pDesc").getValue();
+                    String pId = "" + ds.child("pId").getValue();
+                    String pLikes = "" + ds.child("pLikes").getValue();
+                    String pTimeStamp = "" + ds.child("pTime").getValue();
+                    String uId = "" + ds.child("uId").getValue();
+                    String uLoc = "" + ds.child("uLoc").getValue();
+                    String uName = "" + ds.child("uName").getValue();
+                    String uPic = "" + ds.child("uPic").getValue();
+                    String commentCount = "" + ds.child("pComments").getValue();
+
+
+                    Calendar calendar = Calendar.getInstance(Locale.getDefault());
+                    calendar.setTimeInMillis(Long.parseLong(pTimeStamp));
+                    String pTime = DateFormat.format("dd/MM/yyyy hh:mm  aa", calendar).toString();
+
+                    //set data
+
+                    description_comment.setText(pDesc);
+                    name_comment.setText(uName);
+                    time_comment.setText(pTime);
+                    Glide.with(bottomSheetView1).asBitmap().load(Uri.parse(uPic)).into(picture_comment);
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
