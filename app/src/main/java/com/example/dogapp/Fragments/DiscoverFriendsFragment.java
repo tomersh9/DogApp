@@ -116,7 +116,7 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
                         }
                     }
                     //adapter
-                    adapter = new FriendsAdapter(users, false);
+                    adapter = new FriendsAdapter(users, false,true);
                     //set adapter to recyclerview
                     recyclerView.setAdapter(adapter);
                     //adapter click events
@@ -138,7 +138,9 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
     @Override
     public void onFriendClicked(int pos, View v) {
         //go to profile (activity)
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
+        User user = users.get(pos);
+        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUri());
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment).commit();
     }
 
     @Override
@@ -151,7 +153,7 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
 
     @Override
     public void onFriendFollowClicked(int pos, View v) {
-        User user = users.get(pos);
+        final User user = users.get(pos);
         followingList.add(user.getId());
         users.remove(user);
         adapter.notifyItemRemoved(pos);
@@ -159,26 +161,27 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
         Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_SHORT).show();
 
         //get user's followers list
-        followersRef.child(user.getId()).addValueEventListener(new ValueEventListener() {
+        followersRef.child(user.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 followersList.clear();
-                if(snapshot.exists()) {
-                    for(DataSnapshot ds : snapshot.getChildren()) {
-                        followersList.add(ds.getValue(String.class));
-                    }
+
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    followersList.add(ds.getValue(String.class));
                 }
+                //add myself as a user
+                if (!followersList.contains(fUser.getUid())) {
+                    followersList.add(fUser.getUid());
+                    followersRef.child(user.getId()).setValue(followersList);
+                }
+
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
-
-        //add myself as a user
-        followersList.add(fUser.getUid());
-        followersRef.child(user.getId()).setValue(followersList);
-
     }
 
     @Override

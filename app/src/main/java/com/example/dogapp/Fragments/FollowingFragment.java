@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
 
@@ -50,10 +51,20 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
     private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
     private DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers");
     private DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+    private String userID;
+    private boolean isMe;
 
     //UI
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    public static FollowingFragment newInstance(String userID) {
+        FollowingFragment fragment = new FollowingFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("userID", userID);
+        fragment.setArguments(bundle);
+        return fragment; //holds the bundle
+    }
 
 
     @Override
@@ -69,6 +80,14 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
         View rootView = inflater.inflate(R.layout.friends_fragment_layout, container, false);
+
+        //for other users but myself
+        userID = getArguments().getString("userID");
+        if (userID.equals(fUser.getUid())) {
+            isMe = true;
+        } else {
+            isMe = false;
+        }
 
         progressBar = rootView.findViewById(R.id.friends_fragment_progress_bar);
         swipeRefreshLayout = rootView.findViewById(R.id.friends_swiper);
@@ -89,7 +108,7 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
     private void getAllFollowing() {
         progressBar.setVisibility(View.VISIBLE);
 
-        followingRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        followingRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 followingList.clear();
@@ -120,7 +139,7 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
                         }
                     }
                     //adapter
-                    adapter = new FriendsAdapter(users, true);
+                    adapter = new FriendsAdapter(users, true, isMe);
                     //set adapter to recyclerview
                     recyclerView.setAdapter(adapter);
                     //adapter click events
@@ -142,7 +161,9 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
     //Adapter events to handle outside
     @Override
     public void onFriendClicked(int pos, View v) {
-        //go to profile (activity)
+        User user = users.get(pos);
+        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUri());
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment).commit();
     }
 
     @Override
@@ -160,23 +181,28 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
 
     @Override
     public void onFriendDeleteClicked(int pos, View v) {
-        User user = users.get(pos);
+        final User user = users.get(pos);
         //remove from following list
         Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.unfollow_from) + " " + user.getFullName(), Snackbar.LENGTH_SHORT).show();
         followingList.remove(user.getId());
         users.remove(user);
         adapter.notifyItemRemoved(pos);
-        followingRef.child(fUser.getUid()).setValue(followingList);
+        followingRef.child(userID).setValue(followingList);
 
         //remove myself from his followers
-        followersRef.child(user.getId()).addValueEventListener(new ValueEventListener() {
+        followersRef.child(user.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 followersList.clear();
-                if(snapshot.exists()) {
-                    for(DataSnapshot ds : snapshot.getChildren()) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot ds : snapshot.getChildren()) {
                         followersList.add(ds.getValue(String.class));
                     }
+                }
+                //remove myself from his followers list
+                if (followersList.contains(userID)) {
+                    followersList.remove(userID);
+                    followersRef.child(user.getId()).setValue(followersList);
                 }
             }
 
@@ -185,9 +211,6 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
 
             }
         });
-        //remove myself from his followers list
-        followersList.remove(fUser.getUid());
-        followersRef.child(user.getId()).setValue(followersList);
     }
 
     @Override

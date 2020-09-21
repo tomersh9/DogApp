@@ -91,4 +91,6 @@
     <string name="you_now_follow">\"You now follow \"</string>
     <string name="followers">Followers</string>
     <string name="following">Following</string>
+    <string name="comments">Comments</string>
+    <string name="likes">Likes</string>
 </resources>

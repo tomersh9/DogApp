@@ -48,6 +48,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     private DatabaseReference postsRef;
 
     boolean mProcessLike = false;
+    boolean isLike;
 
 
     public interface OnPostListener {
@@ -100,8 +101,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         holder.timeTv.setText(pTime);
         holder.descTv.setText(pDesc);
         Glide.with(holder.itemView).asBitmap().load(Uri.parse(uPic)).placeholder(R.drawable.account_icon).into(holder.postIv);
-        holder.likesTv.setText(pLikes + " " + "Likes");
-        holder.comTv.setText(pComments + " " + "Comments");
+        holder.likesTv.setText(pLikes + " " + context.getString(R.string.likes));
+        holder.comTv.setText(pComments + " " + context.getString(R.string.comments));
 
         setLikes(holder, pId);
 
@@ -130,17 +131,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                 likesRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(mProcessLike)
-                        {
-                            if(snapshot.child(postId).hasChild(myUid))
-                            {
-                                postsRef.child(postId).child("pLikes").setValue("" + (pLikes-1));
+                        if (mProcessLike) {
+                            if (snapshot.child(postId).hasChild(myUid)) {
+                                postsRef.child(postId).child("pLikes").setValue("" + (pLikes - 1));
                                 likesRef.child(postId).child(myUid).removeValue();
                                 mProcessLike = false;
-                            }
-                            else
-                            {
-                                postsRef.child(postId).child("pLikes").setValue("" + (pLikes+1));
+                            } else {
+                                postsRef.child(postId).child("pLikes").setValue("" + (pLikes + 1));
                                 likesRef.child(postId).child(myUid).setValue("Liked");
                                 mProcessLike = false;
                             }
@@ -163,21 +160,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                if(snapshot.child(postKey).hasChild(myUid))
-                {
-                    //holder.likeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_baseline_thumb_up_blue_24,0,0,0);
+                if (snapshot.child(postKey).hasChild(myUid)) {
                     holder.likeBtn.setImageResource(R.drawable.ic_baseline_thumb_up_black_24);
                     holder.likeBtn.setColorFilter(Color.parseColor("#fe8c00"));
-                    holder.likeBtnTv.setText("Liked");
                     holder.likeBtnTv.setTextColor(Color.parseColor("#fe8c00"));
-                }
-                else
-                {
-                    //holder.likeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_baseline_thumb_up_black_24,0,0,0);
+                } else {
                     holder.likeBtn.setImageResource(R.drawable.ic_baseline_thumb_up_black_24);
-                    holder.likeBtnTv.setText("Like");
                 }
-
             }
 
             @Override
@@ -185,8 +174,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
 
             }
         });
-
-
     }
 
     private void showMoreOptions(ImageButton moreBtn, String uId, String myUid, final String pId) {
@@ -232,7 +219,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                     //if(ds.child("pId").getKey() == pId)
                     //Toast.makeText(context, "Have To delete", Toast.LENGTH_SHORT).show();
                     //ds.getRef().removeValue();
-
                 }
                 //deleted
                 Toast.makeText(context, "Posts Deleted", Toast.LENGTH_SHORT).show();
@@ -255,7 +241,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     class MyHolder extends RecyclerView.ViewHolder {
 
         ImageView postIv, likeBtn;
-        TextView nameTv, timeTv, descTv, likesTv, comTv,likeBtnTv;
+        TextView nameTv, timeTv, descTv, likesTv, comTv, likeBtnTv;
         ImageButton moreBtn;
         LinearLayout commentsLayout, likesLayout;
 

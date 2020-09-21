@@ -2,6 +2,8 @@ package com.example.dogapp.Fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -33,12 +35,15 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.dogapp.Activities.InChatActivity;
+import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,16 +61,20 @@ import java.util.List;
 public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
 
     //Firebase
+    private List<String> followingList = new ArrayList<>();
+    private List<String> followersList = new ArrayList<>();
     private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
     private DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
     private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
     private DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers");
-    //private List<String> followersList = new ArrayList<>();
+    private String userID, imgURL; //for any user of the app
+    private boolean isMe;
 
     //views
     private ImageView profileIv, genderIv, typeIv;
     private TextView nameTv, followingTv, followersTv, criticsTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
     private LinearLayout followersLayoutBtn, followingLayoutBtn;
+    private FloatingActionButton chatFab, followFab, profileFab;
 
 
     private AppBarLayout appBarLayout;
@@ -78,9 +87,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     public interface OnProfileFragmentListener {
         void changeProfileToolBar(Toolbar toolbar);
 
-        void onProfileFollowingsClick();
+        void onProfileFollowingsClick(String userID);
 
-        void onProfileFollowersClick();
+        void onProfileFollowersClick(String userID);
     }
 
     private OnProfileFragmentListener listener;
@@ -95,11 +104,30 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
     }
 
+    public static ProfileFragment newInstance(String userID, String imgURL) {
+        ProfileFragment fragment = new ProfileFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("userID", userID);
+        bundle.putString("imgURL", imgURL);
+        fragment.setArguments(bundle);
+        return fragment; //holds the bundle
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.profile_fragment, container, false);
+
+        //get user who activated the fragment
+        userID = getArguments().getString("userID");
+        imgURL = getArguments().getString("imgURL");
+
+        if (userID.equals(fUser.getUid())) {
+            isMe = true;
+        } else {
+            isMe = false;
+        }
 
         //assign views
         profileIv = rootView.findViewById(R.id.profile_frag_iv);
@@ -114,10 +142,55 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         genderIv = rootView.findViewById(R.id.profile_gender_iv);
         followersLayoutBtn = rootView.findViewById(R.id.followers_layout);
         followingLayoutBtn = rootView.findViewById(R.id.following_layout);
-
+        chatFab = rootView.findViewById(R.id.chat_fab);
+        followFab = rootView.findViewById(R.id.follow_fab);
+        profileFab = rootView.findViewById(R.id.profile_fab);
 
         //profile assign
         loadProfileViews();
+
+        if (isMe) {
+            chatFab.setVisibility(View.GONE);
+            followFab.setVisibility(View.GONE);
+            profileFab.setVisibility(View.VISIBLE);
+
+            profileFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Settings", Snackbar.LENGTH_LONG).show();
+                }
+            });
+
+        } else {
+            chatFab.setVisibility(View.VISIBLE);
+            followFab.setVisibility(View.VISIBLE);
+            profileFab.setVisibility(View.GONE);
+
+            loadFollowingList(); //seeing other user's profile
+
+            followFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onProfileFollowClick();
+                }
+            });
+
+            chatFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), InChatActivity.class);
+                    intent.putExtra("userID", userID);
+                    startActivity(intent);
+                }
+            });
+        }
+
+
+        try {
+            Glide.with(getActivity()).asBitmap().load(imgURL).into(profileIv);
+        } catch (Exception ex) {
+            ex.getMessage();
+        }
 
         //toolbar
         collapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar_layout);
@@ -139,28 +212,120 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         followingLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onProfileFollowingsClick();
+                listener.onProfileFollowingsClick(userID);
             }
         });
         followersLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onProfileFollowersClick();
+                listener.onProfileFollowersClick(userID);
             }
         });
 
         return rootView;
     }
 
-    private void loadProfileViews() {
+    //loading MYSELF (fUSer) following list to see if i follow this user already
+    private void loadFollowingList() {
 
-        nameTv.setText(fUser.getDisplayName()); //display name
-        if (fUser.getPhotoUrl() != null) { //profile image
-            Glide.with(this).asBitmap().load(fUser.getPhotoUrl()).into(profileIv);
+        followingRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                followingList.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    followingList.add(ds.getValue(String.class)); //filter only the ones i follow
+                }
+                if (followingList.contains(userID)) {
+                    followFab.setImageResource(R.drawable.ic_explore_black_24dp);
+                    followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.red)));
+                } else {
+                    followFab.setImageResource(R.drawable.ic_person_add_black_24dp);
+                    followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.green)));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void onProfileFollowClick() {
+
+        if (!followingList.contains(userID)) { //follow user
+
+            //add the user to my following list
+            followingList.add(userID);
+            followingRef.child(fUser.getUid()).setValue(followingList);
+
+            //get user's followers list to add myself
+            followersRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    followersList.clear();
+
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        followersList.add(ds.getValue(String.class));
+                    }
+                    //add myself as a user
+                    if (!followersList.contains(fUser.getUid())) {
+                        followersList.add(fUser.getUid());
+                        followersRef.child(userID).setValue(followersList);
+                        followersTv.setText(followersList.size()+"");
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            //change fab apperance
+            followFab.setImageResource(R.drawable.ic_explore_black_24dp);
+            followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.red)));
+
+        } else { //unfollow user
+
+            followingList.remove(userID);
+            followingRef.child(fUser.getUid()).setValue(followingList);
+
+            //remove myself from his followers
+            followersRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    followersList.clear();
+                    if (snapshot.exists()) {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            followersList.add(ds.getValue(String.class));
+                        }
+                    }
+                    //remove myself from his followers list
+                    if (followersList.contains(fUser.getUid())) {
+                        followersList.remove(fUser.getUid());
+                        followersRef.child(userID).setValue(followersList);
+                        followersTv.setText(followersList.size()+"");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            //change fab apperance
+            followFab.setImageResource(R.drawable.ic_person_add_black_24dp);
+            followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.green)));
         }
 
+        //loadDetailsViews();
+
+    }
+
+    private void loadDetailsViews() {
         //following count
-        followingRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        followingRef.child(userID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -175,7 +340,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         });
 
         //followers count
-        followersRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        followersRef.child(userID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -188,9 +353,14 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
             }
         });
+    }
+
+    private void loadProfileViews() {
+
+        loadDetailsViews();
 
         //assign personal details
-        usersRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        usersRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -219,6 +389,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     genderAgeTv.setText(user.getGender());
                     locationTv.setText(user.getLocation());
                     typeTv.setText(user.getTitle());
+                    nameTv.setText(user.getFullName()); //display name
                 }
             }
 
@@ -253,7 +424,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 progressBar.setVisibility(View.VISIBLE);
 
                 try {
-                    Glide.with(dialogView).load(fUser.getPhotoUrl()).listener(new RequestListener<Drawable>() {
+                    Glide.with(dialogView).load(imgURL).listener(new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                             Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_upload_image, Snackbar.LENGTH_SHORT).show();

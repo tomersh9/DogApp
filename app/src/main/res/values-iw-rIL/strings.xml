@@ -76,7 +76,6 @@
     <string name="_5_comments">5 תגובות</string>
     <string name="comment">תגובה</string>
     <string name="no_msgs">אין הודעה</string>
-    <string name="like">אהבתי</string>
     <string name="sending_email">אנחנו שולחים אליך מייל</string>
     <string name="delete_post">מחק פוסט</string>
     <string name="upload_post">מעלים את הפוסט שלך</string>
@@ -93,4 +92,7 @@
     <string name="you_now_follow">אתה כעת עוקב אחר</string>
     <string name="followers">עוקבים</string>
     <string name="following">במעקב</string>
+    <string name="like">לייק</string>
+    <string name="comments">תגובות</string>
+    <string name="likes">לייקים</string>
 </resources>

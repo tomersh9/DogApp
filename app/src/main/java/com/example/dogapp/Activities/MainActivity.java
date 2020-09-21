@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         homeFragment = new HomeFragment();
         exploreFragment = new ExploreFragment();
         chatsFragment = new ChatsFragment();
-        profileFragment = new ProfileFragment();
+        //profileFragment = new ProfileFragment();
 
         //set on click listeners
         setOnClickListeners();
@@ -220,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         break;
 
                     case R.id.bottom_profile:
+                        profileFragment = ProfileFragment.newInstance(fUser.getUid(),fUser.getPhotoUrl().toString());
                         currFragment = profileFragment;
                         break;
 
@@ -297,17 +298,20 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     }
 
     @Override
-    public void onProfileFollowingsClick() {
+    public void onProfileFollowingsClick(String userID) {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getString(R.string.following));
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FollowingFragment()).commit();
+        FollowingFragment followingFragment = FollowingFragment.newInstance(userID);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, followingFragment).commit();
     }
 
     @Override
-    public void onProfileFollowersClick() {
+    public void onProfileFollowersClick(String userID) {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getString(R.string.followers));
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FollowersFragment()).commit();
+        Toast.makeText(this, userID, Toast.LENGTH_SHORT).show();
+        FollowersFragment followersFragment = FollowersFragment.newInstance(userID);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, followersFragment).commit();
     }
 
     @Override

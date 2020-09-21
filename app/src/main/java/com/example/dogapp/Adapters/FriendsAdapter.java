@@ -23,11 +23,13 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
 
     private final int FRIEND_TYPE = 0;
     private final int NON_FRIEND_TYPE = 1;
+    private final int MYSELF_TYPE = 2;
 
     private List<User> users;
     private List<User> usersFull;
     private MyUserListener listener;
     private boolean isMyFriend;
+    private boolean isMe;
 
     public interface MyUserListener {
         void onFriendClicked(int pos, View v);
@@ -43,9 +45,10 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         this.listener = listener;
     }
 
-    public FriendsAdapter(List<User> users, boolean isMyFriend) {
+    public FriendsAdapter(List<User> users, boolean isMyFriend, boolean isMe) {
         this.users = users;
         this.isMyFriend = isMyFriend;
+        this.isMe = isMe;
         usersFull = new ArrayList<>(users); //for filtering (copy of list)
     }
 
@@ -83,23 +86,27 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
                 }
             });
 
-            chatBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        listener.onFriendChatClicked(getAdapterPosition(), v);
-                    }
-                }
-            });
+            if (!isMe) {
 
-            if (isMyFriend) {
+            } else if (isMe && isMyFriend) { //can chat and delete
+
                 deleteBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         listener.onFriendDeleteClicked(getAdapterPosition(), v);
                     }
                 });
-            } else {
+
+                chatBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (listener != null) {
+                            listener.onFriendChatClicked(getAdapterPosition(), v);
+                        }
+                    }
+                });
+
+            } else { //can only follow
                 followBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -115,10 +122,15 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (!isMyFriend) {
+        if (!isMe) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.myself_card_view, parent, false);
+            UserViewHolder userViewHolder = new UserViewHolder(view);
+            return userViewHolder;
+        } else if (!isMyFriend) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_card_view, parent, false);
             UserViewHolder userViewHolder = new UserViewHolder(view);
             return userViewHolder;
+
         } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.following_card_view, parent, false);
             UserViewHolder userViewHolder = new UserViewHolder(view);
@@ -128,6 +140,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
 
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+
         User user = users.get(position);
         holder.usernameTv.setText(user.getFullName());
         holder.typeTv.setText(user.getTitle());
@@ -136,13 +149,18 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         try {
             Glide.with(holder.itemView).asBitmap().load(user.getPhotoUri()).placeholder(R.drawable.account_icon).into(holder.profileIv);
         } catch (Exception ex) {
-
+            ex.getMessage();
         }
     }
 
     @Override
     public int getItemCount() {
         return users.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
     }
 
     @Override

@@ -103,7 +103,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     CommentAdapter commentAdapter;
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -207,7 +206,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     private void buildCommentSheetDialog(final String pId) {
 
 
-
         final BottomSheetDialog dialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
         bottomSheetView1 = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_add_comment, null);
 
@@ -218,7 +216,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         name_comment = bottomSheetView1.findViewById(R.id.owner_post_name_tv);
         description_comment = bottomSheetView1.findViewById(R.id.owner_post_tv);
         time_comment = bottomSheetView1.findViewById(R.id.owner_time);
-        picture_comment  = bottomSheetView1.findViewById(R.id.owner_post_img);
+        picture_comment = bottomSheetView1.findViewById(R.id.owner_post_img);
 
         loadPostInfo(pId);
 
@@ -234,7 +232,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         commentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 postComment(pId);
                 Toast.makeText(getActivity(), commentEt.getEditText().getText().toString(), Toast.LENGTH_SHORT).show();
                 commentEt.getEditText().setText("");
@@ -257,13 +254,12 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 commentList.clear();
-                for (DataSnapshot ds: snapshot.getChildren())
-                {
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     ModelComment modelComment = ds.getValue(ModelComment.class);
 
                     commentList.add(modelComment);
 
-                    commentAdapter = new CommentAdapter(bottomSheetView1.getContext(),commentList);
+                    commentAdapter = new CommentAdapter(bottomSheetView1.getContext(), commentList);
 
                     recyclerViewComments.setAdapter(commentAdapter);
 
@@ -277,15 +273,13 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         });
     }
 
-    private void postComment(final String pId)
-    {
+    private void postComment(final String pId) {
         progressBarComment = new ProgressDialog(getActivity());
         progressBarComment.setMessage("Adding Comment...");
 
         String comment = commentEt.getEditText().getText().toString();
 
-        if(TextUtils.isEmpty(comment))
-        {
+        if (TextUtils.isEmpty(comment)) {
             Toast.makeText(getActivity(), "Comment is empty", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -298,7 +292,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Posts").child(pId).child("Comments");
 
-        HashMap<String,Object> hashMap = new HashMap<>();
+        HashMap<String, Object> hashMap = new HashMap<>();
 
         hashMap.put("cId", timeStamp);
         hashMap.put("comment", comment);
@@ -311,7 +305,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        
+
                         progressBarComment.dismiss();
                         Toast.makeText(getActivity(), "Comment Added...", Toast.LENGTH_SHORT).show();
                         commentEt.getEditText().setText("");
@@ -328,11 +322,8 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                 });
 
 
-
-
-
-
     }
+
     boolean mProcessComment = false;
 
     private void updateCommentCount(String pId) {
@@ -343,15 +334,11 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(mProcessComment)
-                {
+                if (mProcessComment) {
                     String comments = "" + snapshot.child("pComments").getValue();
                     int newCommentVal = Integer.parseInt(comments) + 1;
-                    ref.child("pComments").setValue(""+newCommentVal);
+                    ref.child("pComments").setValue("" + newCommentVal);
                     mProcessComment = false;
-
-
-
                 }
             }
 
@@ -465,8 +452,8 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         hashMap.put("pTime", timeStamp);
         hashMap.put("uId", uid);
         hashMap.put("uPic", fUser.getPhotoUrl().toString());
-        hashMap.put("pLikes","0");
-        hashMap.put("pComments","0");
+        hashMap.put("pLikes", "0");
+        hashMap.put("pComments", "0");
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
         ref.child(timeStamp).setValue(hashMap)
@@ -532,24 +519,22 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadPostInfo(String pId)
-    {
+    private void loadPostInfo(String pId) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
         Query query = ref.orderByChild("pId").equalTo(pId);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                for(DataSnapshot ds: snapshot.getChildren())
-                {
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     //get data
-                    String pDesc = "" + ds.child("pDesc").getValue();
+                    String pDesc = ds.child("pDesc").getValue(String.class);
                     String pId = "" + ds.child("pId").getValue();
                     String pLikes = "" + ds.child("pLikes").getValue();
-                    String pTimeStamp = "" + ds.child("pTime").getValue();
+                    String pTimeStamp = ds.child("pTime").getValue(String.class);
                     String uId = "" + ds.child("uId").getValue();
                     String uLoc = "" + ds.child("uLoc").getValue();
-                    String uName = "" + ds.child("uName").getValue();
+                    String uName = ds.child("uName").getValue(String.class);
                     String uPic = "" + ds.child("uPic").getValue();
                     String commentCount = "" + ds.child("pComments").getValue();
 
@@ -559,14 +544,15 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     String pTime = DateFormat.format("dd/MM/yyyy hh:mm  aa", calendar).toString();
 
                     //set data
-
                     description_comment.setText(pDesc);
                     name_comment.setText(uName);
                     time_comment.setText(pTime);
-                    Glide.with(bottomSheetView1).asBitmap().load(Uri.parse(uPic)).into(picture_comment);
-
+                    try {
+                        Glide.with(bottomSheetView1).asBitmap().load(Uri.parse(uPic)).into(picture_comment);
+                    } catch (Exception ex) {
+                        ex.getMessage();
+                    }
                 }
-
             }
 
             @Override

@@ -58,7 +58,20 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:src="@drawable/ic_person_add_black_24dp"
+            android:visibility="gone"
             app:backgroundTint="@color/green"
+            app:layout_anchor="@id/collapsing_toolbar_layout"
+            app:layout_anchorGravity="start|bottom"
+            app:layout_behavior="com.google.android.material.floatingactionbutton.FloatingActionButton$Behavior"
+            app:tint="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/profile_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/ic_settings_black_24dp"
+            app:backgroundTint="@color/colorPrimary"
             app:layout_anchor="@id/collapsing_toolbar_layout"
             app:layout_anchorGravity="start|bottom"
             app:layout_behavior="com.google.android.material.floatingactionbutton.FloatingActionButton$Behavior"
@@ -70,6 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:src="@drawable/ic_chat_black_24dp"
+            android:visibility="gone"
             app:backgroundTint="@color/colorPrimary"
             app:layout_anchor="@id/collapsing_toolbar_layout"
             app:layout_anchorGravity="end|bottom"
@@ -99,7 +113,6 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="5dp"
-                android:text="תומר שטרית"
                 android:textSize="25sp" />
 
             <RelativeLayout
@@ -168,7 +181,7 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:text="0"
-                        android:textSize="19sp"/>
+                        android:textSize="19sp" />
 
                 </LinearLayout>
 
@@ -242,7 +255,6 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_marginStart="10dp"
-                            android:text="גבר, 25"
                             android:textSize="18sp" />
 
                     </LinearLayout>
@@ -277,7 +289,6 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_marginStart="10dp"
-                            android:text="חולון, ישראל"
                             android:textSize="18sp" />
 
                     </LinearLayout>
@@ -313,7 +324,6 @@
                             android:layout_gravity="center"
                             android:layout_marginStart="10dp"
                             android:gravity="center"
-                            android:text="בעל כלב"
                             android:textSize="18sp" />
 
                     </LinearLayout>

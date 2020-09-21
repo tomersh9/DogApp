@@ -71,36 +71,6 @@
                     android:textSize="15sp" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/friend_cell_add_btn"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:padding="10dp"
-                    android:layout_gravity="center"
-                    android:background="?attr/selectableItemBackground"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/add_friend_selector" />
-
-                <!--<ImageButton
-                    android:id="@+id/friend_cell_chat_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="1"
-                    android:background="?attr/selectableItemBackground"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_chat_black_24dp"
-                    android:tint="@color/colorPrimary" />-->
-
-            </LinearLayout>
-
         </LinearLayout>
 
     </RelativeLayout>

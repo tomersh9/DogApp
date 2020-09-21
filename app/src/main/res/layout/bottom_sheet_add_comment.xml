@@ -83,8 +83,8 @@
                     android:text="skdnfkafgksbdfgjafnksjdfngjksfdngkjdfg" />
 
                 <TextView
-                    android:layout_width="wrap_content"
                     android:id="@+id/owner_time"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:text="11:55 PM" />
@@ -95,7 +95,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bottom_comments_recycler"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="300dp"
             android:layout_below="@id/post_owner_layout"
             android:layout_marginHorizontal="5dp"
             android:layout_marginTop="5dp"
@@ -114,19 +114,19 @@
                 android:id="@+id/comment_et"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
                 android:layout_gravity="center"
+                android:layout_marginHorizontal="10dp"
+                android:layout_weight="3"
                 app:boxBackgroundColor="@color/white"
                 app:boxBackgroundMode="outline"
-                android:layout_marginHorizontal="10dp"
                 app:endIconMode="clear_text">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="13dp"
                     android:layout_gravity="center"
-                    android:hint="@string/write_a_comment" />
+                    android:hint="@string/write_a_comment"
+                    android:padding="13dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
@@ -135,8 +135,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:padding="7dp"
                 android:gravity="center"
+                android:padding="7dp"
                 android:text="@string/commit"
                 android:textAllCaps="false"
                 android:textSize="20sp"
