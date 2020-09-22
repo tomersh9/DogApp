@@ -94,7 +94,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     TextView name_comment;
     TextView description_comment;
     TextView time_comment;
-    TextInputLayout commentEt;
+    EditText commentEt;
     ImageView picture_comment;
     View bottomSheetView1;
     ProgressDialog progressBarComment;
@@ -183,14 +183,14 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         final BottomSheetDialog dialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
         View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_add_post, null);
 
-        final TextInputLayout postEt = bottomSheetView.findViewById(R.id.post_et);
-        Button postBtn = bottomSheetView.findViewById(R.id.post_btn);
+        final EditText postEt = bottomSheetView.findViewById(R.id.post_et);
+        ImageButton postBtn = bottomSheetView.findViewById(R.id.post_btn);
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String description = postEt.getEditText().getText().toString();
+                String description = postEt.getText().toString();
                 uploadPost(description);
-                postEt.getEditText().setText("");
+                postEt.setText("");
                 dialog.dismiss();
             }
         });
@@ -212,7 +212,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         recyclerViewComments = bottomSheetView1.findViewById(R.id.bottom_comments_recycler);
 
         commentEt = bottomSheetView1.findViewById(R.id.comment_et);
-        Button commentBtn = bottomSheetView1.findViewById(R.id.comment_btn);
+        ImageButton commentBtn = bottomSheetView1.findViewById(R.id.comment_btn);
         name_comment = bottomSheetView1.findViewById(R.id.owner_post_name_tv);
         description_comment = bottomSheetView1.findViewById(R.id.owner_post_tv);
         time_comment = bottomSheetView1.findViewById(R.id.owner_time);
@@ -233,9 +233,8 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
             @Override
             public void onClick(View v) {
                 postComment(pId);
-                Toast.makeText(getActivity(), commentEt.getEditText().getText().toString(), Toast.LENGTH_SHORT).show();
-                commentEt.getEditText().setText("");
-                dialog.dismiss();
+                commentEt.setText("");
+                //dialog.dismiss();
             }
         });
         dialog.setContentView(bottomSheetView1);
@@ -277,7 +276,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         progressBarComment = new ProgressDialog(getActivity());
         progressBarComment.setMessage("Adding Comment...");
 
-        String comment = commentEt.getEditText().getText().toString();
+        String comment = commentEt.getText().toString();
 
         if (TextUtils.isEmpty(comment)) {
             Toast.makeText(getActivity(), "Comment is empty", Toast.LENGTH_SHORT).show();
@@ -307,8 +306,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     public void onSuccess(Void aVoid) {
 
                         progressBarComment.dismiss();
-                        Toast.makeText(getActivity(), "Comment Added...", Toast.LENGTH_SHORT).show();
-                        commentEt.getEditText().setText("");
+                        commentEt.setText("");
                         updateCommentCount(pId);
 
                     }
@@ -317,7 +315,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         progressBarComment.dismiss();
-                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
 

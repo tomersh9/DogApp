@@ -17,8 +17,8 @@ import com.google.android.material.tabs.TabLayout;
 
 public class ExploreFragment extends Fragment {
 
-    ViewPager viewPager;
-    TabLayout tabLayout;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
 
     @Nullable
     @Override
@@ -42,6 +42,8 @@ public class ExploreFragment extends Fragment {
         boardsPagerAdapter.addFragment(walkerBoardFragment,getString(R.string.dog_walkers));
         viewPager.setAdapter(boardsPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.group_icon_64);
+        tabLayout.getTabAt(1).setIcon(R.drawable.dog_helper_icon_64);
     }
 
     @Override

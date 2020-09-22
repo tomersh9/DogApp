@@ -3,13 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
     app:cardElevation="1dp">
 
     <RelativeLayout
         android:id="@+id/cell_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:paddingVertical="15dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -43,6 +45,7 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:text="ענת חיים"
+                    android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 

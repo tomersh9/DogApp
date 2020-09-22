@@ -3,13 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
     app:cardElevation="1dp">
 
     <RelativeLayout
         android:id="@+id/cell_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:paddingVertical="15dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -43,6 +45,7 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:text="ענת חיים"
+                    android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -75,19 +78,20 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:gravity="center"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:orientation="horizontal">
 
                 <ImageButton
                     android:id="@+id/friend_cell_add_btn"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:padding="10dp"
                     android:layout_gravity="center"
                     android:background="?attr/selectableItemBackground"
+                    android:padding="10dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/add_friend_selector" />
+                    android:src="@drawable/follow_user_icon_64"
+                    android:tint="@color/green" />
 
                 <!--<ImageButton
                     android:id="@+id/friend_cell_chat_btn"

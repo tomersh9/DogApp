@@ -165,6 +165,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             chatFab.setVisibility(View.VISIBLE);
             followFab.setVisibility(View.VISIBLE);
             profileFab.setVisibility(View.GONE);
+            chatFab.hide();
 
             loadFollowingList(); //seeing other user's profile
 
@@ -236,10 +237,12 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     followingList.add(ds.getValue(String.class)); //filter only the ones i follow
                 }
                 if (followingList.contains(userID)) {
-                    followFab.setImageResource(R.drawable.ic_explore_black_24dp);
+                    chatFab.show();
+                    followFab.setImageResource(R.drawable.unfollow_user_icon_64);
                     followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.red)));
                 } else {
-                    followFab.setImageResource(R.drawable.ic_person_add_black_24dp);
+                    chatFab.hide();
+                    followFab.setImageResource(R.drawable.follow_user_icon_64);
                     followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.green)));
                 }
             }
@@ -272,7 +275,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     if (!followersList.contains(fUser.getUid())) {
                         followersList.add(fUser.getUid());
                         followersRef.child(userID).setValue(followersList);
-                        followersTv.setText(followersList.size()+"");
+                        followersTv.setText(followersList.size() + "");
                     }
 
                 }
@@ -283,8 +286,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 }
             });
             //change fab apperance
-            followFab.setImageResource(R.drawable.ic_explore_black_24dp);
+            chatFab.show();
+            followFab.setImageResource(R.drawable.unfollow_user_icon_64);
             followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.red)));
+            Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + nameTv.getText().toString(), Snackbar.LENGTH_SHORT).show();
 
         } else { //unfollow user
 
@@ -305,7 +310,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     if (followersList.contains(fUser.getUid())) {
                         followersList.remove(fUser.getUid());
                         followersRef.child(userID).setValue(followersList);
-                        followersTv.setText(followersList.size()+"");
+                        followersTv.setText(followersList.size() + "");
                     }
                 }
 
@@ -315,8 +320,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 }
             });
             //change fab apperance
-            followFab.setImageResource(R.drawable.ic_person_add_black_24dp);
+            chatFab.hide();
+            followFab.setImageResource(R.drawable.follow_user_icon_64);
             followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.green)));
+            Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.unfollow_from) + " " + nameTv.getText().toString(), Snackbar.LENGTH_SHORT).show();
         }
 
         //loadDetailsViews();

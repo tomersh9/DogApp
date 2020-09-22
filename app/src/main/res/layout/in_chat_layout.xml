@@ -71,7 +71,7 @@
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/round_bg__dialog_shape"
+        android:background="@drawable/bottom_sheet_et_shape"
         android:padding="8dp"
         android:translationZ="1dp">
 

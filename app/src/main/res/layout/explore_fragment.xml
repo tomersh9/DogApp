@@ -8,24 +8,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
- <!--       <androidx.appcompat.widget.Toolbar
-            android:id="@+id/explore_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="fuck off" />-->
+        <!--       <androidx.appcompat.widget.Toolbar
+                   android:id="@+id/explore_toolbar"
+                   android:layout_width="match_parent"
+                   android:layout_height="?attr/actionBarSize"
+                   android:background="?attr/colorPrimary"
+                   android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                   app:title="fuck off" />-->
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
+            style="@style/Theme.AppCompat.Light"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
-            style="@style/Theme.AppCompat.Light"
-            app:tabTextColor="@color/tab_unselected_text"
-            app:tabSelectedTextColor="#fff"
-            app:tabIndicatorColor="@color/whitish"
-            app:tabGravity="fill" />
+            app:tabGravity="fill"
+            app:tabIconTint="@color/white"
+            app:tabIndicatorColor="@color/white"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/tab_unselected_text" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

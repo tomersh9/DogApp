@@ -210,7 +210,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         fquery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Toast.makeText(context, pId, Toast.LENGTH_SHORT).show();
 
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     if (ds.child("pId").getValue() == pId)
@@ -221,9 +220,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                     //ds.getRef().removeValue();
                 }
                 //deleted
-                Toast.makeText(context, "Posts Deleted", Toast.LENGTH_SHORT).show();
                 progressDialog.dismiss();
-
             }
 
             @Override

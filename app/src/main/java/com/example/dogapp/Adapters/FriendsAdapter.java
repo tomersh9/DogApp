@@ -111,7 +111,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
                     @Override
                     public void onClick(View v) {
                         listener.onFriendFollowClicked(getAdapterPosition(), v);
-                        followBtn.setImageResource(R.drawable.friend_checked);
+                        //followBtn.setImageResource(R.drawable.friend_checked);
                     }
                 });
             }

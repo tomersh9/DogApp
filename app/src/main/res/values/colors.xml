@@ -11,6 +11,8 @@
     <color name="whitish">#F4F4F4</color>
     <color name="chat_color_box">#E3E3E3</color>
     <color name="nav_bar_item_color">#BCB3B3B3</color>
+    <color name="bottom_et_color">#D2F3F2F2</color>
+    <color name="bottom_et_comments_color">#BFE6E6E6</color>
     <color name="tab_unselected_text">#D8EAE8E8</color>
     <color name="red">#e3342f</color>
     <color name="green">#38c172</color>

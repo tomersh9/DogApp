@@ -25,7 +25,7 @@
         android:layout_below="@id/comment_sheet_thumb"
         android:layout_marginTop="10dp"
         android:paddingTop="15dp"
-        android:paddingBottom="30dp">
+        android:paddingBottom="10dp">
 
 
         <TextView
@@ -46,6 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/comment_tv"
             android:layout_marginHorizontal="10dp"
+            android:background="@drawable/bottom_sheet_comments_card_shape"
             android:layout_marginTop="10dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
@@ -54,7 +55,7 @@
                 android:layout_height="35dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="5dp"
+                android:layout_marginStart="7dp"
                 android:src="@drawable/shutterstock_648907024" />
 
             <LinearLayout
@@ -72,6 +73,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:text="yafa yarkoni"
+                    android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -80,6 +82,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
                     android:text="skdnfkafgksbdfgjafnksjdfngjksfdngkjdfg" />
 
                 <TextView
@@ -92,17 +96,71 @@
 
         </RelativeLayout>
 
+        <!--<ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="5dp"
+            android:src="@color/nav_bar_item_color"
+            android:layout_below="@id/post_owner_layout"
+            android:layout_marginHorizontal="10dp"/>-->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bottom_comments_recycler"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="350dp"
             android:layout_below="@id/post_owner_layout"
             android:layout_marginHorizontal="5dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="7dp"
             android:paddingHorizontal="15dp"
             android:paddingVertical="5dp" />
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/comment_line"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:src="@color/nav_bar_item_color"
+            android:layout_above="@id/send_comment_layout"
+            android:layout_marginHorizontal="10dp"/>
+
+        <RelativeLayout
+            android:id="@+id/send_comment_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bottom_comments_recycler"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/bottom_sheet_et_shape"
+            android:padding="8dp">
+
+            <EditText
+                android:id="@+id/comment_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_toStartOf="@id/comment_btn"
+                android:background="@android:color/transparent"
+                android:textCursorDrawable="@color/black"
+                android:layout_centerVertical="true"
+                android:hint="@string/write_a_comment"
+                android:padding="5dp" />
+
+            <ImageButton
+                android:id="@+id/comment_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="10dp"
+                android:background="?attr/selectableItemBackground"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_send_black_24dp"
+                android:tint="@color/colorPrimary" />
+
+        </RelativeLayout>
+
+        <!--<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/bottom_comments_recycler"
@@ -142,6 +200,6 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-        </LinearLayout>
+        </LinearLayout>-->
     </RelativeLayout>
 </RelativeLayout>

@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:src="@drawable/ic_person_add_black_24dp"
+            android:src="@drawable/follow_user_icon_64"
             android:visibility="gone"
             app:backgroundTint="@color/green"
             app:layout_anchor="@id/collapsing_toolbar_layout"
@@ -161,6 +161,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_marginHorizontal="50dp"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:background="?attr/selectableItemBackground"
                     android:orientation="vertical">
 
@@ -190,6 +192,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/following_layout"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:background="?attr/selectableItemBackground"
                     android:orientation="vertical">
 
@@ -240,6 +244,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
                         android:padding="10dp">
 
                         <ImageView
@@ -273,6 +280,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_below="@id/line1"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
                         android:orientation="horizontal"
                         android:padding="10dp">
 
@@ -307,6 +317,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_below="@id/line2"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
                         android:orientation="horizontal"
                         android:padding="10dp">
 
@@ -349,7 +362,7 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/about_icon_50" />
+                            android:src="@drawable/about_blue_icon" />
 
                         <TextView
                             android:layout_width="wrap_content"

@@ -3,13 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
     app:cardElevation="1dp">
 
     <RelativeLayout
         android:id="@+id/cell_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:paddingVertical="15dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -43,6 +45,7 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:text="ענת חיים"
+                    android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -73,7 +76,7 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_toEndOf="@id/friend_cell_details_layout"
                 android:layout_weight="1"
@@ -82,21 +85,23 @@
                 <ImageButton
                     android:id="@+id/friend_cell_delete_btn"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="?attr/selectableItemBackground"
+                    android:padding="20dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_delete_black_24dp"
+                    android:src="@drawable/unfollow_user_icon_64"
                     android:tint="@color/red" />
 
                 <ImageButton
                     android:id="@+id/friend_cell_chat_btn"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="?attr/selectableItemBackground"
+                    android:padding="20dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_chat_black_24dp"
+                    android:src="@drawable/chat_icon_64"
                     android:tint="@color/colorPrimary" />
 
             </LinearLayout>

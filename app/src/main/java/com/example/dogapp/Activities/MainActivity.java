@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
         //set default home fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
+        toolbar.setTitle(R.string.home);
 
         //listens to events of fire base instances
         authStateListener = new FirebaseAuth.AuthStateListener() {
@@ -192,6 +193,15 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
     private void setOnClickListeners() {
 
+        drawerProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProfileFragment profileFragment = ProfileFragment.newInstance(fUser.getUid(), fUser.getPhotoUrl().toString());
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment).commit();
+                drawerLayout.closeDrawers();
+            }
+        });
+
         //bottom nav_bar items click events (swapping different fragments)
         bottomNavBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -220,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         break;
 
                     case R.id.bottom_profile:
-                        profileFragment = ProfileFragment.newInstance(fUser.getUid(),fUser.getPhotoUrl().toString());
+                        profileFragment = ProfileFragment.newInstance(fUser.getUid(), fUser.getPhotoUrl().toString());
                         currFragment = profileFragment;
                         break;
 
@@ -245,7 +255,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 switch (item.getItemId()) {
 
                     case R.id.item_profile:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
+                        profileFragment = ProfileFragment.newInstance(fUser.getUid(), fUser.getPhotoUrl().toString());
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment).commit();
                         bottomNavBar.setSelectedItemId(R.id.bottom_profile);
                         break;
 
