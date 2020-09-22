@@ -1,6 +1,8 @@
 package com.example.dogapp.Enteties;
 
-public class User {
+import java.util.Comparator;
+
+public class User  implements Comparable<User> {
 
     private String fullName;
     private String dateOfBirth;
@@ -11,10 +13,11 @@ public class User {
     private String photoUri;
     private String id;
     private String status;
+    private String timeStamp;
 
     public User() {}
 
-    public User(String fullName, String dateOfBirth, String email, String gender, String title, String location, String photoUri, String id, String status) {
+    public User(String fullName, String dateOfBirth, String email, String gender, String title, String location, String photoUri, String id, String status, String timeStamp) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
@@ -24,6 +27,7 @@ public class User {
         this.photoUri = photoUri;
         this.id = id;
         this.status = status;
+        this.timeStamp = timeStamp;
     }
 
     public String getFullName() {
@@ -96,5 +100,25 @@ public class User {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+
+
+    @Override
+    public int compareTo(User o) {
+        
+        long time1 = Long.parseLong(timeStamp);
+        long time2 = Long.parseLong(o.timeStamp);
+        int compare = Long.compare(time2,time1);
+        
+        return  compare;
     }
 }

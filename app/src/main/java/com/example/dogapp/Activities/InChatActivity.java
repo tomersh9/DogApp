@@ -20,6 +20,7 @@ import com.example.dogapp.Enteties.Chat;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Adapters.MessageAdapter;
 import com.example.dogapp.R;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -52,6 +53,7 @@ public class InChatActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private String userID; //to whom i send messages
     private ValueEventListener isSeenListener;
+    String tempStemp;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,6 +90,7 @@ public class InChatActivity extends AppCompatActivity {
         //sender and receiver
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         userID = getIntent().getStringExtra("userID");
+
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,8 +212,26 @@ public class InChatActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
+
+                    String timeStamp = String.valueOf(System.currentTimeMillis());
                     senderChatRef.child("id").setValue(userID); //putting a uid field to whom i send once
+                    //senderChatRef.child("timeStamp").setValue(timeStamp);
                 }
+
+                databaseReference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
+
+                String timeStamp = String.valueOf(System.currentTimeMillis());
+
+                tempStemp = timeStamp;
+
+                databaseReference.child("timeStamp").setValue(timeStamp).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        //Toast.makeText(getActivity(), "YESSSS", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
             }
 
             @Override
@@ -229,6 +250,19 @@ public class InChatActivity extends AppCompatActivity {
                 if (!snapshot.exists()) {
                     receiverChatRef.child("id").setValue(fUser.getUid()); //putting a uid field to whom i send once
                 }
+
+                databaseReference = FirebaseDatabase.getInstance().getReference("users").child(userID);
+
+                //String timeStamp = String.valueOf(System.currentTimeMillis());
+
+                databaseReference.child("timeStamp").setValue(tempStemp).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        //Toast.makeText(getActivity(), "YESSSS", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
             }
 
             @Override

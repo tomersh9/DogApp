@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +20,7 @@ import com.example.dogapp.Adapters.ChatUsersAdapter;
 import com.example.dogapp.Enteties.ChatList;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +30,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ChatsFragment extends Fragment implements ChatUsersAdapter.MyChatUserListener {
@@ -96,6 +101,7 @@ public class ChatsFragment extends Fragment implements ChatUsersAdapter.MyChatUs
                     ChatList chatList = ds.getValue(ChatList.class);
                     allChatsList.add(chatList);
                 }
+               // updateUserWithTimeStamp();
                 createChatList(); //create users list with recyclerview
             }
 
@@ -105,6 +111,56 @@ public class ChatsFragment extends Fragment implements ChatUsersAdapter.MyChatUs
             }
         });
 
+    }
+
+    private void updateUserWithTimeStamp() {
+        users = new ArrayList<>();
+        databaseReference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
+
+        String timeStamp = String.valueOf(System.currentTimeMillis());
+
+        databaseReference.child("timeStamp").setValue(timeStamp).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+
+                //Toast.makeText(getActivity(), "YESSSS", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+//        databaseReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//
+//                for (DataSnapshot ds : snapshot.getChildren()) {
+//
+//                    if()
+//
+//                    String timeStamp = String.valueOf(System.currentTimeMillis());
+//                    databaseReference.setValue(timeStamp);
+//                    Toast.makeText(getActivity(), "success!!!!", Toast.LENGTH_SHORT).show();
+//
+////                    User user = ds.getValue(User.class);
+////                    for (ChatList chatList : allChatsList) {
+////                        if (user.getId().equals(chatList.getId())) {
+////
+////                            users.add(user);
+////                        }
+////                    }
+//                }
+//                //Toast.makeText(getActivity(), "success!!!!", Toast.LENGTH_SHORT).show();
+//                userAdapter = new ChatUsersAdapter(users, getActivity());
+//                userAdapter.setMyChatUserListener(ChatsFragment.this);
+//                recyclerView.setAdapter(userAdapter);
+//                progressBar.setVisibility(View.GONE);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                progressBar.setVisibility(View.GONE);
+//                Toast.makeText(getActivity(), "cancel", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
     private void createChatList() {
@@ -119,10 +175,16 @@ public class ChatsFragment extends Fragment implements ChatUsersAdapter.MyChatUs
                     User user = ds.getValue(User.class);
                     for (ChatList chatList : allChatsList) {
                         if (user.getId().equals(chatList.getId())) {
+
                             users.add(user);
+//                            Collections.sort(users);
+//                            Toast.makeText(getActivity(), users.size() + "", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
+
+                Collections.sort(users);
+                //Toast.makeText(getActivity(), users.size() + "", Toast.LENGTH_SHORT).show();
                 //Toast.makeText(getActivity(), users.size()+"", Toast.LENGTH_SHORT).show();
                 userAdapter = new ChatUsersAdapter(users, getActivity());
                 userAdapter.setMyChatUserListener(ChatsFragment.this);

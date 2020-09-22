@@ -54,6 +54,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.myHolder
         //set the data
 
 
+
+
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.setTimeInMillis(Long.parseLong(timeStamp));
         String pTime = DateFormat.format("dd/MM/yyyy hh:mm  aa", calendar).toString();
