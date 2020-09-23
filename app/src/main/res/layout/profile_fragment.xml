@@ -48,7 +48,7 @@
             android:src="@drawable/shutterstock_648907024"
             android:translationZ="20dp"
             app:elevation="20dp"
-            app:layout_anchor="@id/app_bar"
+            app:layout_anchor="@+id/app_bar"
             app:layout_anchorGravity="bottom|center"
             app:layout_collapseMode="parallax" />
 

@@ -78,6 +78,7 @@ public class SecondRegisterFragment extends Fragment {
     final int SELECT_IMAGE = 3;
     final int LOCATION_PERMISSION_REQUEST = 4;
     boolean isFromCamera;
+    boolean permission = true;
 
     Uri fileUri;
     AlertDialog alertDialog;
@@ -131,8 +132,12 @@ public class SecondRegisterFragment extends Fragment {
         if (requestCode == WRITE_PERMISSION_REQUEST) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getActivity(), "No permissions", Toast.LENGTH_SHORT).show();
+                permission = false;
             } else
+                {
                 Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+                permission = true;
+            }
         }
 
         if (requestCode == LOCATION_PERMISSION_REQUEST) {
@@ -169,7 +174,7 @@ public class SecondRegisterFragment extends Fragment {
 
         }
 
-        if (requestCode == SELECT_IMAGE) {
+        if (requestCode == SELECT_IMAGE && permission == true) {
             if (resultCode == Activity.RESULT_OK) {
                 fileUri = data.getData();
                 bitmap1 = null;

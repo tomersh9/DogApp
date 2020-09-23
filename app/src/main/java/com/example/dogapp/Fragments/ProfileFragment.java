@@ -1,14 +1,23 @@
 package com.example.dogapp.Fragments;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.ImageDecoder;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +37,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -39,6 +49,8 @@ import com.example.dogapp.Activities.InChatActivity;
 import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -48,12 +60,18 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +101,18 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     //Dialogs
     private AlertDialog alertDialog;
+
+    //camera and gallery
+    Uri fileUri;
+    Bitmap bitmap1, bitmap2;
+
+    // Activity requests
+    final int CAMERA_REQUEST = 1;
+    final int WRITE_PERMISSION_REQUEST = 2;
+    final int SELECT_IMAGE = 3;
+    boolean isFromCamera;
+    boolean permission = true;
+    String email;
 
     public interface OnProfileFragmentListener {
         void changeProfileToolBar(Toolbar toolbar);
@@ -205,7 +235,41 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         profileIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buildProfileSheetDialog();
+                if(isMe) {
+                    buildProfileSheetDialog();
+                }
+                else
+                {
+                    View dialogView = getLayoutInflater().inflate(R.layout.image_display_dialog, null);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    alertDialog = builder.setView(dialogView).show();
+                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                    final ProgressBar progressBar = dialogView.findViewById(R.id.img_loader_bar);
+                    final ImageView imageView = dialogView.findViewById(R.id.img_display);
+                    progressBar.setVisibility(View.VISIBLE);
+
+                    try {
+                        Glide.with(dialogView).load(imgURL).listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_upload_image, Snackbar.LENGTH_SHORT).show();
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                imageView.setVisibility(View.VISIBLE);
+                                return false;
+                            }
+                        }).into(imageView);
+                    } catch (Exception e) {
+
+                    }
+                }
+
             }
         });
 
@@ -374,6 +438,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                     User user = snapshot.getValue(User.class);
 
+                    email = user.getEmail();
+
                     //setting icons
                     if (getActivity() != null) {
 
@@ -409,6 +475,14 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     }
 
     private void buildProfileSheetDialog() {
+        if (Build.VERSION.SDK_INT >= 23)
+        {
+            int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+            if (hasWritePermission != PackageManager.PERMISSION_GRANTED && hasReadPermission != PackageManager.PERMISSION_GRANTED)
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
+        }
+
 
         final BottomSheetDialog bottomDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
         View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_profile, null);
@@ -452,6 +526,34 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 bottomDialog.dismiss();
             }
         });
+
+        takePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "Picture");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "from");
+                fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                startActivityForResult(intent, CAMERA_REQUEST);
+                bottomDialog.dismiss();
+            }
+        });
+
+        selectPic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                startActivityForResult(intent, SELECT_IMAGE);
+                bottomDialog.dismiss();
+            }
+        });
+
+
         bottomDialog.setContentView(bottomSheetView);
         bottomDialog.show();
     }
@@ -494,4 +596,143 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CAMERA_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                //Toast.makeText(getActivity(), fileUri.toString(), Toast.LENGTH_SHORT).show();
+                bitmap2 = null;
+                try {
+                    bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                profileIv.setImageBitmap(bitmap1);
+                //getActivity().getContentResolver().delete(fileUri,null, null); // have to transfer to register button
+                //pressTv.setVisibility(View.GONE);
+                isFromCamera = true;
+                if(bitmap1 != null)
+                {
+                    profileIv.setImageBitmap(bitmap1);
+                    handleUpload(bitmap1);
+
+                }
+                //alertDialog.dismiss();
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_SHORT).show();
+                fileUri = null;
+            }
+
+        }
+
+        if (requestCode == SELECT_IMAGE) {
+            if (resultCode == Activity.RESULT_OK && permission == true ) {
+                Toast.makeText(getActivity(), "NBBBB", Toast.LENGTH_SHORT).show();
+                fileUri = data.getData();
+                bitmap1 = null;
+                try {
+                    bitmap2 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(bitmap2 != null)
+                {
+                    profileIv.setImageBitmap(bitmap2);
+                    handleUpload(bitmap2);
+
+                }
+
+                //pressTv.setVisibility(View.GONE);
+                isFromCamera = false;
+                if (isFromCamera)
+                    getActivity().getContentResolver().delete(fileUri, null, null);
+                //alertDialog.dismiss();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == WRITE_PERMISSION_REQUEST) {
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getActivity(), "No permissions!!!", Toast.LENGTH_SHORT).show();
+                permission = false;
+            }
+
+            else
+                {
+                Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+                permission = true;
+            }
+        }
+
+    }
+
+    private void handleUpload(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Images").child(email + ".jpeg");
+
+        storage.putBytes(baos.toByteArray())
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        getDownloadUrl(storage);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+
+    }
+
+    private void getDownloadUrl(StorageReference storage) {
+        storage.getDownloadUrl()
+                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        setUserProfileUrl(uri);
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
+
+    private void setUserProfileUrl(Uri uri) {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                .setPhotoUri(uri)
+                .build();
+
+        if (user != null) {
+            user.updateProfile(request)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
+                            //listener.stopLoader();
+                            //listener.createConfirmDialog();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //listener.stopLoader();
+                        }
+                    });
+        }
+    }
+
 }
