@@ -14,6 +14,17 @@
         android:paddingVertical="10dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/chat_cell_new_msg_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_below="@id/chat_cell_time"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="19dp"
+            android:layout_marginTop="7dp"
+            android:visibility="gone"
+            android:src="@color/colorPrimary" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/chat_cell_image"
             android:layout_width="50dp"
             android:layout_height="50dp"

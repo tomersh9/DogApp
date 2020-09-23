@@ -6,6 +6,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.Chat;
 import com.example.dogapp.Enteties.User;
@@ -29,9 +37,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class InChatActivity extends AppCompatActivity {
@@ -53,7 +67,12 @@ public class InChatActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private String userID; //to whom i send messages
     private ValueEventListener isSeenListener;
-    String tempStemp;
+    private String tempStamp;
+
+    //server
+    private final String SERVER_KEY = "AAAAsSPUwiM:APA91bF5T2kokP05wtjBjEwMiUXAuB9OXF4cCSgqf4HV9ST1kzKuD9w3ncboYoGTZxMQbBSv0EocqTcycHE4gGzFDDeGIYkyLolsd3W1gY1ZPu5qCHjpNAh-H3g0Y-JvNUIZ1iOm8uOW";
+    private final String BASE_URL = "https://fcm.googleapis.com/fcm/send/";
+    private String hisToken;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,13 +110,14 @@ public class InChatActivity extends AppCompatActivity {
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         userID = getIntent().getStringExtra("userID");
 
-
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String msg = messageEt.getText().toString();
                 if (!msg.equals("")) {
                     sendMessage(fUser.getUid(), userID, msg);
+                    sendNotification();
                     messageEt.setText("");
                 }
             }
@@ -105,6 +125,76 @@ public class InChatActivity extends AppCompatActivity {
 
         //load user conversation
         loadUserMessages();
+    }
+
+    private void sendNotification() {
+
+        //getting the user's token
+        DatabaseReference tokenRef = FirebaseDatabase.getInstance().getReference("Tokens");
+        tokenRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    hisToken = snapshot.child("token").getValue(String.class);
+                    sendToToken();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(InChatActivity.this, "NO TOKEN FOUND!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void sendToToken() {
+        //setting data with JSON objects to get the children
+        final JSONObject rootJson = new JSONObject();
+        try {
+            if (hisToken != null) {
+                rootJson.put("to", hisToken); //send to this user
+                JSONObject messageJson = new JSONObject();
+                rootJson.put("data", messageJson.put("message", messageEt.getText().toString())); //putting the actual message data
+            } else {
+                return; //no token found
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        //create POST request
+        StringRequest stringRequest = new StringRequest(StringRequest.Method.POST, BASE_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) { //POST REQUEST class implementation
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "key=" + SERVER_KEY);
+                return headers;
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return rootJson.toString().getBytes(); //return the root object with data inside
+            }
+        };
+
+        //sending the actual request
+        RequestQueue queue = Volley.newRequestQueue(InChatActivity.this);
+        queue.add(stringRequest);
     }
 
     private void loadUserMessages() {
@@ -193,7 +283,9 @@ public class InChatActivity extends AppCompatActivity {
     }
 
     //collect data to send and push to the database in table "chats"
-    private void sendMessage(String sender, String receiver, String message) {
+    private void sendMessage(String sender, String receiver, final String message) {
+
+        String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         //is seen default to false
@@ -201,6 +293,7 @@ public class InChatActivity extends AppCompatActivity {
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
         hashMap.put("message", message);
+        hashMap.put("time", currentTime);
         hashMap.put("isSeen", "false");
         reference.child("chats").push().setValue(hashMap);
 
@@ -222,13 +315,11 @@ public class InChatActivity extends AppCompatActivity {
 
                 String timeStamp = String.valueOf(System.currentTimeMillis());
 
-                tempStemp = timeStamp;
+                tempStamp = timeStamp;
 
                 databaseReference.child("timeStamp").setValue(timeStamp).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-
-                        //Toast.makeText(getActivity(), "YESSSS", Toast.LENGTH_SHORT).show();
 
                     }
                 });
@@ -255,11 +346,9 @@ public class InChatActivity extends AppCompatActivity {
 
                 //String timeStamp = String.valueOf(System.currentTimeMillis());
 
-                databaseReference.child("timeStamp").setValue(tempStemp).addOnSuccessListener(new OnSuccessListener<Void>() {
+                databaseReference.child("timeStamp").setValue(tempStamp).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-
-                        //Toast.makeText(getActivity(), "YESSSS", Toast.LENGTH_SHORT).show();
 
                     }
                 });
@@ -276,13 +365,31 @@ public class InChatActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setUserStatus(getString(R.string.online));
+        setOtherUserStatus();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         databaseReference.removeEventListener(isSeenListener);
-        //setUserStatus(getString(R.string.offline));
+    }
+
+    private void setOtherUserStatus() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(userID);
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    User user = snapshot.getValue(User.class);
+                    statusTv.setText(user.getStatus());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void setUserStatus(String status) {

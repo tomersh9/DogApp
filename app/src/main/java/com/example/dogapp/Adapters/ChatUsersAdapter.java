@@ -1,6 +1,7 @@
 package com.example.dogapp.Adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,8 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
     private MyChatUserListener listener;
     private Context context;
     private String lastMessage;
+    private String lastTime;
+    private boolean isNew;
 
     public interface MyChatUserListener {
         void onChatUserClicked(int pos, View v);
@@ -56,6 +59,7 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
         TextView timeTv;
         ImageView profileIv;
         ImageView onlineIv, offlineIv;
+        ImageView isNewIv;
 
         //constructor
         public ChatUserViewHolder(@NonNull View itemView) {
@@ -67,6 +71,7 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
             profileIv = itemView.findViewById(R.id.chat_cell_image);
             onlineIv = itemView.findViewById(R.id.chat_cell_status_online);
             offlineIv = itemView.findViewById(R.id.chat_cell_status_offline);
+            isNewIv = itemView.findViewById(R.id.chat_cell_new_msg_icon);
 
             //on on cell click event
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -99,7 +104,7 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
         }
 
         //set status symbol
-        if (user.getStatus().equals("Online") || user.getStatus().equals("מחובר")){
+        if (user.getStatus().equals("Online") || user.getStatus().equals("מחובר")) {
             holder.onlineIv.setVisibility(View.VISIBLE);
             holder.offlineIv.setVisibility(View.GONE);
         } else {
@@ -108,7 +113,7 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
         }
 
         //set last message appear
-        setLastMessage(user.getId(),holder.lastMessageTv);
+        setLastMessage(user.getId(), holder.lastMessageTv, holder.timeTv, holder.isNewIv);
     }
 
     @Override
@@ -152,7 +157,7 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
         }
     };
 
-    private void setLastMessage(final String userID, final TextView lastMessageTv) {
+    private void setLastMessage(final String userID, final TextView lastMessageTv, final TextView timeTv, final ImageView iconIv) {
         lastMessage = "default";
         final FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("chats");
@@ -162,21 +167,37 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Chat chat = ds.getValue(Chat.class);
-                    if(fUser!=null) {
+                    if (fUser != null) {
+
                         if (chat.getReceiver().equals(fUser.getUid()) && chat.getSender().equals(userID)
                                 || chat.getReceiver().equals(userID) && chat.getSender().equals(fUser.getUid())) {
                             lastMessage = chat.getMessage();
+                            lastTime = chat.getTime();
+
+                            //indicate new message
+                            if ((chat.getReceiver().equals(fUser.getUid()) && chat.getSender().equals(userID))) {
+
+                                if (!chat.getIsSeen().equals("true")) {
+                                    iconIv.setVisibility(View.VISIBLE);
+                                    lastMessageTv.setTypeface(null, Typeface.BOLD);
+                                } else {
+                                    iconIv.setVisibility(View.GONE);
+                                    lastMessageTv.setTypeface(null, Typeface.NORMAL);
+                                }
+                            }
+
                         }
                     }
                 }
 
-                if(lastMessage.equals("default")) {
+                if (lastMessage.equals("default")) {
                     lastMessageTv.setText(R.string.no_msgs);
-                }
-                else {
+                } else {
                     lastMessageTv.setText(lastMessage);
                 }
                 lastMessage = "default"; //back to default
+                timeTv.setText(lastTime);
+
             }
 
             @Override

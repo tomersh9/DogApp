@@ -8,8 +8,15 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,17 +34,22 @@ import com.example.dogapp.Fragments.FollowingFragment;
 import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
 import com.example.dogapp.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.io.File;
 import java.util.HashMap;
@@ -73,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     FirebaseUser fUser = firebaseAuth.getCurrentUser();
     File file;
 
+    //Change UI from notification
+    BroadcastReceiver receiver;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -94,9 +109,22 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //create channel once
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel("ID", "NAME", NotificationManager.IMPORTANCE_HIGH);
+            manager.createNotificationChannel(channel);
+        }
 
         //initial set up of referencing
         toolbar = findViewById(R.id.toolbar);
@@ -154,9 +182,29 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         //***************UPDATE DRAWER UI WITH USER FIELDS**************************//
         //to prevent deleted users create real time things in the table
         //update photo url field in User class
-        usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
+
+        if(fUser!=null) {
+            Map<String,Object> hashMap = new HashMap<>();
+            hashMap.put("photoUri",fUser.getPhotoUrl().toString());
+            hashMap.put("id",fUser.getUid());
+            usersRef.child(fUser.getUid()).updateChildren(hashMap);
+
+            fUser.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                @Override
+                public void onComplete(@NonNull Task<GetTokenResult> task) {
+                    if(task.isSuccessful()) {
+                        sendRegistrationToServer(task.getResult().getToken());
+                    }
+                    else {
+                        Toast.makeText(MainActivity.this, "NO TOKEN", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+
+       /* usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
         //update Unique ID field
-        usersRef.child(fUser.getUid()).child("id").setValue(fUser.getUid());
+        usersRef.child(fUser.getUid()).child("id").setValue(fUser.getUid());*/
 
         //get data of current user from firebase and update views
         usersRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -182,6 +230,31 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
         if (fUser.getPhotoUrl() != null) {
             Glide.with(this).asBitmap().load(fUser.getPhotoUrl()).into(drawerProfilePic);
+        }
+
+        //Broadcast Receiver - update UI when user is in the app
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //add badge to the chats bottom nav item
+                String msg = intent.getStringExtra("message");
+            }
+        };
+
+        IntentFilter filter = new IntentFilter("action_msg_receive");
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+    }
+
+    private void sendRegistrationToServer(String token) {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens");
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("token", token);
+
+        if (firebaseUser != null) {
+            reference.child(firebaseUser.getUid()).updateChildren(hashMap);
         }
     }
 
@@ -320,7 +393,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     public void onProfileFollowersClick(String userID) {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getString(R.string.followers));
-        Toast.makeText(this, userID, Toast.LENGTH_SHORT).show();
         FollowersFragment followersFragment = FollowersFragment.newInstance(userID);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, followersFragment).commit();
     }

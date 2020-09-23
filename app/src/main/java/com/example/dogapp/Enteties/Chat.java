@@ -5,16 +5,18 @@ public class Chat {
     private String sender;
     private String receiver;
     private String message;
+    private String time;
     private String isSeen;
 
-    public Chat(String sender, String receiver, String message, String isSeen) {
+    public Chat() {
+    }
+
+    public Chat(String sender, String receiver, String message, String time, String isSeen) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
+        this.time = time;
         this.isSeen = isSeen;
-    }
-
-    public Chat() {
     }
 
     public String getSender() {
@@ -39,6 +41,14 @@ public class Chat {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getIsSeen() {

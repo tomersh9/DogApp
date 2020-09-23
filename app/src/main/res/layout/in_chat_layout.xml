@@ -36,6 +36,7 @@
                     android:layout_marginStart="7dp"
                     android:layout_toEndOf="@id/in_chat_profile_img"
                     android:text="Omer ifrach"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
@@ -46,8 +47,8 @@
                     android:layout_below="@id/in_chat_username"
                     android:layout_marginStart="7dp"
                     android:layout_toEndOf="@id/in_chat_profile_img"
-                    android:text="@string/online"
-                    android:visibility="gone"/>
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:text="@string/online" />
 
             </RelativeLayout>
 
@@ -61,6 +62,7 @@
         android:layout_height="match_parent"
         android:layout_above="@id/send_text_layout"
         android:layout_below="@id/in_chat_appbar"
+        android:layout_marginHorizontal="10dp"
         android:layout_marginBottom="3dp" />
 
     <RelativeLayout
