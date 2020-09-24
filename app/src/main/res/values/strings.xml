@@ -93,4 +93,8 @@
     <string name="following">Following</string>
     <string name="comments">Comments</string>
     <string name="likes">Likes</string>
+    <string name="new_msg_from">\"New message from \"</string>
+    <string name="register_as_client">Register as client</string>
+    <string name="register_as_dog_walker">Register as dog walker</string>
+    <string name="continue_as_guest">Continue as guest</string>
 </resources>

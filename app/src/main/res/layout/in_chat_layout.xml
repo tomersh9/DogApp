@@ -25,8 +25,7 @@
                     android:id="@+id/in_chat_profile_img"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/account_icon" />
+                    android:layout_gravity="center"/>
 
                 <TextView
                     android:id="@+id/in_chat_username"
@@ -35,7 +34,6 @@
                     android:layout_gravity="center"
                     android:layout_marginStart="7dp"
                     android:layout_toEndOf="@id/in_chat_profile_img"
-                    android:text="Omer ifrach"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
@@ -47,8 +45,7 @@
                     android:layout_below="@id/in_chat_username"
                     android:layout_marginStart="7dp"
                     android:layout_toEndOf="@id/in_chat_profile_img"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:text="@string/online" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
             </RelativeLayout>
 

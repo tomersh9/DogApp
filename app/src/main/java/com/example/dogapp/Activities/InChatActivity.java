@@ -1,5 +1,6 @@
 package com.example.dogapp.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -37,6 +38,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -71,7 +73,7 @@ public class InChatActivity extends AppCompatActivity {
 
     //server
     private final String SERVER_KEY = "AAAAsSPUwiM:APA91bF5T2kokP05wtjBjEwMiUXAuB9OXF4cCSgqf4HV9ST1kzKuD9w3ncboYoGTZxMQbBSv0EocqTcycHE4gGzFDDeGIYkyLolsd3W1gY1ZPu5qCHjpNAh-H3g0Y-JvNUIZ1iOm8uOW";
-    private final String BASE_URL = "https://fcm.googleapis.com/fcm/send/";
+    private final String BASE_URL = "https://fcm.googleapis.com/fcm/send";
     private String hisToken;
 
     @Override
@@ -88,6 +90,8 @@ public class InChatActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(InChatActivity.this, MainActivity.class);
+                startActivity(intent);
                 finish();
             }
         });
@@ -117,7 +121,7 @@ public class InChatActivity extends AppCompatActivity {
                 String msg = messageEt.getText().toString();
                 if (!msg.equals("")) {
                     sendMessage(fUser.getUid(), userID, msg);
-                    sendNotification();
+                    sendNotification(msg);
                     messageEt.setText("");
                 }
             }
@@ -127,7 +131,7 @@ public class InChatActivity extends AppCompatActivity {
         loadUserMessages();
     }
 
-    private void sendNotification() {
+    private void sendNotification(final String msg) {
 
         //getting the user's token
         DatabaseReference tokenRef = FirebaseDatabase.getInstance().getReference("Tokens");
@@ -136,7 +140,7 @@ public class InChatActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     hisToken = snapshot.child("token").getValue(String.class);
-                    sendToToken();
+                    sendToToken(msg);
                 }
             }
 
@@ -148,14 +152,21 @@ public class InChatActivity extends AppCompatActivity {
 
     }
 
-    private void sendToToken() {
+    private void sendToToken(String msg) {
+
         //setting data with JSON objects to get the children
-        final JSONObject rootJson = new JSONObject();
+        final JSONObject rootJson = new JSONObject(); //we put here "data" and "to"
+        final JSONObject dataJson = new JSONObject();
+
         try {
             if (hisToken != null) {
-                rootJson.put("to", hisToken); //send to this user
-                JSONObject messageJson = new JSONObject();
-                rootJson.put("data", messageJson.put("message", messageEt.getText().toString())); //putting the actual message data
+
+                dataJson.put("message", msg);
+                dataJson.put("fullName", fUser.getDisplayName());
+                dataJson.put("uID", fUser.getUid());
+                rootJson.put("to", hisToken);
+                rootJson.put("data", dataJson);
+
             } else {
                 return; //no token found
             }

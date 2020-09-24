@@ -51,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="15dp"
             app:boxStrokeErrorColor="@color/red"
             app:endIconMode="clear_text"
             app:errorEnabled="true"
@@ -71,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             app:boxStrokeErrorColor="@color/red"
             app:endIconCheckable="true"
             app:endIconMode="password_toggle"
@@ -107,7 +107,7 @@
         android:layout_below="@id/login_input_layout"
         android:layout_alignParentBottom="true"
         android:layout_marginHorizontal="50dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="30dp"
         android:layout_marginBottom="20dp"
         android:orientation="vertical">
 
@@ -117,7 +117,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginTop="30dp"
             android:paddingVertical="12dp"
             android:text="@string/login"
             android:textAllCaps="false"
@@ -125,14 +124,42 @@
             app:cornerRadius="40dp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/register_btn"
+            android:id="@+id/register_regular_btn"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="7dp"
             android:paddingVertical="12dp"
-            android:text="@string/register"
+            android:text="@string/register_as_client"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            app:cornerRadius="40dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/register_walker_btn"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="7dp"
+            android:paddingVertical="12dp"
+            android:text="@string/register_as_dog_walker"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            app:cornerRadius="40dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/continue_guest_btn"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="7dp"
+            android:paddingVertical="12dp"
+            android:text="@string/continue_as_guest"
             android:textAllCaps="false"
             android:textColor="@color/colorPrimary"
             android:textSize="18sp"
@@ -143,11 +170,11 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:textSize="15sp"
-        android:layout_marginBottom="20dp"
+        android:layout_centerHorizontal="true"
         android:layout_marginHorizontal="50dp"
-        android:text="@string/login_hidden_text"/>
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="@string/login_hidden_text"
+        android:textSize="15sp" />
 </RelativeLayout>

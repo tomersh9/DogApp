@@ -136,88 +136,8 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- <View
-                     android:layout_width="match_parent"
-                     android:layout_height="1dp"
-                     android:layout_marginTop="10dp"
-                     android:background="@android:color/darker_gray" />-->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/gender"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <RadioGroup
-                    android:id="@+id/gender_radio_group"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/male"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/colorPrimary"
-                        android:paddingHorizontal="5dp"
-                        android:text="@string/male" />
-
-                    <RadioButton
-                        android:id="@+id/female"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/colorPrimary"
-                        android:paddingHorizontal="5dp"
-                        android:text="@string/female" />
-
-                    <RadioButton
-                        android:id="@+id/other"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/colorPrimary"
-                        android:paddingHorizontal="5dp"
-                        android:text="@string/other" />
-                </RadioGroup>
-
-                <!--<TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/title"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <RadioGroup
-                    android:id="@+id/type_radio_group"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/dog_owner"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/colorPrimary"
-                        android:paddingHorizontal="5dp"
-                        android:text="@string/dog_owner" />
-
-                    <RadioButton
-                        android:id="@+id/dog_walker"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/colorPrimary"
-                        android:paddingHorizontal="5dp"
-                        android:text="@string/dog_walker" />
-                </RadioGroup>-->
-
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/reg_2_btn"
+                    android:id="@+id/reg_3_btn"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -228,21 +148,6 @@
                     android:textAllCaps="false"
                     android:textSize="18sp"
                     app:cornerRadius="40dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/next_2_btn"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginBottom="30dp"
-                    android:paddingVertical="12dp"
-                    android:text="@string/next"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:visibility="gone"
-                    app:cornerRadius="40dp" />
-
 
             </LinearLayout>
         </ScrollView>

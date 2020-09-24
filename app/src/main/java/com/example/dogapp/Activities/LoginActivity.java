@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +20,7 @@ import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Fragments.ForgotPasswordFragment;
 import com.example.dogapp.Fragments.RegisterFragment;
 import com.example.dogapp.Fragments.SecondRegisterFragment;
+import com.example.dogapp.Fragments.WalkerFinalRegisterFragment;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,15 +32,16 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class LoginActivity extends AppCompatActivity implements RegisterFragment.OnRegisterFragmentListener, SecondRegisterFragment.OnSecondRegisterFragmentListener, ForgotPasswordFragment.OnForgotPasswordListener {
+public class LoginActivity extends AppCompatActivity implements RegisterFragment.OnRegisterFragmentListener, SecondRegisterFragment.OnSecondRegisterFragmentListener, ForgotPasswordFragment.OnForgotPasswordListener, WalkerFinalRegisterFragment.MyFinalWalkerFragmentListener {
 
     RelativeLayout loginContainer;
 
     final String REGISTER_FRAGMENT_TAG = "register_fragment";
     final String REGISTER_FRAGMENT_2_TAG = "reg_2_frag";
+    final String REGISTER_FRAGMENT_3_TAG = "reg_3_frag";
     final String FORGOT_PASS_TAG = "forgot_pass_frag";
 
-    Button loginBtn, regBtn;
+    Button loginBtn, registerClientBtn, registerWalkerBtn, guestBtn;
     TextInputLayout emailEt, passwordEt;
     TextView forgotPassTv;
     ProgressBar progressBar;
@@ -73,7 +74,9 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
         setContentView(R.layout.login_page_layout);
 
         loginBtn = findViewById(R.id.login_btn);
-        regBtn = findViewById(R.id.register_btn);
+        registerClientBtn = findViewById(R.id.register_regular_btn);
+        registerWalkerBtn = findViewById(R.id.register_walker_btn);
+        guestBtn = findViewById(R.id.continue_guest_btn);
         emailEt = findViewById(R.id.email_login_input);
         passwordEt = findViewById(R.id.password_login_input);
         forgotPassTv = findViewById(R.id.forgot_pass_tv);
@@ -110,10 +113,19 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
             }
         };
 
-        regBtn.setOnClickListener(new View.OnClickListener() {
+        registerClientBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, new RegisterFragment(), REGISTER_FRAGMENT_TAG).addToBackStack(null).commit();
+                RegisterFragment registerFragment = RegisterFragment.newInstance(false);
+                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, registerFragment, REGISTER_FRAGMENT_TAG).addToBackStack(null).commit();
+            }
+        });
+
+        registerWalkerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RegisterFragment registerFragment = RegisterFragment.newInstance(true);
+                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, registerFragment, REGISTER_FRAGMENT_TAG).addToBackStack(null).commit();
             }
         });
 
@@ -175,8 +187,8 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     }
 
     @Override
-    public void onNext(String name, String email, String password) {
-        SecondRegisterFragment fragment = SecondRegisterFragment.newInstance(name, email, password);
+    public void onNext(String name, String email, String password, boolean isWalker) {
+        SecondRegisterFragment fragment = SecondRegisterFragment.newInstance(name, email, password, isWalker);
         getSupportFragmentManager().beginTransaction().add(R.id.login_container, fragment, REGISTER_FRAGMENT_2_TAG).addToBackStack(null).commit();
     }
 
@@ -186,22 +198,28 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     }
 
     @Override
+    public void onBackSecond() {
+        closeFragment(REGISTER_FRAGMENT_2_TAG);
+    }
+
+    @Override
+    public void onNextSecond(String name, String email, String password, String date, String gender, String title, String location) {
+        WalkerFinalRegisterFragment fragment = WalkerFinalRegisterFragment.newInstance(name, email, password, date, gender, title, location);
+        getSupportFragmentManager().beginTransaction().add(R.id.login_container, fragment, REGISTER_FRAGMENT_3_TAG).addToBackStack(null).commit();
+    }
+
+    @Override
     public void onRegister(final String name, final String email, String password, final String date, final String gender, final String title, final String location) {
         this.fullName = name; //for the auth listener
 
-        //buildLoaderDialog(getString(R.string.create_new_acc));
 
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
 
-                //progressDialog.dismiss();
-                //closeFragment(REGISTER_FRAGMENT_2_TAG);
-                //closeFragment(REGISTER_FRAGMENT_TAG);
-
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, email, gender, title, location,"uri","id","default", "0");
+                    User user = new User(name, date, email, gender, title, location, "uri", "id", "default", "0");
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {
@@ -278,11 +296,6 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     }
 
     @Override
-    public void onBackSecond() {
-        closeFragment(REGISTER_FRAGMENT_2_TAG);
-    }
-
-    @Override
     public void sendEmail(final String emailToSend) {
         buildLoaderDialog(getString(R.string.sending_email));
         firebaseAuth.sendPasswordResetEmail(emailToSend).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -341,11 +354,57 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
         }
     }
 
+    //***************Walker 3rd page fragment events****************//
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onWalkerRegisterClick(final String name, final String email, String password, final String date, final String gender, final String title, final String location) {
+        this.fullName = name; //for the auth listener
+
+
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                if (task.isSuccessful()) {
+                    //push new User to database
+                    User user = new User(name, date, email, gender, title, location, "uri", "id", "default", "0");
+                    users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
+
+                } else {
+                    progressDialog.dismiss();
+                    closeFragment(REGISTER_FRAGMENT_2_TAG);
+                    closeFragment(REGISTER_FRAGMENT_TAG);
+                    buildFailDialog(getString(R.string.reg_failed), getString(R.string.try_again));
+                    fullName = null;
+                }
+            }
+        });
     }
 
+    @Override
+    public void onBackThird() {
+        closeFragment(REGISTER_FRAGMENT_3_TAG);
+    }
+
+    @Override
+    public void startWalkerRegisterLoader() {
+        buildLoaderDialog(getString(R.string.create_new_acc));
+    }
+
+    @Override
+    public void stopWalkerRegisterLoader() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void createWalkerConfirmDialog() {
+        String welcome = getString(R.string.welcome) + " " + firebaseAuth.getCurrentUser().getDisplayName();
+        buildConfirmDialog(getString(R.string.reg_complete), welcome);
+    }
+
+
+    //*******Client register fragment events********//
     @Override
     public void startLoader() {
         buildLoaderDialog(getString(R.string.create_new_acc));

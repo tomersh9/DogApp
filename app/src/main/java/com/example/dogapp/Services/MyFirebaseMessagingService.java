@@ -1,7 +1,10 @@
 package com.example.dogapp.Services;
 
+import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
@@ -11,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.example.dogapp.Activities.InChatActivity;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -26,13 +30,14 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.gson.Gson;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
-    private NotificationManager manager;
     private final int NOTIF_ID = 1;
 
     /**
@@ -73,41 +78,60 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }*/
     }
 
-
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
+
         if (remoteMessage.getData().size() > 0) {
 
-            Toast.makeText(this, remoteMessage.getData().get("message"), Toast.LENGTH_SHORT).show();
-            System.out.println(remoteMessage.getData().get("message")+" 555555555555555555555555555");
+            Map<String, String> data = remoteMessage.getData();
+            String msg = data.get("message");
+            String from = data.get("fullName");
+            String uid = data.get("uID");
+
+
+            //when click notification, get to chat activity
+            Intent chatIntent = new Intent(MyFirebaseMessagingService.this, InChatActivity.class);
+            chatIntent.putExtra("userID", uid);
+            PendingIntent pendingIntent = PendingIntent.getActivity(MyFirebaseMessagingService.this, 0, chatIntent, PendingIntent.FLAG_ONE_SHOT);
 
             // when the user is OUT OF THE APP!!!!
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ID");
-            builder.setContentText(remoteMessage.getData().get("message"))
+            builder.setContentText(msg)
                     .setSmallIcon(R.drawable.ic_explore_black_24dp)
-                    .setContentTitle("New message");
+                    .setContentTitle(getString(R.string.new_msg_from) + " " + from)
+                    .setContentIntent(pendingIntent);
 
-            NotificationManager manager = getNotificationManager();
-            manager.notify(NOTIF_ID,builder.build());
+            if (!checkApp()) {
+                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                manager.notify(NOTIF_ID, builder.build());
+            }
 
             //When user is in the application (broadcast receiver)
             Intent intent = new Intent("action_msg_receive");
-            intent.putExtra("message", remoteMessage.getData().get("message"));
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        }
+
+
+        if (remoteMessage.getNotification() != null) {
+
         }
 
     }
 
-    private NotificationManager getNotificationManager() {
-        if (manager == null) {
-            manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (Build.VERSION.SDK_INT >= 26) {
-                NotificationChannel channel = new NotificationChannel("ID", "NAME", NotificationManager.IMPORTANCE_HIGH);
-                manager.createNotificationChannel(channel);
-            }
+    public boolean checkApp() {
+        ActivityManager am = (ActivityManager) this
+                .getSystemService(ACTIVITY_SERVICE);
+
+        // get the info from the currently running task
+        List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+
+        ComponentName componentInfo = taskInfo.get(0).topActivity;
+        if (componentInfo.getPackageName().equalsIgnoreCase("com.example.dogapp")) {
+            return true;
+        } else {
+            return false;
         }
-        return manager;
     }
 
 }

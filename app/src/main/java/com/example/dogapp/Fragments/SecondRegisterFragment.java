@@ -105,12 +105,15 @@ public class SecondRegisterFragment extends Fragment {
     private TextInputLayout dateEt, locationEt;
     private RadioGroup genderGroup, typeGroup;
 
+    private boolean isWalker;
     private boolean isValid;
+    private boolean isLocation;
 
     //to create user
     private String fullName, email, password, gender = "", location, type = "", dateOfBirth;
 
     public interface OnSecondRegisterFragmentListener {
+
         void startLoader();
 
         void stopLoader();
@@ -120,6 +123,8 @@ public class SecondRegisterFragment extends Fragment {
         void onRegister(String name, String email, String password, String date, String gender, String title, String location);
 
         void onBackSecond();
+
+        void onNextSecond(String name, String email, String password, String date, String gender, String title, String location);
     }
 
     private OnSecondRegisterFragmentListener listener;
@@ -132,9 +137,11 @@ public class SecondRegisterFragment extends Fragment {
         if (requestCode == WRITE_PERMISSION_REQUEST) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getActivity(), "No permissions", Toast.LENGTH_SHORT).show();
+                if (alertDialog != null) {
+                    alertDialog.dismiss();
+                }
                 permission = false;
-            } else
-                {
+            } else {
                 Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
                 permission = true;
             }
@@ -143,9 +150,15 @@ public class SecondRegisterFragment extends Fragment {
         if (requestCode == LOCATION_PERMISSION_REQUEST) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getActivity(), "No permissions", Toast.LENGTH_SHORT).show();
-            } else
-                startLocation();
-            Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+                if (alertDialog != null) {
+                    alertDialog.dismiss();
+                }
+            } else {
+                if (isLocation) {
+                    startLocation();
+                }
+                Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -206,12 +219,13 @@ public class SecondRegisterFragment extends Fragment {
         }
     }
 
-    public static SecondRegisterFragment newInstance(String fullName, String email, String password) {
+    public static SecondRegisterFragment newInstance(String fullName, String email, String password, boolean isWalker) {
         SecondRegisterFragment fragment = new SecondRegisterFragment();
         Bundle bundle = new Bundle();
         bundle.putString("fullName", fullName);
         bundle.putString("email", email);
         bundle.putString("password", password);
+        bundle.putBoolean("isWalker", isWalker);
         fragment.setArguments(bundle);
         return fragment; //holds the bundle
     }
@@ -222,6 +236,22 @@ public class SecondRegisterFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.register_fragment_layout_2, container, false);
 
+        Button regBtn = rootView.findViewById(R.id.reg_2_btn);
+        Button next2Btn = rootView.findViewById(R.id.next_2_btn);
+
+        //user type
+        isWalker = getArguments().getBoolean("isWalker");
+        if (isWalker) {
+            type = getString(R.string.dog_walker);
+            regBtn.setVisibility(View.GONE);
+            next2Btn.setVisibility(View.VISIBLE);
+
+        } else {
+            type = getString(R.string.dog_owner);
+            regBtn.setVisibility(View.VISIBLE);
+            next2Btn.setVisibility(View.GONE);
+        }
+
         // storage instance
         myStorageRef = FirebaseStorage.getInstance().getReference("Images");
 
@@ -231,7 +261,6 @@ public class SecondRegisterFragment extends Fragment {
         password = getArguments().getString("password");
 
         pressTv = rootView.findViewById(R.id.press_tv);
-        //progressBar = rootView.findViewById(R.id.reg_2_progress_bar);
 
         profileBtn = rootView.findViewById(R.id.profile_btn);
         profileBtn.animate().scaleX(1.3f).scaleY(1.3f).setDuration(500).withEndAction(new Runnable() {
@@ -317,7 +346,7 @@ public class SecondRegisterFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                final boolean isLocation = isLocationEnabled(getActivity());
+                isLocation = isLocationEnabled(getActivity());
 
                 if (Build.VERSION.SDK_INT >= 23) {
                     int hasLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
@@ -363,7 +392,7 @@ public class SecondRegisterFragment extends Fragment {
             }
         });
 
-        typeGroup = rootView.findViewById(R.id.type_radio_group);
+        /*typeGroup = rootView.findViewById(R.id.type_radio_group);
         typeGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -376,33 +405,48 @@ public class SecondRegisterFragment extends Fragment {
                         break;
                 }
             }
-        });
+        });*/
 
-        Button regBtn = rootView.findViewById(R.id.reg_2_btn);
-        regBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isValid = validateFields();
-                if (isValid) {
+        if (!isWalker) {
+            regBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    isValid = validateFields();
+                    if (isValid) {
 
-                    listener.startLoader();
+                        listener.startLoader();
 
-                    if (bitmap1 != null)
-                        handleUpload(bitmap1);
-                    else if (bitmap2 != null)
-                        handleUpload(bitmap2);
+                        if (bitmap1 != null)
+                            handleUpload(bitmap1);
+                        else if (bitmap2 != null)
+                            handleUpload(bitmap2);
 
-                    if (isFromCamera) {
-                        getActivity().getContentResolver().delete(fileUri, null, null);
+                        if (isFromCamera) {
+                            getActivity().getContentResolver().delete(fileUri, null, null);
+                        }
+
+                        listener.onRegister(fullName, email, password, dateOfBirth, gender, type, location);
+
+                    } else {
+                        return;
                     }
-
-                    listener.onRegister(fullName, email, password, dateOfBirth, gender, type, location);
-
-                } else {
-                    return;
                 }
-            }
-        });
+            });
+        } else {
+            next2Btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    isValid = validateFields();
+                    if (isValid) {
+
+                        listener.onNextSecond(fullName, email, password, dateOfBirth, gender, type, location);
+
+                    } else {
+                        return;
+                    }
+                }
+            });
+        }
 
         ImageButton backBtn = rootView.findViewById(R.id.back_frag_btn_2);
         backBtn.setOnClickListener(new View.OnClickListener() {
@@ -523,7 +567,6 @@ public class SecondRegisterFragment extends Fragment {
 
                     }
                 });
-
     }
 
     private void getDownloadUrl(StorageReference storage) {
@@ -575,7 +618,7 @@ public class SecondRegisterFragment extends Fragment {
     }
 
     private boolean validGroups() {
-        if (type.isEmpty() || gender.isEmpty()) {
+        if (gender.isEmpty()) {
             Toast.makeText(getActivity(), R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
             return false;
         }

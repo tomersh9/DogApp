@@ -19,10 +19,11 @@ import com.google.android.material.textfield.TextInputLayout;
 public class RegisterFragment extends Fragment {
 
     private boolean isValid;
+    private boolean isWalker;
     private TextInputLayout fullNameEt, emailEt, passwordValidEt, passwordEt;
 
     public interface OnRegisterFragmentListener {
-        void onNext(String fullName,String email, String password);
+        void onNext(String fullName,String email, String password, boolean isWalker);
         void onBack();
     }
 
@@ -39,11 +40,23 @@ public class RegisterFragment extends Fragment {
         }
     }
 
+    //to identify user type
+    public static RegisterFragment newInstance(boolean isWalker) {
+        RegisterFragment registerFragment = new RegisterFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("isWalker",isWalker);
+        registerFragment.setArguments(bundle);
+        return registerFragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.register_fragment_layout, container, false);
+
+        //user type
+        isWalker = getArguments().getBoolean("isWalker");
 
         fullNameEt = rootView.findViewById(R.id.full_name_input);
         emailEt = rootView.findViewById(R.id.email_input);
@@ -63,7 +76,7 @@ public class RegisterFragment extends Fragment {
                 isValid = verifyFields(name, email, passValid, pass); //check all fields validation
 
                 if (isValid) {
-                    listener.onNext(name,email,pass);
+                    listener.onNext(name,email,pass,isWalker);
                 }
             }
         });
@@ -91,10 +104,10 @@ public class RegisterFragment extends Fragment {
             passwordEt.setError(getString(R.string.field_empty_error));
             return false;
         }
-        /*else if(pass.length() < 6) {
+        else if(pass.length() < 6) {
             passwordEt.setError(getString(R.string.at_least_six));
             return false;
-        }*/
+        }
         else {
             passwordEt.setError(null);
             return true;

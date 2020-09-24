@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -38,6 +39,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -183,8 +185,26 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         //to prevent deleted users create real time things in the table
         //update photo url field in User class
 
-        if(fUser!=null) {
-            Map<String,Object> hashMap = new HashMap<>();
+        if (fUser != null) {
+
+            //update user fields
+            Map<String, Object> hashMap = new HashMap<>();
+            hashMap.put("photoUri", fUser.getPhotoUrl().toString());
+            hashMap.put("id", fUser.getUid());
+            usersRef.child(fUser.getUid()).updateChildren(hashMap);
+
+            //token
+            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                @Override
+                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                    if (task.isSuccessful()) {
+                        sendRegistrationToServer(task.getResult().getToken());
+                    } else {
+                        Toast.makeText(MainActivity.this, "NO TOKEN", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            /*Map<String,Object> hashMap = new HashMap<>();
             hashMap.put("photoUri",fUser.getPhotoUrl().toString());
             hashMap.put("id",fUser.getUid());
             usersRef.child(fUser.getUid()).updateChildren(hashMap);
@@ -199,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         Toast.makeText(MainActivity.this, "NO TOKEN", Toast.LENGTH_SHORT).show();
                     }
                 }
-            });
+            });*/
         }
 
        /* usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
@@ -233,13 +253,18 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         }
 
         //Broadcast Receiver - update UI when user is in the app
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                //add badge to the chats bottom nav item
-                String msg = intent.getStringExtra("message");
-            }
-        };
+        if (receiver == null) {
+            receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    //add badge to the chats bottom nav item
+                    Menu menu = bottomNavBar.getMenu();
+                    MenuItem menuItem = menu.findItem(R.id.bottom_chat); //chats item
+                    BadgeDrawable badgeDrawable = bottomNavBar.getOrCreateBadge(menuItem.getItemId());
+                    badgeDrawable.setVisible(true);
+                }
+            };
+        }
 
         IntentFilter filter = new IntentFilter("action_msg_receive");
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
@@ -278,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         //bottom nav_bar items click events (swapping different fragments)
         bottomNavBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
 
                 Fragment currFragment;
 
@@ -300,6 +325,13 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         currFragment = chatsFragment;
                         toolbar.setTitle(getString(R.string.chats));
                         setSupportActionBar(toolbar);
+
+                        //clean badge dot
+                        BadgeDrawable badgeDrawable = bottomNavBar.getBadge(item.getItemId());
+                        if (badgeDrawable != null) {
+                            badgeDrawable.setVisible(false);
+                        }
+
                         break;
 
                     case R.id.bottom_profile:
