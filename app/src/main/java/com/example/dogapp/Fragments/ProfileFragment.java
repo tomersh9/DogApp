@@ -46,6 +46,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.dogapp.Activities.InChatActivity;
+import com.example.dogapp.Activities.LoginActivity;
 import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
@@ -78,6 +79,8 @@ import java.util.List;
 
 public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
 
+    private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
+
     //Firebase
     private List<String> followingList = new ArrayList<>();
     private List<String> followersList = new ArrayList<>();
@@ -87,12 +90,17 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers");
     private String userID, imgURL; //for any user of the app
     private boolean isMe;
+    private boolean isWalker;
 
     //views
     private ImageView profileIv, genderIv, typeIv;
     private TextView nameTv, followingTv, followersTv, criticsTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
     private LinearLayout followersLayoutBtn, followingLayoutBtn;
+    private RelativeLayout aboutMeLayout;
     private FloatingActionButton chatFab, followFab, profileFab;
+    private LinearLayout row1, row2;
+    private RelativeLayout dogSizeLayoutBtn, rangeLayoutBtn, lastCallLayoutBtn, paymentLayoutBtn;
+    private TextView sizesTv, rangeTv, lastCallTv, paymentTv;
 
 
     private AppBarLayout appBarLayout;
@@ -115,11 +123,14 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     String email;
 
     public interface OnProfileFragmentListener {
+
         void changeProfileToolBar(Toolbar toolbar);
 
         void onProfileFollowingsClick(String userID);
 
         void onProfileFollowersClick(String userID);
+
+        void onProfileBackPress();
     }
 
     private OnProfileFragmentListener listener;
@@ -172,9 +183,22 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         genderIv = rootView.findViewById(R.id.profile_gender_iv);
         followersLayoutBtn = rootView.findViewById(R.id.followers_layout);
         followingLayoutBtn = rootView.findViewById(R.id.following_layout);
+        aboutMeLayout = rootView.findViewById(R.id.profile_list_about_me_layout_item);
         chatFab = rootView.findViewById(R.id.chat_fab);
         followFab = rootView.findViewById(R.id.follow_fab);
         profileFab = rootView.findViewById(R.id.profile_fab);
+
+        //dog walker relevant
+        row1 = rootView.findViewById(R.id.row_1);
+        row2 = rootView.findViewById(R.id.row_2);
+        dogSizeLayoutBtn = rootView.findViewById(R.id.profile_list_dog_sizes_layout_item);
+        rangeLayoutBtn = rootView.findViewById(R.id.profile_list_km_range_layout_item);
+        lastCallLayoutBtn = rootView.findViewById(R.id.profile_list_last_call_layout_item);
+        paymentLayoutBtn = rootView.findViewById(R.id.profile_list_payment_layout_item);
+        sizesTv = rootView.findViewById(R.id.profile_item_dog_sizes_tv);
+        rangeTv = rootView.findViewById(R.id.profile_item_km_range_tv);
+        lastCallTv = rootView.findViewById(R.id.profile_item_last_call_tv);
+        paymentTv = rootView.findViewById(R.id.profile_item_payment_tv);
 
         //profile assign
         loadProfileViews();
@@ -217,12 +241,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
 
 
-        try {
-            Glide.with(getActivity()).asBitmap().load(imgURL).into(profileIv);
-        } catch (Exception ex) {
-            ex.getMessage();
-        }
-
         //toolbar
         collapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar_layout);
         toolbar = rootView.findViewById(R.id.toolbar_profile);
@@ -235,11 +253,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         profileIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isMe) {
+                if (isMe) {
                     buildProfileSheetDialog();
-                }
-                else
-                {
+                } else {
                     View dialogView = getLayoutInflater().inflate(R.layout.image_display_dialog, null);
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     alertDialog = builder.setView(dialogView).show();
@@ -253,7 +269,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         Glide.with(dialogView).load(imgURL).listener(new RequestListener<Drawable>() {
                             @Override
                             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_upload_image, Snackbar.LENGTH_SHORT).show();
                                 progressBar.setVisibility(View.GONE);
                                 return false;
                             }
@@ -288,6 +303,155 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         });
 
         return rootView;
+    }
+
+    private void assignWalkerListeners(final String sizes, final String range, final boolean lastCall, final int paymentPerWalk) {
+
+        dogSizeLayoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createCustomDialog(R.drawable.dog_icon_128, getString(R.string.good_with_dogs_at_sizes), sizes);
+            }
+        });
+
+        rangeLayoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createCustomDialog(R.drawable.trek_icon_128, getString(R.string.is_willing_in_range_of), range);
+            }
+        });
+
+        lastCallLayoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String answer;
+                if (lastCall) {
+                    answer = getString(R.string.yes);
+                } else {
+                    answer = getString(R.string.no);
+                }
+                createCustomDialog(R.drawable.deadline_icon_128, getString(R.string.allows_last_minute_call), answer);
+            }
+        });
+
+        paymentLayoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createCustomDialog(R.drawable.pay_icon_128, getString(R.string.service_cost_per_trip), paymentPerWalk + " " + getString(R.string.ils));
+            }
+        });
+    }
+
+    private void createCustomDialog(int icon, String title, String body) {
+
+        final AlertDialog alertDialog;
+        View dialogView = getLayoutInflater().inflate(R.layout.profile_items_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        alertDialog = builder.setView(dialogView).show();
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        TextView titleTv = dialogView.findViewById(R.id.profile_dialog_title);
+        TextView bodyTv = dialogView.findViewById(R.id.profile_dialog_body);
+        ImageView iconIv = dialogView.findViewById(R.id.profile_dialog_icon);
+        final Button okBtn = dialogView.findViewById(R.id.profile_dialog_btn);
+
+        titleTv.setText(title);
+        bodyTv.setText(body);
+        iconIv.setImageResource(icon);
+        iconIv.animate().scaleX(1f).scaleY(1f).setDuration(250).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                okBtn.animate().scaleX(1f).scaleY(1f).setDuration(200).start();
+            }
+        }).start();
+
+        okBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+    }
+
+    private void loadProfileViews() {
+
+        loadDetailsViews();
+
+        //assign personal details
+        usersRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+
+                    User user = snapshot.getValue(User.class);
+
+                    email = user.getEmail();
+                    imgURL = user.getPhotoUri();
+
+                    try {
+                        Glide.with(getActivity()).asBitmap().load(imgURL).placeholder(R.drawable.account_icon).into(profileIv);
+                    } catch (Exception ex) {
+                        ex.getMessage();
+                    }
+
+                    //set text
+                    genderAgeTv.setText(user.getGender());
+                    locationTv.setText(user.getLocation());
+                    typeTv.setText(user.getTitle());
+                    nameTv.setText(user.getFullName());
+                    aboutMeTv.setText(user.getAboutMe());
+
+                    //setting icons
+                    if (getActivity() != null) {
+
+                        if (user.getGender().equals(getString(R.string.male))) {
+                            genderIv.setImageResource(R.drawable.man_icon);
+                        } else if (user.getGender().equals(getString(R.string.female))) {
+                            genderIv.setImageResource(R.drawable.woman_icon);
+                        } else {
+                            genderIv.setImageResource(R.drawable.other_icon);
+                        }
+
+                        if (user.getTitle().equals(getString(R.string.dog_owner))) {
+
+                            typeIv.setImageResource(R.drawable.dog_owner_icon);
+                            isWalker = false;
+                            row1.setVisibility(View.GONE);
+                            row2.setVisibility(View.GONE);
+
+                        } else {
+
+                            typeIv.setImageResource(R.drawable.dog_walker_icon);
+                            isWalker = true;
+                            row1.setVisibility(View.VISIBLE);
+                            row2.setVisibility(View.VISIBLE);
+
+                            String sizes = user.getDogSizesList();
+                            String size = sizes.substring(1, sizes.length() - 1);
+                            String range = user.getKmRange();
+                            boolean lastCall = user.getLastCall();
+                            int paymentPerWalk = user.getPaymentPerWalk();
+
+                            sizesTv.setText(size);
+                            rangeTv.setText(range);
+                            if (lastCall) {
+                                lastCallTv.setText(R.string.yes);
+                            } else {
+                                lastCallTv.setText(R.string.no);
+                            }
+                            paymentTv.setText(paymentPerWalk + " " + getString(R.string.ils));
+                            assignWalkerListeners(size, range, lastCall, paymentPerWalk);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     //loading MYSELF (fUSer) following list to see if i follow this user already
@@ -426,57 +590,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         });
     }
 
-    private void loadProfileViews() {
-
-        loadDetailsViews();
-
-        //assign personal details
-        usersRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-
-                    User user = snapshot.getValue(User.class);
-
-                    email = user.getEmail();
-
-                    //setting icons
-                    if (getActivity() != null) {
-
-                        if (user.getGender().equals(getString(R.string.male))) {
-                            genderIv.setImageResource(R.drawable.man_icon);
-                        } else if (user.getGender().equals(getString(R.string.female))) {
-                            genderIv.setImageResource(R.drawable.woman_icon);
-                        } else {
-                            genderIv.setImageResource(R.drawable.other_icon);
-                        }
-
-                        if (user.getTitle().equals(getString(R.string.dog_owner))) {
-                            typeIv.setImageResource(R.drawable.dog_owner_icon);
-                        } else {
-                            typeIv.setImageResource(R.drawable.dog_walker_icon);
-                        }
-                    }
-
-                    //set text
-                    genderAgeTv.setText(user.getGender());
-                    locationTv.setText(user.getLocation());
-                    typeTv.setText(user.getTitle());
-                    nameTv.setText(user.getFullName()); //display name
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-    }
-
     private void buildProfileSheetDialog() {
-        if (Build.VERSION.SDK_INT >= 23)
-        {
+        if (Build.VERSION.SDK_INT >= 23) {
             int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
             int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
             if (hasWritePermission != PackageManager.PERMISSION_GRANTED && hasReadPermission != PackageManager.PERMISSION_GRANTED)
@@ -586,12 +701,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
         switch (item.getItemId()) {
-            case R.id.menu_item_settings:
-                Toast.makeText(getActivity(), getString(R.string.settings), Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.menu_item_friends:
-                Toast.makeText(getActivity(), getString(R.string.friends), Toast.LENGTH_SHORT).show();
+            case R.id.menu_profile_back:
+                listener.onProfileBackPress();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -614,8 +727,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 //getActivity().getContentResolver().delete(fileUri,null, null); // have to transfer to register button
                 //pressTv.setVisibility(View.GONE);
                 isFromCamera = true;
-                if(bitmap1 != null)
-                {
+                if (bitmap1 != null) {
                     profileIv.setImageBitmap(bitmap1);
                     handleUpload(bitmap1);
 
@@ -629,7 +741,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
 
         if (requestCode == SELECT_IMAGE) {
-            if (resultCode == Activity.RESULT_OK && permission == true ) {
+            if (resultCode == Activity.RESULT_OK && permission == true) {
                 Toast.makeText(getActivity(), "NBBBB", Toast.LENGTH_SHORT).show();
                 fileUri = data.getData();
                 bitmap1 = null;
@@ -638,8 +750,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if(bitmap2 != null)
-                {
+                if (bitmap2 != null) {
                     profileIv.setImageBitmap(bitmap2);
                     handleUpload(bitmap2);
 
@@ -661,10 +772,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getActivity(), "No permissions!!!", Toast.LENGTH_SHORT).show();
                 permission = false;
-            }
-
-            else
-                {
+            } else {
                 Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
                 permission = true;
             }

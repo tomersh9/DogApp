@@ -17,12 +17,11 @@
         android:visibility="gone" />
 
     <RelativeLayout
-        android:id="@+id/reg_2_hide_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <ImageButton
-            android:id="@+id/back_frag_btn_2"
+            android:id="@+id/back_frag_btn_3"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginStart="8dp"
@@ -31,51 +30,30 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_arrow_back_black_24dp" />
 
-        <LinearLayout
-            android:id="@+id/reg_2_head_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/back_frag_btn_2"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:gravity="center"
-                android:text="@string/about_you"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                android:textColor="@color/colorPrimary"
-                android:textSize="25sp" />
-
-        </LinearLayout>
-
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/reg_2_head_layout"
+            android:layout_below="@id/back_frag_btn_3"
             android:layout_marginTop="10dp">
 
             <LinearLayout
-                android:id="@+id/reg_2_input_layout"
+                android:id="@+id/reg_3_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="50dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginHorizontal="40dp"
                 android:orientation="vertical">
 
                 <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/profile_btn"
+                    android:id="@+id/profile_btn_2"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_gravity="center"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:padding="5dp"
                     android:src="@drawable/account_icon" />
 
                 <TextView
-                    android:id="@+id/press_tv"
+                    android:id="@+id/press_tv_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -85,6 +63,7 @@
                     android:textSize="15sp" />
 
                 <TextView
+                    android:id="@+id/not_req_tv_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -92,49 +71,116 @@
                     android:text="@string/not_required"
                     android:textSize="12sp" />
 
-                <!--<View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@android:color/darker_gray" />-->
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/date_input"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    app:boxStrokeErrorColor="@color/red"
-                    app:endIconMode="clear_text"
-                    app:errorEnabled="true"
-                    app:startIconDrawable="@drawable/ic_cake_black_24dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:hint="@string/date_of_birth" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/location_input"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <LinearLayout
+                    android:id="@+id/reg_3_input_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    app:boxStrokeErrorColor="@color/red"
-                    app:endIconMode="clear_text"
-                    app:errorEnabled="true"
-                    app:startIconDrawable="@drawable/ic_location_on_black_24dp">
+                    android:orientation="vertical">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/about_me_et"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:hint="@string/your_location" />
+                        android:layout_gravity="center"
+                        android:layout_marginTop="7dp"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:endIconMode="clear_text"
+                        app:errorEnabled="true"
+                        android:padding="5dp"
+                        app:helperText="ספר בהרחבה כדי לתת יותר מידע הכרחי למשתמשים"
+                        app:startIconDrawable="@drawable/ic_person_outline_black_24dp">
 
-                </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="ספר קצת על עצמך" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/range_km_et"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:hint="בחר טווח קילומטרים"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        android:padding="5dp"
+                        app:helperText="כמה רחוק אתה מוכן ללכת כדי לבקר בבית בעלי הכלב?"
+                        app:startIconDrawable="@drawable/ic_map_black_24dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:focusable="false" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/dog_size_et"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:hint="גודל כלבים שאתה מקבל"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        android:padding="5dp"
+                        app:helperText="בחר גודל כלבים שאתה מוכן לקחת על עצמך"
+                        app:startIconDrawable="@drawable/kg_icon">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:focusable="false" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/last_call_et"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:hint="מוכן להזמנה ברגע האחרון?"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        android:padding="5dp"
+                        app:helperText="האם אתה מאפשר הזמנה ברגע האחרון?"
+                        app:startIconDrawable="@drawable/ic_directions_run_black_24dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:focusable="false" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/payment_et"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:padding="5dp"
+                        android:hint="עלות עבור כל הליכה"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:helperText="כדי ליידע מראש משתמשים על עלות השירות שלך (בשקלים)"
+                        app:startIconDrawable="@drawable/payment_icon">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/reg_3_btn"

@@ -45,7 +45,6 @@
             android:id="@+id/profile_frag_iv"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:src="@drawable/shutterstock_648907024"
             android:translationZ="20dp"
             app:elevation="20dp"
             app:layout_anchor="@+id/app_bar"
@@ -97,15 +96,6 @@
             android:paddingTop="10dp"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-            <!--<ImageView
-                android:id="@+id/line"
-                android:layout_width="match_parent"
-                android:layout_height="0.7dp"
-                android:layout_below="@id/follow_details_layout"
-                android:layout_marginTop="5dp"
-                android:layout_marginHorizontal="20dp"
-                android:src="@color/nav_bar_item_color" />-->
-
             <TextView
                 android:id="@+id/profile_frag_name_tv"
                 style="@style/TextAppearance.AppCompat.Body2"
@@ -132,7 +122,8 @@
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:translationZ="2dp">
 
                     <TextView
                         android:id="@+id/profile_frag_followers_tv"
@@ -161,10 +152,11 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_marginHorizontal="50dp"
+                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="?attr/selectableItemBackground"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:translationZ="2dp">
 
                     <TextView
                         android:id="@+id/profile_frag_following_tv"
@@ -192,10 +184,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/following_layout"
+                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="?attr/selectableItemBackground"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:translationZ="2dp">
 
                     <TextView
                         android:id="@+id/profile_frag_critics_tv"
@@ -230,173 +223,320 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:padding="10dp">
 
-                    <ImageView
-                        android:id="@+id/line0"
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_marginHorizontal="5dp"
-                        android:src="@color/nav_bar_item_color" />
-
-                    <LinearLayout
-                        android:id="@+id/profile_list_age_layout_item"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?attr/selectableItemBackground"
-                        android:padding="10dp">
-
-                        <ImageView
-                            android:id="@+id/profile_gender_iv"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/man_icon" />
-
-                        <TextView
-                            android:id="@+id/profile_item_gender_age_tv"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginStart="10dp"
-                            android:textSize="18sp" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/line1"
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_below="@id/profile_list_age_layout_item"
-                        android:layout_marginHorizontal="5dp"
-                        android:layout_marginTop="1dp"
-                        android:src="@color/nav_bar_item_color" />
-
-                    <LinearLayout
-                        android:id="@+id/profile_list_location_layout_item"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@id/line1"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?attr/selectableItemBackground"
-                        android:orientation="horizontal"
-                        android:padding="10dp">
-
-                        <ImageView
-                            android:id="@+id/profile_location_iv"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/location_64_icon" />
-
-                        <TextView
-                            android:id="@+id/profile_item_location_tv"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginStart="10dp"
-                            android:textSize="18sp" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/line2"
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_below="@id/profile_list_location_layout_item"
-                        android:layout_marginHorizontal="5dp"
-                        android:layout_marginTop="1dp"
-                        android:src="@color/nav_bar_item_color" />
-
-                    <LinearLayout
-                        android:id="@+id/profile_list_type_layout_item"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@id/line2"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?attr/selectableItemBackground"
-                        android:orientation="horizontal"
-                        android:padding="10dp">
-
-                        <ImageView
-                            android:id="@+id/profile_type_iv"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/dog_owner_icon" />
-
-                        <TextView
-                            android:id="@+id/profile_item_type_tv"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginStart="10dp"
-                            android:gravity="center"
-                            android:textSize="18sp" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/line3"
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_below="@id/profile_list_type_layout_item"
-                        android:layout_marginHorizontal="5dp"
-                        android:layout_marginTop="1dp"
-                        android:src="@color/nav_bar_item_color" />
-
-                    <LinearLayout
+                    <RelativeLayout
                         android:id="@+id/profile_list_about_me_layout_item"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_below="@id/line3"
-                        android:orientation="horizontal"
-                        android:padding="10dp">
+                        android:layout_marginHorizontal="1dp"
+                        android:background="@drawable/profile_item_btn_selector"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="10dp"
+                        android:translationZ="2dp">
 
                         <ImageView
+                            android:id="@+id/profile_about_icon"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:layout_gravity="center"
+                            android:layout_alignParentStart="true"
                             android:src="@drawable/about_blue_icon" />
 
                         <TextView
+                            android:id="@+id/profile_about_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
                             android:layout_marginStart="10dp"
-                            android:gravity="center"
+                            android:layout_toEndOf="@id/profile_about_icon"
                             android:text="על עצמי"
                             android:textColor="@color/black"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
-                    </LinearLayout>
+                        <TextView
+                            android:id="@+id/profile_item_about_me_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/profile_about_title"
+                            android:layout_marginStart="5dp"
+                            android:layout_toEndOf="@id/profile_about_icon"
+                            android:gravity="start"
+                            android:paddingHorizontal="5dp"
+                            android:paddingBottom="5dp"
+                            android:textSize="18sp" />
 
-                    <TextView
-                        android:id="@+id/profile_item_about_me_tv"
-                        android:layout_width="wrap_content"
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:id="@+id/main_details_layout"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/profile_list_about_me_layout_item"
-                        android:layout_gravity="center"
-                        android:gravity="start"
-                        android:paddingHorizontal="10dp"
-                        android:paddingVertical="5dp"
-                        android:text="אני מאוד אוהב כלבים מסור. אפילו בעל 2 כלבים יפים מיצי ופיצי. גר בצפון הארץ."
-                        android:textSize="18sp" />
+                        android:layout_marginVertical="10dp"
+                        android:orientation="horizontal">
 
-                    <ImageView
-                        android:id="@+id/line4"
+                        <RelativeLayout
+                            android:id="@+id/profile_list_age_layout_item"
+                            android:layout_width="0dp"
+                            android:layout_height="100dp"
+                            android:layout_marginVertical="5dp"
+                            android:layout_marginStart="1dp"
+                            android:layout_weight="2"
+                            android:background="@drawable/profile_item_btn_selector"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="15dp"
+                            android:translationZ="2dp">
+
+                            <ImageView
+                                android:id="@+id/profile_gender_iv"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_centerHorizontal="true"
+                                android:src="@drawable/man_icon" />
+
+                            <TextView
+                                android:id="@+id/profile_item_gender_age_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/profile_gender_iv"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="7dp"
+                                android:gravity="center"
+                                android:textColor="@color/black"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/profile_list_location_layout_item"
+                            android:layout_width="0dp"
+                            android:layout_height="100dp"
+                            android:layout_marginHorizontal="10dp"
+                            android:layout_marginVertical="5dp"
+                            android:layout_weight="3"
+                            android:background="@drawable/profile_item_btn_selector"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:orientation="horizontal"
+                            android:padding="15dp"
+                            android:translationZ="2dp">
+
+                            <ImageView
+                                android:id="@+id/profile_location_iv"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_centerHorizontal="true"
+                                android:src="@drawable/location_64_icon" />
+
+                            <TextView
+                                android:id="@+id/profile_item_location_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/profile_location_iv"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginTop="7dp"
+                                android:gravity="center"
+                                android:textColor="@color/black"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/profile_list_type_layout_item"
+                            android:layout_width="0dp"
+                            android:layout_height="100dp"
+                            android:layout_marginVertical="5dp"
+                            android:layout_marginEnd="1dp"
+                            android:layout_weight="2"
+                            android:background="@drawable/profile_item_btn_selector"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="15dp"
+                            android:translationZ="2dp">
+
+                            <ImageView
+                                android:id="@+id/profile_type_iv"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_centerHorizontal="true"
+                                android:src="@drawable/dog_owner_icon" />
+
+                            <TextView
+                                android:id="@+id/profile_item_type_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/profile_type_iv"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="7dp"
+                                android:gravity="center"
+                                android:textColor="@color/black"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/row_1"
                         android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_below="@id/profile_item_about_me_tv"
-                        android:layout_marginHorizontal="5dp"
-                        android:layout_marginTop="5dp"
-                        android:src="@color/nav_bar_item_color" />
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/main_details_layout"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <RelativeLayout
+                            android:id="@+id/profile_list_dog_sizes_layout_item"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginVertical="5dp"
+                            android:layout_marginStart="1dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/profile_item_btn_selector"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="10dp"
+                            android:translationZ="3dp">
+
+                            <ImageView
+                                android:id="@+id/dog_icon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_centerHorizontal="true"
+                                android:src="@drawable/dog_icon_64" />
+
+                            <TextView
+                                android:id="@+id/profile_item_dog_sizes_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/dog_icon"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="5dp"
+                                android:gravity="center"
+                                android:textColor="@color/black"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/profile_list_km_range_layout_item"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginVertical="5dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="1dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/profile_item_btn_selector"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="10dp"
+                            android:translationZ="3dp">
+
+                            <ImageView
+                                android:id="@+id/trek_icon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_centerHorizontal="true"
+                                android:src="@drawable/trek_icon_64" />
+
+                            <TextView
+                                android:id="@+id/profile_item_km_range_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/trek_icon"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="5dp"
+                                android:gravity="center"
+                                android:textColor="@color/black"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/row_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/row_1"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <RelativeLayout
+                            android:id="@+id/profile_list_last_call_layout_item"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginVertical="5dp"
+                            android:layout_marginStart="1dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/profile_item_btn_selector"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="10dp"
+                            android:translationZ="3dp">
+
+                            <ImageView
+                                android:id="@+id/clock_icon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_centerHorizontal="true"
+                                android:src="@drawable/deadline_icon_64" />
+
+                            <TextView
+                                android:id="@+id/profile_item_last_call_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/clock_icon"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="5dp"
+                                android:gravity="center"
+                                android:textColor="@color/black"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/profile_list_payment_layout_item"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginVertical="5dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="1dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/profile_item_btn_selector"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="10dp"
+                            android:translationZ="3dp">
+
+                            <ImageView
+                                android:id="@+id/payment_icon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_centerHorizontal="true"
+                                android:src="@drawable/pay_icon_64" />
+
+                            <TextView
+                                android:id="@+id/profile_item_payment_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/payment_icon"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="5dp"
+                                android:gravity="center"
+                                android:textColor="@color/black"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
 
                 </RelativeLayout>
 

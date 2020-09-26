@@ -3,16 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_item_friends"
-        android:icon="@drawable/ic_group_black_24dp"
+        android:id="@+id/menu_profile_back"
+        android:icon="@drawable/ic_arrow_back_black_24dp"
         app:iconTint="@color/white"
-        android:title="@string/friends"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/menu_item_settings"
-        android:icon="@drawable/ic_settings_black_24dp"
-        app:iconTint="@color/white"
-        android:title="@string/settings"
+        android:title="back"
         app:showAsAction="always" />
 </menu>

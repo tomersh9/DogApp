@@ -219,7 +219,8 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, email, gender, title, location, "uri", "id", "default", "0");
+                    User user = new User(name, date, email, gender, title, location, "uri", "id", "default", "0",
+                            "about","range","size",false,0);
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {
@@ -356,9 +357,10 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
     //***************Walker 3rd page fragment events****************//
     @Override
-    public void onWalkerRegisterClick(final String name, final String email, String password, final String date, final String gender, final String title, final String location) {
-        this.fullName = name; //for the auth listener
+    public void onWalkerRegisterClick(final String name, final String email, String password, final String date, final String gender, final String title, final String location,
+                                      final String aboutMe, final String kmRange, final String dogSizeList, final Boolean lastCall, final Integer payPerWalk) {
 
+        this.fullName = name; //for the auth listener
 
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -366,11 +368,13 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, email, gender, title, location, "uri", "id", "default", "0");
+                    User user = new User(name, date, email, gender, title, location, "uri", "id", "default", "0",
+                            aboutMe,kmRange,dogSizeList,lastCall,payPerWalk);
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {
                     progressDialog.dismiss();
+                    closeFragment(REGISTER_FRAGMENT_3_TAG);
                     closeFragment(REGISTER_FRAGMENT_2_TAG);
                     closeFragment(REGISTER_FRAGMENT_TAG);
                     buildFailDialog(getString(R.string.reg_failed), getString(R.string.try_again));

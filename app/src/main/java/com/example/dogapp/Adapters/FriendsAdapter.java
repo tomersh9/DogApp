@@ -111,7 +111,6 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
                     @Override
                     public void onClick(View v) {
                         listener.onFriendFollowClicked(getAdapterPosition(), v);
-                        //followBtn.setImageResource(R.drawable.friend_checked);
                     }
                 });
             }
@@ -122,6 +121,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
         if (!isMe) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.myself_card_view, parent, false);
             UserViewHolder userViewHolder = new UserViewHolder(view);

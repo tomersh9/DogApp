@@ -5,9 +5,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageDecoder;
 import android.graphics.drawable.ColorDrawable;
@@ -31,6 +33,7 @@ import androidx.fragment.app.Fragment;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -40,30 +43,44 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class WalkerFinalRegisterFragment extends Fragment {
 
     // Activity requests
-    final int CAMERA_REQUEST = 1;
-    final int WRITE_PERMISSION_REQUEST = 2;
-    final int SELECT_IMAGE = 3;
-    final int LOCATION_PERMISSION_REQUEST = 4;
-    boolean isFromCamera;
-    boolean permission = true;
+    private final int CAMERA_REQUEST = 1;
+    private final int WRITE_PERMISSION_REQUEST = 2;
+    private final int SELECT_IMAGE = 3;
+    private boolean isFromCamera;
+    private boolean permission = true;
 
-    Uri fileUri;
-    AlertDialog alertDialog;
-    Bitmap bitmap1, bitmap2;
+    private Uri fileUri;
+    private AlertDialog alertDialog;
+    private Bitmap bitmap1, bitmap2;
 
-    CircleImageView profileBtn;
-    TextView pressTv;
-
-    // Firebase storage
-    StorageReference myStorageRef;
+    private CircleImageView profileBtn;
+    private TextView pressTv;
 
     private String fullName, email, password, gender, location, type, dateOfBirth;
+    private boolean isValid;
+
+    private TextInputLayout aboutEt;
+    private TextInputLayout rangeEt;
+    private TextInputLayout sizeEt;
+    private TextInputLayout lastCallEt;
+    private TextInputLayout paymentEt;
+
+
+    private Integer payPerWalk;
+    private Boolean lastCall;
+    private String kmRange;
+    private List<String> dogSizeList = new ArrayList<>();
+    private String dogSizeString;
+    private boolean[] dogSizeChoices = {false, false, false, false, false};
+
 
     public static WalkerFinalRegisterFragment newInstance(String fullName, String email, String password, String date, String gender, String title, String location) {
         WalkerFinalRegisterFragment fragment = new WalkerFinalRegisterFragment();
@@ -81,7 +98,8 @@ public class WalkerFinalRegisterFragment extends Fragment {
 
     public interface MyFinalWalkerFragmentListener {
 
-        void onWalkerRegisterClick(String name, String email, String password, String date, String gender, String title, String location);
+        void onWalkerRegisterClick(String name, String email, String password, String date, String gender, String title, String location,
+                                   String aboutMe, String kmRange, String dogSizeList, Boolean lastCall, Integer payPerWalk);
 
         void startWalkerRegisterLoader();
 
@@ -120,9 +138,218 @@ public class WalkerFinalRegisterFragment extends Fragment {
         location = getArguments().getString("location");
         dateOfBirth = getArguments().getString("dateOfBirth");
 
+        //assign views
+        ImageButton backBtn = rootView.findViewById(R.id.back_frag_btn_3);
+        Button regBtn = rootView.findViewById(R.id.reg_3_btn);
+        aboutEt = rootView.findViewById(R.id.about_me_et);
+        rangeEt = rootView.findViewById(R.id.range_km_et);
+        sizeEt = rootView.findViewById(R.id.dog_size_et);
+        lastCallEt = rootView.findViewById(R.id.last_call_et);
+        paymentEt = rootView.findViewById(R.id.payment_et);
+        pressTv = rootView.findViewById(R.id.press_tv_2);
+        profileBtn = rootView.findViewById(R.id.profile_btn_2);
 
-        pressTv = rootView.findViewById(R.id.press_tv);
-        profileBtn = rootView.findViewById(R.id.profile_btn);
+        //back arrow
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onBackThird();
+            }
+        });
+
+
+        //profile image event listener
+        setProfileViewsListener();
+
+        //handling user inputs
+        sizeEt.getEditText().setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.choose_dog_size)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (dogSizeList.isEmpty()) {
+                                    sizeEt.getEditText().setText("");
+                                } else {
+                                    sizeEt.getEditText().setText(dogSizeList.toString());
+                                    dogSizeString = dogSizeList.toString();
+                                }
+                            }
+                        })
+                        .setMultiChoiceItems(R.array.dog_sizes_array, dogSizeChoices, new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                String[] sizeArr = getActivity().getResources().getStringArray(R.array.dog_sizes_array);
+                                if (isChecked) {
+                                    dogSizeList.add(sizeArr[which]);
+                                    dogSizeChoices[which] = true;
+                                } else {
+                                    dogSizeList.remove(sizeArr[which]);
+                                    dogSizeChoices[which] = false;
+                                }
+                            }
+                        }).show();
+            }
+        });
+
+        rangeEt.getEditText().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.choose_km_range)
+                        .setCancelable(false)
+                        .setSingleChoiceItems(R.array.km_range, -1, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String[] kmArr = getActivity().getResources().getStringArray(R.array.km_range);
+                                kmRange = kmArr[which];
+                            }
+                        }).setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (kmRange != null) {
+                            rangeEt.getEditText().setText(kmRange);
+                        }
+                    }
+                }).show();
+            }
+        });
+
+        lastCallEt.getEditText().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.allow_last_call)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (lastCall) {
+                                    lastCallEt.getEditText().setText(R.string.yes);
+                                } else {
+                                    lastCallEt.getEditText().setText(R.string.no);
+                                }
+                            }
+                        }).setSingleChoiceItems(R.array.last_call_array, -1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        String[] lastCallArr = getActivity().getResources().getStringArray(R.array.last_call_array);
+                        if (lastCallArr[which].equals(getString(R.string.yes))) {
+                            lastCall = true;
+                        } else {
+                            lastCall = false;
+                        }
+                    }
+                }).show();
+            }
+        });
+
+        regBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String aboutMe = aboutEt.getEditText().getText().toString();
+                paymentEt.clearFocus();
+                aboutEt.clearFocus();
+
+                isValid = validateFields(aboutMe, kmRange, dogSizeList);
+
+                if (isValid) {
+
+                    listener.startWalkerRegisterLoader();
+
+                    if (bitmap1 != null) {
+                        handleUpload(bitmap1);
+                    } else if (bitmap2 != null) {
+                        handleUpload(bitmap2);
+                    } else {
+                        //TODO fix register without photo
+                        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.account_icon);
+                        handleUpload(bitmap);
+                    }
+
+                    if (isFromCamera) {
+                        getActivity().getContentResolver().delete(fileUri, null, null);
+                    }
+
+                    listener.onWalkerRegisterClick(fullName, email, password, dateOfBirth, gender, type, location,
+                            aboutMe, kmRange, dogSizeString, lastCall, payPerWalk);
+                } else {
+                    return;
+                }
+            }
+        });
+
+        return rootView;
+    }
+
+    private boolean validateFields(String about, String range, List<String> sizeList) {
+        if (!validateAboutMe(about) | !validateRange(range) | !validateSizes(sizeList) | !validateLastCall() | !validatePayment()) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateAboutMe(String about) {
+        if (about == null || about.equals("")) {
+            aboutEt.setError(getString(R.string.field_empty_error));
+            return false;
+        } else {
+            aboutEt.setError(null);
+            return true;
+        }
+    }
+
+    private boolean validateRange(String range) {
+        if (range == null) {
+            rangeEt.setError(getString(R.string.field_empty_error));
+            return false;
+        } else {
+            rangeEt.setError(null);
+            return true;
+        }
+    }
+
+    private boolean validateSizes(List<String> list) {
+        if (list.isEmpty()) {
+            sizeEt.setError(getString(R.string.field_empty_error));
+            return false;
+        } else {
+            sizeEt.setError(null);
+            return true;
+        }
+    }
+
+    private boolean validateLastCall() {
+        if (lastCallEt.getEditText().getText().toString().isEmpty()) {
+            lastCallEt.setError(getString(R.string.field_empty_error));
+            return false;
+        } else {
+            lastCallEt.setError(null);
+            return true;
+        }
+    }
+
+    private boolean validatePayment() {
+        if (paymentEt.getEditText().getText().toString().isEmpty()) {
+            paymentEt.setError(getString(R.string.field_empty_error));
+            return false;
+        } else if (Integer.parseInt(paymentEt.getEditText().getText().toString().trim()) == 0) {
+            paymentEt.setError(getString(R.string.must_take_charge));
+            return false;
+        } else {
+            paymentEt.setError(null);
+            payPerWalk = Integer.parseInt(paymentEt.getEditText().getText().toString());
+            return true;
+        }
+    }
+
+    private void setProfileViewsListener() {
         profileBtn.animate().scaleX(1.3f).scaleY(1.3f).setDuration(500).withEndAction(new Runnable() {
             @Override
             public void run() {
@@ -174,28 +401,6 @@ public class WalkerFinalRegisterFragment extends Fragment {
                 }
             }
         });
-
-        Button regBtn = rootView.findViewById(R.id.reg_3_btn);
-        regBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                listener.startWalkerRegisterLoader();
-
-                if (bitmap1 != null)
-                    handleUpload(bitmap1);
-                else if (bitmap2 != null)
-                    handleUpload(bitmap2);
-
-                if (isFromCamera) {
-                    getActivity().getContentResolver().delete(fileUri, null, null);
-                }
-
-                listener.onWalkerRegisterClick(fullName,email,password,dateOfBirth,gender,type,location);
-            }
-        });
-
-        return rootView;
     }
 
     //location or images taken permissions
@@ -205,13 +410,13 @@ public class WalkerFinalRegisterFragment extends Fragment {
 
         if (requestCode == WRITE_PERMISSION_REQUEST) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getActivity(), "No permissions", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.no_permissions, Toast.LENGTH_SHORT).show();
                 if (alertDialog != null) {
                     alertDialog.dismiss();
                 }
                 permission = false;
             } else {
-                Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.permissions_granted, Toast.LENGTH_SHORT).show();
                 permission = true;
             }
         }
@@ -223,7 +428,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
 
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                Toast.makeText(getActivity(), fileUri.toString(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), fileUri.toString(), Toast.LENGTH_SHORT).show();
                 bitmap2 = null;
                 try {
                     bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
@@ -236,7 +441,6 @@ public class WalkerFinalRegisterFragment extends Fragment {
                 isFromCamera = true;
                 alertDialog.dismiss();
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_SHORT).show();
                 fileUri = null;
             }
 

@@ -22,10 +22,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Models.ModelPost;
 import com.example.dogapp.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,9 +41,14 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
 
@@ -49,6 +61,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
 
     boolean mProcessLike = false;
     boolean isLike;
+
+    private final String SERVER_KEY = "AAAAsSPUwiM:APA91bF5T2kokP05wtjBjEwMiUXAuB9OXF4cCSgqf4HV9ST1kzKuD9w3ncboYoGTZxMQbBSv0EocqTcycHE4gGzFDDeGIYkyLolsd3W1gY1ZPu5qCHjpNAh-H3g0Y-JvNUIZ1iOm8uOW";
+    private final String BASE_URL = "https://fcm.googleapis.com/fcm/send";
 
 
     public interface OnPostListener {
@@ -83,7 +98,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     public void onBindViewHolder(@NonNull final MyHolder holder, final int position) {
 
         final String uId = postList.get(position).getuId();
-        String uName = postList.get(position).getuName();
+        final String uName = postList.get(position).getuName();
         final String pId = postList.get(position).getpId();
         String pDesc = postList.get(position).getpDesc();
         String pTimeStamp = postList.get(position).getpTime();
@@ -140,7 +155,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                                 postsRef.child(postId).child("pLikes").setValue("" + (pLikes + 1));
                                 likesRef.child(postId).child(myUid).setValue("Liked");
                                 mProcessLike = false;
+                                sendToToken(postId,FirebaseAuth.getInstance().getCurrentUser().getDisplayName() );
                             }
+
                         }
                     }
 
@@ -257,5 +274,62 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             likeBtn = itemView.findViewById(R.id.like_btn);
             likeBtnTv = itemView.findViewById(R.id.like_btn_tv);
         }
+    }
+
+    private void sendToToken(String pId, String name) {
+
+        //setting data with JSON objects to get the children
+        final JSONObject rootJson = new JSONObject(); //we put here "data" and "to"
+        final JSONObject dataJson = new JSONObject();
+
+        try {
+            if (pId != null) {
+
+                dataJson.put("message", "check");
+                dataJson.put("isLike", "check");
+                dataJson.put("fullName", name);
+//                dataJson.put("uID", fUser.getUid());
+                rootJson.put("to", "/topics/" + pId + "Likes");
+                rootJson.put("data", dataJson);
+
+            } else {
+                return; //no token found
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        //create POST request
+        StringRequest stringRequest = new StringRequest(StringRequest.Method.POST, BASE_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) { //POST REQUEST class implementation
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "key=" + SERVER_KEY);
+                return headers;
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return rootJson.toString().getBytes(); //return the root object with data inside
+            }
+        };
+
+        //sending the actual request
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
     }
 }

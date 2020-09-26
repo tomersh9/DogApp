@@ -33,7 +33,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.example.dogapp.Activities.InChatActivity;
 import com.example.dogapp.Activities.LoginActivity;
 import com.example.dogapp.Adapters.CommentAdapter;
 import com.example.dogapp.Adapters.PostAdapter;
@@ -56,6 +63,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -78,6 +89,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     private DatabaseReference userDbRef = FirebaseDatabase.getInstance().getReference("users");
     private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
     private DatabaseReference postsRef = FirebaseDatabase.getInstance().getReference("Posts");
+    private FirebaseMessaging firebaseMessaging;
 
     private String uid, name, location;
 
@@ -102,12 +114,19 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     List<ModelComment> commentList;
     CommentAdapter commentAdapter;
 
+    //PUSH NOTIFICATION
+    private final String SERVER_KEY = "AAAAsSPUwiM:APA91bF5T2kokP05wtjBjEwMiUXAuB9OXF4cCSgqf4HV9ST1kzKuD9w3ncboYoGTZxMQbBSv0EocqTcycHE4gGzFDDeGIYkyLolsd3W1gY1ZPu5qCHjpNAh-H3g0Y-JvNUIZ1iOm8uOW";
+    private final String BASE_URL = "https://fcm.googleapis.com/fcm/send";
+    boolean s;
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
         setHasOptionsMenu(true);
+
+        firebaseMessaging = FirebaseMessaging.getInstance();
 
         final View rootView = inflater.inflate(R.layout.home_fragment, container, false);
 
@@ -166,7 +185,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
             }
         });
 
-        //******************ADD NEW POST BUTTONS****************************//
+        //*******ADD NEW POST BUTTONS*********//
         /*fab = rootView.findViewById(R.id.home_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,6 +223,8 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     }
 
     private void buildCommentSheetDialog(final String pId) {
+
+        s = isMyPost(pId);
 
 
         final BottomSheetDialog dialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
@@ -276,6 +297,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         progressBarComment = new ProgressDialog(getActivity());
         progressBarComment.setMessage("Adding Comment...");
 
+
         String comment = commentEt.getText().toString();
 
         if (TextUtils.isEmpty(comment)) {
@@ -318,6 +340,18 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     }
                 });
 
+        if(s == true) {
+            firebaseMessaging.subscribeToTopic(pId);
+            sendToToken(pId, comment,true);
+            Toast.makeText(getActivity(), "MINE!!!!", Toast.LENGTH_SHORT).show();
+        }
+
+        else {
+            Toast.makeText(getActivity(), "NOT MINE!!!!", Toast.LENGTH_SHORT).show();
+            firebaseMessaging.subscribeToTopic(pId + "COMMENTS");
+            sendToToken(pId + "COMMENTS", comment,false);
+            sendToToken(pId, comment,true);
+        }
 
     }
 
@@ -436,6 +470,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
         buildLoaderDialog(getString(R.string.upload_post));
 
+
         String timeStamp = String.valueOf(System.currentTimeMillis());
 
         String filePathAndName = "Posts/" + "post_" + timeStamp;
@@ -451,6 +486,10 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         hashMap.put("uPic", fUser.getPhotoUrl().toString());
         hashMap.put("pLikes", "0");
         hashMap.put("pComments", "0");
+
+        firebaseMessaging.subscribeToTopic(hashMap.get("pId"));
+        firebaseMessaging.subscribeToTopic(hashMap.get("pId") + "Likes");
+
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
         ref.child(timeStamp).setValue(hashMap)
@@ -557,6 +596,120 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
             }
         });
+    }
+
+//    private void sendNotification(final String pId) {
+//
+//        //getting the user's token
+//        DatabaseReference tokenRef = FirebaseDatabase.getInstance().getReference("Tokens");
+//        tokenRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()) {
+//                    hisToken = snapshot.child("token").getValue(String.class);
+//                    sendToToken(msg);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Toast.makeText(getActivity(), "NO TOKEN FOUND!", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//    }
+
+    private void sendToToken(String pId, String comment, boolean isMyComment) {
+
+        //setting data with JSON objects to get the children
+        final JSONObject rootJson = new JSONObject(); //we put here "data" and "to"
+        final JSONObject dataJson = new JSONObject();
+
+        try {
+            if (pId != null) {
+
+                dataJson.put("message", comment);
+                if(isMyComment) {
+                    dataJson.put("isCom", "check");
+                }
+                else {
+                    dataJson.put("isComFriend", "check");
+                }
+
+                dataJson.put("nameComment", name_comment.getText().toString());
+                dataJson.put("fullName", fUser.getDisplayName());
+//                dataJson.put("uID", fUser.getUid());
+                rootJson.put("to", "/topics/" + pId);
+                rootJson.put("data", dataJson);
+
+            } else {
+                return; //no token found
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        //create POST request
+        StringRequest stringRequest = new StringRequest(StringRequest.Method.POST, BASE_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) { //POST REQUEST class implementation
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "key=" + SERVER_KEY);
+                return headers;
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return rootJson.toString().getBytes(); //return the root object with data inside
+            }
+        };
+
+        //sending the actual request
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        queue.add(stringRequest);
+    }
+    private boolean isMyPost(String pId)
+    {
+
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Posts").child(pId).child("uId");
+        final String isMyPost;
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if (snapshot.getValue().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    s = true;
+                    //Toast.makeText(getActivity(), s + "%%111111%%", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    s = false;
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        //Toast.makeText(getActivity(), s + "%%%%", Toast.LENGTH_SHORT).show();
+        return s;
     }
 
     @Override

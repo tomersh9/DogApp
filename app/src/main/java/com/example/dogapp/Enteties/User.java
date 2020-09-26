@@ -14,10 +14,15 @@ public class User  implements Comparable<User> {
     private String id;
     private String status;
     private String timeStamp;
+    private String aboutMe;
+    private String kmRange;
+    private String dogSizesList;
+    private Boolean lastCall;
+    private Integer paymentPerWalk;
 
     public User() {}
 
-    public User(String fullName, String dateOfBirth, String email, String gender, String title, String location, String photoUri, String id, String status, String timeStamp) {
+    public User(String fullName, String dateOfBirth, String email, String gender, String title, String location, String photoUri, String id, String status, String timeStamp, String aboutMe, String kmRange, String dogSizesList, Boolean lastCall, Integer paymentPerWalk) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
@@ -28,6 +33,11 @@ public class User  implements Comparable<User> {
         this.id = id;
         this.status = status;
         this.timeStamp = timeStamp;
+        this.aboutMe = aboutMe;
+        this.kmRange = kmRange;
+        this.dogSizesList = dogSizesList;
+        this.lastCall = lastCall;
+        this.paymentPerWalk = paymentPerWalk;
     }
 
     public String getFullName() {
@@ -110,7 +120,45 @@ public class User  implements Comparable<User> {
         this.timeStamp = timeStamp;
     }
 
+    public String getAboutMe() {
+        return aboutMe;
+    }
 
+    public void setAboutMe(String aboutMe) {
+        this.aboutMe = aboutMe;
+    }
+
+    public String getKmRange() {
+        return kmRange;
+    }
+
+    public void setKmRange(String kmRange) {
+        this.kmRange = kmRange;
+    }
+
+    public String getDogSizesList() {
+        return dogSizesList;
+    }
+
+    public void setDogSizesList(String dogSizesList) {
+        this.dogSizesList = dogSizesList;
+    }
+
+    public Boolean getLastCall() {
+        return lastCall;
+    }
+
+    public void setLastCall(Boolean lastCall) {
+        this.lastCall = lastCall;
+    }
+
+    public Integer getPaymentPerWalk() {
+        return paymentPerWalk;
+    }
+
+    public void setPaymentPerWalk(Integer paymentPerWalk) {
+        this.paymentPerWalk = paymentPerWalk;
+    }
 
     @Override
     public int compareTo(User o) {

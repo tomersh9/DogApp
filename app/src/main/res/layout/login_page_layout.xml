@@ -153,7 +153,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/continue_guest_btn"
-            style="?attr/materialButtonOutlinedStyle"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -161,7 +161,6 @@
             android:paddingVertical="12dp"
             android:text="@string/continue_as_guest"
             android:textAllCaps="false"
-            android:textColor="@color/colorPrimary"
             android:textSize="18sp"
             app:cornerRadius="40dp" />
 

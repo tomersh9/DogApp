@@ -44,7 +44,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,7 +56,12 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, ChatsFragment.OnChatClickListener {
+public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, ChatsFragment.OnChatClickListener, FollowersFragment.MyFollowersFragmentListener, FollowingFragment.MyFollowingFragmentListener {
+
+    //Fragments TAGs
+    private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
+    private final String FOLLOWING_FRAGMENT_TAG = "following_tag";
+    private final String FOLLOWERS_FRAGMENT_TAG = "followers_tag";
 
     //UI Layout
     private Toolbar toolbar;
@@ -297,6 +301,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 ProfileFragment profileFragment = ProfileFragment.newInstance(fUser.getUid(), fUser.getPhotoUrl().toString());
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment).commit();
                 drawerLayout.closeDrawers();
+                bottomNavBar.setSelectedItemId(R.id.bottom_profile);
             }
         });
 
@@ -366,8 +371,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         break;
 
                     case R.id.item_friends:
-                        /*toolbar.setTitle(getString(R.string.friends));
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FriendsFragment()).commit();*/
                         break;
 
                     case R.id.item_sign_out:
@@ -396,13 +399,52 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         }
     }
 
+    @Override
+    public void onFollowersFragmentBackPress() {
+        closeFragment(FOLLOWERS_FRAGMENT_TAG);
+    }
+
+    @Override
+    public void onFollowingFragmentBackPress() {
+        closeFragment(FOLLOWING_FRAGMENT_TAG);
+    }
+
+    @Override
+    public void onProfileBackPress() {
+        closeFragment(PROFILE_FRAGMENT_TAG);
+    }
+
     //close fragments by tag
     private void closeFragment(String tag) {
+
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             getSupportFragmentManager().popBackStack(); //remove from back stack
+
+
+            if (tag.equals(PROFILE_FRAGMENT_TAG)) {
+
+                //get current fragment after
+                Fragment currFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+                if(currFragment!=null) {
+
+                    if (currFragment.getTag().equals(FOLLOWERS_FRAGMENT_TAG)) {
+                        toolbar.setTitle(getString(R.string.followers));
+                    } else if (currFragment.getTag().equals(FOLLOWING_FRAGMENT_TAG)) {
+                        toolbar.setTitle(getString(R.string.following));
+                    }
+                    setSupportActionBar(toolbar);
+                }
+            }
         }
+    }
+
+    private Fragment getCurrentFragment() {
+        String fragmentTag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
+        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(fragmentTag);
+        return currentFragment;
     }
 
     //*****************FRAGMENTS DATA TRANSFER**************************//
@@ -418,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         setSupportActionBar(toolbar);
         toolbar.setTitle(getString(R.string.following));
         FollowingFragment followingFragment = FollowingFragment.newInstance(userID);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, followingFragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, followingFragment, FOLLOWING_FRAGMENT_TAG).addToBackStack(null).commit();
     }
 
     @Override
@@ -426,7 +468,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         setSupportActionBar(toolbar);
         toolbar.setTitle(getString(R.string.followers));
         FollowersFragment followersFragment = FollowersFragment.newInstance(userID);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, followersFragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, followersFragment, FOLLOWERS_FRAGMENT_TAG).addToBackStack(null).commit();
     }
 
     @Override

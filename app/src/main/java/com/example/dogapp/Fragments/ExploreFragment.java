@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +24,7 @@ public class ExploreFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.explore_fragment,container,false);
+        View rootView = inflater.inflate(R.layout.explore_fragment, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
         viewPager = rootView.findViewById(R.id.board_view_pager);
         tabLayout = rootView.findViewById(R.id.tab_layout);
@@ -35,11 +36,12 @@ public class ExploreFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         //setting pager and adapter
-        BoardsPagerAdapter boardsPagerAdapter = new BoardsPagerAdapter(getChildFragmentManager(),0);
+        BoardsPagerAdapter boardsPagerAdapter = new BoardsPagerAdapter(getChildFragmentManager(), 0);
         DiscoverFriendsFragment discoverFriendsFragment = new DiscoverFriendsFragment();
         WalkerBoardFragment walkerBoardFragment = new WalkerBoardFragment();
-        boardsPagerAdapter.addFragment(discoverFriendsFragment,getString(R.string.discover_friends));
-        boardsPagerAdapter.addFragment(walkerBoardFragment,getString(R.string.dog_walkers));
+        boardsPagerAdapter.addFragment(walkerBoardFragment, getString(R.string.dog_walkers));
+        boardsPagerAdapter.addFragment(discoverFriendsFragment, getString(R.string.discover_friends));
+
         viewPager.setAdapter(boardsPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.group_icon_64);

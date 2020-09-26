@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageDecoder;
 import android.graphics.drawable.ColorDrawable;
@@ -29,7 +30,6 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,9 +40,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.location.LocationManagerCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.dogapp.Activities.LoginActivity;
-import com.example.dogapp.Activities.MainActivity;
-import com.example.dogapp.Enteties.User;
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.dogapp.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -66,7 +64,6 @@ import java.time.Period;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -86,7 +83,7 @@ public class SecondRegisterFragment extends Fragment {
 
     //views
     ImageButton locationBtn1;
-    TextView pressTv;
+    TextView pressTv, notReqTv;
     CircleImageView profileBtn;
 
     //Location
@@ -104,6 +101,8 @@ public class SecondRegisterFragment extends Fragment {
 
     private TextInputLayout dateEt, locationEt;
     private RadioGroup genderGroup, typeGroup;
+    private LottieAnimationView walkerAnim, aboutAnim;
+    private Button next2Btn, regBtn;
 
     private boolean isWalker;
     private boolean isValid;
@@ -236,21 +235,51 @@ public class SecondRegisterFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.register_fragment_layout_2, container, false);
 
-        Button regBtn = rootView.findViewById(R.id.reg_2_btn);
-        Button next2Btn = rootView.findViewById(R.id.next_2_btn);
+        //normal user
+        regBtn = rootView.findViewById(R.id.reg_2_btn);
+        pressTv = rootView.findViewById(R.id.press_tv);
+        notReqTv = rootView.findViewById(R.id.not_req_tv);
+        profileBtn = rootView.findViewById(R.id.profile_btn);
+
+        //walker user
+        next2Btn = rootView.findViewById(R.id.next_2_btn);
+        aboutAnim = rootView.findViewById(R.id.reg_normal_anim);
 
         //user type
         isWalker = getArguments().getBoolean("isWalker");
-        if (isWalker) {
+
+        if (isWalker) { //walker registration options
+
             type = getString(R.string.dog_walker);
             regBtn.setVisibility(View.GONE);
+            pressTv.setVisibility(View.GONE);
+            notReqTv.setVisibility(View.GONE);
+            profileBtn.setVisibility(View.GONE);
+            aboutAnim.setVisibility(View.VISIBLE);
             next2Btn.setVisibility(View.VISIBLE);
 
-        } else {
+            setWalkerEventsListeners();
+
+        } else { //normal user registration options
+
             type = getString(R.string.dog_owner);
-            regBtn.setVisibility(View.VISIBLE);
             next2Btn.setVisibility(View.GONE);
+            aboutAnim.setVisibility(View.GONE);
+            regBtn.setVisibility(View.VISIBLE);
+            pressTv.setVisibility(View.VISIBLE);
+            notReqTv.setVisibility(View.VISIBLE);
+            profileBtn.setVisibility(View.VISIBLE);
+            profileBtn.animate().scaleX(1.3f).scaleY(1.3f).setDuration(500).withEndAction(new Runnable() {
+                @Override
+                public void run() {
+                    profileBtn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(500).start();
+                }
+            }).start();
+
+            setNormalEventsListeners();
         }
+
+        //**********COMMON EVENTS**********************//
 
         // storage instance
         myStorageRef = FirebaseStorage.getInstance().getReference("Images");
@@ -260,15 +289,118 @@ public class SecondRegisterFragment extends Fragment {
         email = getArguments().getString("email");
         password = getArguments().getString("password");
 
-        pressTv = rootView.findViewById(R.id.press_tv);
-
-        profileBtn = rootView.findViewById(R.id.profile_btn);
-        profileBtn.animate().scaleX(1.3f).scaleY(1.3f).setDuration(500).withEndAction(new Runnable() {
+        dateEt = rootView.findViewById(R.id.date_input);
+        dateEt.getEditText().setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                profileBtn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(500).start();
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                final int globalYear = calendar.get(Calendar.YEAR);
+                final int globalMonth = calendar.get(Calendar.MONTH);
+                final int globalDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+                if (Build.VERSION.SDK_INT >= 26) {
+                    DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), android.R.style.Theme_Holo_Light_Dialog_MinWidth, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                            //LocalDate myDate = LocalDate.of(year,month,dayOfMonth);
+                            //age = calculateAge(myDate,LocalDate.of(globalYear,globalMonth,globalDay));
+                            dateOfBirth = dayOfMonth + "/" + (month + 1) + "/" + year;
+                            dateEt.getEditText().setText(dateOfBirth);
+                        }
+                    }, globalYear, globalMonth, globalDay);
+                    datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    datePickerDialog.show();
+                }
             }
-        }).start();
+        });
+
+        locationEt = rootView.findViewById(R.id.location_input);
+        geocoder = new Geocoder(getActivity());
+        locationEt.getEditText().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                isLocation = isLocationEnabled(getActivity());
+
+                if (Build.VERSION.SDK_INT >= 23) {
+                    int hasLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
+                    if (hasLocationPermission != PackageManager.PERMISSION_GRANTED)
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
+                    else {
+                        if (isLocation) {
+                            locationEt.getEditText().clearFocus();
+                            startLocation();
+                            locationEt.getEditText().setFocusable(false);
+                            locationEt.getEditText().setClickable(false);
+                        } else {
+                            locationEt.setHint(getString(R.string.enter_loc_manual));
+                            locationEt.getEditText().setFocusable(true);
+                            locationEt.getEditText().setClickable(true);
+                        }
+
+                    }
+                } else {
+                    if (isLocation) {
+                        locationEt.getEditText().clearFocus();
+                        startLocation();
+                        locationEt.getEditText().setFocusable(false);
+                        locationEt.getEditText().setClickable(false);
+                    } else {
+                        locationEt.setHint(getString(R.string.enter_loc_manual));
+                        locationEt.getEditText().setFocusable(true);
+                        locationEt.getEditText().setClickable(true);
+                    }
+                }
+            }
+        });
+
+        genderGroup = rootView.findViewById(R.id.gender_radio_group);
+        genderGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.male:
+                        gender = getString(R.string.male);
+                        break;
+                    case R.id.female:
+                        gender = getString(R.string.female);
+                        break;
+                    case R.id.other:
+                        gender = getString(R.string.other);
+                        break;
+                }
+            }
+        });
+
+        ImageButton backBtn = rootView.findViewById(R.id.back_frag_btn_2);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onBackSecond();
+            }
+        });
+
+        return rootView;
+    }
+
+    private void setWalkerEventsListeners() {
+        next2Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isValid = validateFields();
+                if (isValid) {
+
+                    listener.onNextSecond(fullName, email, password, dateOfBirth, gender, type, location);
+
+                } else {
+                    return;
+                }
+            }
+        });
+    }
+
+    //events for normal user registration
+    private void setNormalEventsListeners() {
         profileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -315,148 +447,35 @@ public class SecondRegisterFragment extends Fragment {
             }
         });
 
-        dateEt = rootView.findViewById(R.id.date_input);
-        dateEt.getEditText().setOnClickListener(new View.OnClickListener() {
+        regBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
-                final int globalYear = calendar.get(Calendar.YEAR);
-                final int globalMonth = calendar.get(Calendar.MONTH);
-                final int globalDay = calendar.get(Calendar.DAY_OF_MONTH);
+                isValid = validateFields();
+                if (isValid) {
 
-                if (Build.VERSION.SDK_INT >= 26) {
-                    DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), android.R.style.Theme_Holo_Light_Dialog_MinWidth, new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                            //LocalDate myDate = LocalDate.of(year,month,dayOfMonth);
-                            //age = calculateAge(myDate,LocalDate.of(globalYear,globalMonth,globalDay));
-                            dateOfBirth = dayOfMonth + "/" + (month + 1) + "/" + year;
-                            dateEt.getEditText().setText(dateOfBirth);
-                        }
-                    }, globalYear, globalMonth, globalDay);
-                    datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    datePickerDialog.show();
-                }
-            }
-        });
+                    listener.startLoader();
 
-        locationEt = rootView.findViewById(R.id.location_input);
-        geocoder = new Geocoder(getActivity());
-        locationEt.getEditText().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                isLocation = isLocationEnabled(getActivity());
-
-                if (Build.VERSION.SDK_INT >= 23) {
-                    int hasLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
-                    if (hasLocationPermission != PackageManager.PERMISSION_GRANTED)
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
-                    else {
-                        if (isLocation) {
-                            startLocation();
-                        } else {
-                            locationEt.setHint(getString(R.string.enter_loc_manual));
-                            locationEt.getEditText().setText("");
-                            locationEt.getEditText().setFocusable(true);
-                        }
-
+                    if (bitmap1 != null) {
+                        handleUpload(bitmap1);
+                    } else if (bitmap2 != null) {
+                        handleUpload(bitmap2);
+                    } else {
+                        //TODO fix register without photo
+                        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.account_icon);
+                        handleUpload(bitmap);
                     }
+
+                    if (isFromCamera) {
+                        getActivity().getContentResolver().delete(fileUri, null, null);
+                    }
+
+                    listener.onRegister(fullName, email, password, dateOfBirth, gender, type, location);
+
                 } else {
-                    if (isLocation) {
-                        startLocation();
-                    } else {
-                        locationEt.setHint(getString(R.string.enter_loc_manual));
-                        locationEt.getEditText().setFocusable(true);
-                        locationEt.getEditText().setText("");
-                    }
+                    return;
                 }
             }
         });
-
-        genderGroup = rootView.findViewById(R.id.gender_radio_group);
-        genderGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.male:
-                        gender = getString(R.string.male);
-                        break;
-                    case R.id.female:
-                        gender = getString(R.string.female);
-                        break;
-                    case R.id.other:
-                        gender = getString(R.string.other);
-                        break;
-                }
-            }
-        });
-
-        /*typeGroup = rootView.findViewById(R.id.type_radio_group);
-        typeGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.dog_owner:
-                        type = getString(R.string.dog_owner);
-                        break;
-                    case R.id.dog_walker:
-                        type = getString(R.string.dog_walker);
-                        break;
-                }
-            }
-        });*/
-
-        if (!isWalker) {
-            regBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    isValid = validateFields();
-                    if (isValid) {
-
-                        listener.startLoader();
-
-                        if (bitmap1 != null)
-                            handleUpload(bitmap1);
-                        else if (bitmap2 != null)
-                            handleUpload(bitmap2);
-
-                        if (isFromCamera) {
-                            getActivity().getContentResolver().delete(fileUri, null, null);
-                        }
-
-                        listener.onRegister(fullName, email, password, dateOfBirth, gender, type, location);
-
-                    } else {
-                        return;
-                    }
-                }
-            });
-        } else {
-            next2Btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    isValid = validateFields();
-                    if (isValid) {
-
-                        listener.onNextSecond(fullName, email, password, dateOfBirth, gender, type, location);
-
-                    } else {
-                        return;
-                    }
-                }
-            });
-        }
-
-        ImageButton backBtn = rootView.findViewById(R.id.back_frag_btn_2);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onBackSecond();
-            }
-        });
-
-        return rootView;
     }
 
     private void startLocation() {

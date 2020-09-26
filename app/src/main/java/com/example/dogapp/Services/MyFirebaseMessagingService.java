@@ -39,6 +39,7 @@ import java.util.Map;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private final int NOTIF_ID = 1;
+    private final int NOTIF_ID2 = 2;
 
     /**
      * Called if InstanceID token is updated. This may occur if the security of
@@ -88,6 +89,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String msg = data.get("message");
             String from = data.get("fullName");
             String uid = data.get("uID");
+            String isLike = data.get("isLike");
+            String isCom = data.get("isCom");
+            String isMsg = data.get("isMsg");
+            String nameComment = data.get("nameComment");
+            String isComFriend = data.get("isComFriend");
+
 
 
             //when click notification, get to chat activity
@@ -99,21 +106,59 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ID");
             builder.setContentText(msg)
                     .setSmallIcon(R.drawable.ic_explore_black_24dp)
-                    .setContentTitle(getString(R.string.new_msg_from) + " " + from)
+                    .setContentTitle(getString(R.string.new_msg_from) + "" + from)
                     .setContentIntent(pendingIntent);
 
-            if (!checkApp()) {
+            NotificationCompat.Builder builder1 = new NotificationCompat.Builder(this, "ID");
+            builder1.setContentText(msg)
+                    .setSmallIcon(R.drawable.ic_explore_black_24dp)
+                    .setContentTitle(from + " Commented on your post");
+
+            NotificationCompat.Builder builder2 = new NotificationCompat.Builder(this, "ID");
+            builder2
+                    .setSmallIcon(R.drawable.ic_add_black_24dp)
+                    .setContentTitle(from + " Liked your post");
+
+            NotificationCompat.Builder builder3 = new NotificationCompat.Builder(this, "ID");
+            builder3.setContentText(msg)
+                    .setSmallIcon(R.drawable.ic_add_black_24dp)
+                    .setContentTitle(from + "  also commented on " + nameComment + "" + " post" );
+
+            if(!checkApp()) {
                 NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                manager.notify(NOTIF_ID, builder.build());
+                if(isCom != null)
+                {
+                    manager.notify(NOTIF_ID, builder1.build());
+                }
+                else if(isComFriend != null)
+                {
+                    manager.notify(NOTIF_ID,builder3.build());
+                }
+                else if(isMsg != null)
+                    manager.notify(NOTIF_ID, builder.build());
+                else if (isLike != null)
+                {
+                    manager.notify(NOTIF_ID,builder2.build());
+                }
+
             }
+//            if (!checkApp()) {
+//                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//                //manager.notify(NOTIF_ID, builder.build());
+//                manager.notify(NOTIF_ID,builder1.build());
+//            }
 
             //When user is in the application (broadcast receiver)
-            Intent intent = new Intent("action_msg_receive");
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            if(isMsg != null)
+            {
+                Intent intent = new Intent("action_msg_receive");
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            }
         }
 
 
         if (remoteMessage.getNotification() != null) {
+
 
         }
 

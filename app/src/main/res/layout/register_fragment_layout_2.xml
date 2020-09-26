@@ -65,6 +65,28 @@
                 android:layout_marginTop="10dp"
                 android:orientation="vertical">
 
+                <!--<com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/reg_walker_anim"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:scaleType="centerInside"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    android:visibility="gone"
+                    app:lottie_rawRes="@raw/walker_anim" />-->
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/reg_normal_anim"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:scaleType="centerInside"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    android:visibility="gone"
+                    app:lottie_rawRes="@raw/about_anim" />
+
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_btn"
                     android:layout_width="100dp"
@@ -72,7 +94,8 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"
                     android:padding="5dp"
-                    android:src="@drawable/account_icon" />
+                    android:src="@drawable/account_icon"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/press_tv"
@@ -85,6 +108,7 @@
                     android:textSize="15sp" />
 
                 <TextView
+                    android:id="@+id/not_req_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -131,7 +155,6 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:focusable="false"
                         android:hint="@string/your_location" />
 
                 </com.google.android.material.textfield.TextInputLayout>

@@ -1,5 +1,6 @@
 package com.example.dogapp.Fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -37,6 +38,9 @@ import java.util.List;
 
 public class FollowersFragment extends Fragment implements FriendsAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
 
+    private final String FOLLOWERS_FRAGMENT_TAG = "followers_tag";
+    private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
+
     //List
     private RecyclerView recyclerView;
     private FriendsAdapter adapter;
@@ -63,6 +67,22 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
         bundle.putString("userID", userID);
         fragment.setArguments(bundle);
         return fragment; //holds the bundle
+    }
+
+    public interface MyFollowersFragmentListener {
+        void onFollowersFragmentBackPress();
+    }
+
+    private MyFollowersFragmentListener listener;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            listener = (MyFollowersFragmentListener) context; //the activity is the callback
+        } catch (ClassCastException ex) {
+            throw new ClassCastException("The Activity must implement MyFollowersFragmentListener interface");
+        }
     }
 
     @Override
@@ -165,7 +185,7 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
     public void onFriendClicked(int pos, View v) {
         User user = users.get(pos);
         ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUri());
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment).commit();
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
     }
 
     @Override
@@ -179,6 +199,15 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
     @Override
     public void onFriendFollowClicked(int pos, View v) {
         //nothing
+    }
+
+    //close fragments by tag
+    private void closeFragment(String tag) {
+        Fragment fragment = getActivity().getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment != null) {
+            getActivity().getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            getActivity().getSupportFragmentManager().popBackStack(); //remove from back stack
+        }
     }
 
     @Override
@@ -224,26 +253,33 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.search_menu, menu);
+        inflater.inflate(R.menu.follow_frag_menu, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId() == R.id.menu_item_search) {
-            SearchView searchView = (SearchView) item.getActionView();
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
-                }
+        switch (item.getItemId()) {
 
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    adapter.getFilter().filter(newText);
-                    return false;
-                }
-            });
+            case R.id.follow_menu_search:
+                SearchView searchView = (SearchView) item.getActionView();
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        adapter.getFilter().filter(newText);
+                        return false;
+                    }
+                });
+                break;
+
+            case R.id.follow_menu_back:
+                listener.onFollowersFragmentBackPress();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

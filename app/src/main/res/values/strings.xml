@@ -1,4 +1,28 @@
 <resources>
+
+    <string-array name="dog_sizes_array">
+        <item>@string/tiny</item>
+        <item>@string/small</item>
+        <item>@string/medium</item>
+        <item>@string/large</item>
+        <item>@string/huge</item>
+    </string-array>
+
+
+    <string-array name="km_range">
+        <item>1-5km</item>
+        <item>5-20km</item>
+        <item>20-50km</item>
+        <item>50-100km</item>
+        <item>100km+</item>
+    </string-array>
+
+    <string-array name="last_call_array">
+       <item>@string/yes</item>
+       <item>@string/no</item>
+    </string-array>
+
+
     <string name="app_name">DogApp</string>
     <string name="welcome_to_dog_app">Welcome to Dog App</string>
     <string name="email">Email</string>
@@ -97,4 +121,22 @@
     <string name="register_as_client">Register as client</string>
     <string name="register_as_dog_walker">Register as dog walker</string>
     <string name="continue_as_guest">Continue as guest</string>
+    <string name="tiny">Tiny</string>
+    <string name="small">Small</string>
+    <string name="medium">Medium</string>
+    <string name="large">Large</string>
+    <string name="huge">Huge</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="choose_dog_size">Choose dog sizes</string>
+    <string name="choose_km_range">Choose km range</string>
+    <string name="allow_last_call">Are you allowing last minute call?</string>
+    <string name="must_take_charge">You must take charge</string>
+    <string name="no_permissions">No permissions</string>
+    <string name="permissions_granted">Permission granted</string>
+    <string name="good_with_dogs_at_sizes">Good with dogs at sizes</string>
+    <string name="is_willing_in_range_of">Is willing to travel to owner\'s house in the range of</string>
+    <string name="allows_last_minute_call">Allows last minute call?</string>
+    <string name="service_cost_per_trip">Service cost for each trip</string>
+    <string name="ils">ILS</string>
 </resources>
