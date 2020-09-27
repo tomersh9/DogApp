@@ -386,7 +386,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     User user = snapshot.getValue(User.class);
 
                     email = user.getEmail();
-                    imgURL = user.getPhotoUri();
+                    imgURL = user.getPhotoUrl();
 
                     try {
                         Glide.with(getActivity()).asBitmap().load(imgURL).placeholder(R.drawable.account_icon).into(profileIv);
@@ -394,54 +394,58 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         ex.getMessage();
                     }
 
-                    //set text
-                    genderAgeTv.setText(user.getGender());
-                    locationTv.setText(user.getLocation());
-                    typeTv.setText(user.getTitle());
+                    //set views and text
                     nameTv.setText(user.getFullName());
+                    locationTv.setText(user.getLocation());
                     aboutMeTv.setText(user.getAboutMe());
+
+                    if(user.getGender() == 0) {
+                        genderAgeTv.setText(R.string.male);
+                        genderIv.setImageResource(R.drawable.man_icon);
+                    } else if(user.getGender() == 1) {
+                        genderAgeTv.setText(R.string.female);
+                        genderIv.setImageResource(R.drawable.woman_icon);
+                    } else {
+                        genderAgeTv.setText(R.string.other);
+                        genderIv.setImageResource(R.drawable.other_icon);
+                    }
+
+                    //USER TYPE
+
+                    if(!user.getType()) { // NOT WALKER
+                        typeTv.setText(R.string.dog_owner);
+                        typeIv.setImageResource(R.drawable.dog_owner_icon);
+                        isWalker = false;
+                        row1.setVisibility(View.GONE);
+                        row2.setVisibility(View.GONE);
+
+                    } else { //WALKER
+                        typeTv.setText(R.string.dog_walker);
+                        typeIv.setImageResource(R.drawable.dog_walker_icon);
+                        isWalker = true;
+                        row1.setVisibility(View.VISIBLE);
+                        row2.setVisibility(View.VISIBLE);
+
+                        String sizes = user.getDogSizesList();
+                        String size = sizes.substring(1, sizes.length() - 1);
+                        String range = user.getKmRange();
+                        boolean lastCall = user.getLastCall();
+                        int paymentPerWalk = user.getPaymentPerWalk();
+
+                        sizesTv.setText(size);
+                        rangeTv.setText(range);
+                        if (lastCall) {
+                            lastCallTv.setText(R.string.yes);
+                        } else {
+                            lastCallTv.setText(R.string.no);
+                        }
+                        paymentTv.setText(paymentPerWalk + " " + getString(R.string.ils));
+                        assignWalkerListeners(size, range, lastCall, paymentPerWalk);
+                    }
 
                     //setting icons
                     if (getActivity() != null) {
-
-                        if (user.getGender().equals(getString(R.string.male))) {
-                            genderIv.setImageResource(R.drawable.man_icon);
-                        } else if (user.getGender().equals(getString(R.string.female))) {
-                            genderIv.setImageResource(R.drawable.woman_icon);
-                        } else {
-                            genderIv.setImageResource(R.drawable.other_icon);
-                        }
-
-                        if (user.getTitle().equals(getString(R.string.dog_owner))) {
-
-                            typeIv.setImageResource(R.drawable.dog_owner_icon);
-                            isWalker = false;
-                            row1.setVisibility(View.GONE);
-                            row2.setVisibility(View.GONE);
-
-                        } else {
-
-                            typeIv.setImageResource(R.drawable.dog_walker_icon);
-                            isWalker = true;
-                            row1.setVisibility(View.VISIBLE);
-                            row2.setVisibility(View.VISIBLE);
-
-                            String sizes = user.getDogSizesList();
-                            String size = sizes.substring(1, sizes.length() - 1);
-                            String range = user.getKmRange();
-                            boolean lastCall = user.getLastCall();
-                            int paymentPerWalk = user.getPaymentPerWalk();
-
-                            sizesTv.setText(size);
-                            rangeTv.setText(range);
-                            if (lastCall) {
-                                lastCallTv.setText(R.string.yes);
-                            } else {
-                                lastCallTv.setText(R.string.no);
-                            }
-                            paymentTv.setText(paymentPerWalk + " " + getString(R.string.ils));
-                            assignWalkerListeners(size, range, lastCall, paymentPerWalk);
-                        }
+                        //move here maybe
                     }
                 }
             }
@@ -695,7 +699,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.profile_menu, menu);
+        if(!isMe) {
+            inflater.inflate(R.menu.profile_menu, menu);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -716,7 +722,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                //Toast.makeText(getActivity(), fileUri.toString(), Toast.LENGTH_SHORT).show();
                 bitmap2 = null;
                 try {
                     bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
@@ -734,7 +739,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 }
                 //alertDialog.dismiss();
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_SHORT).show();
                 fileUri = null;
             }
 
@@ -742,7 +746,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         if (requestCode == SELECT_IMAGE) {
             if (resultCode == Activity.RESULT_OK && permission == true) {
-                Toast.makeText(getActivity(), "NBBBB", Toast.LENGTH_SHORT).show();
                 fileUri = data.getData();
                 bitmap1 = null;
                 try {

@@ -184,7 +184,7 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
     @Override
     public void onFriendClicked(int pos, View v) {
         User user = users.get(pos);
-        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUri());
+        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUrl());
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
     }
 

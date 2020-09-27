@@ -219,12 +219,12 @@ public class InChatActivity extends AppCompatActivity {
                 usernameTv.setText(user.getFullName());
                 //set icon image of user
                 try {
-                    Glide.with(InChatActivity.this).load(user.getPhotoUri()).placeholder(R.drawable.account_icon).into(profileIv);
+                    Glide.with(InChatActivity.this).load(user.getPhotoUrl()).placeholder(R.drawable.account_icon).into(profileIv);
                 } catch (Exception ex) {
 
                 }
                 //reading messages with the Sender details to populate
-                readMessages(fUser.getUid(), userID, user.getPhotoUri());
+                readMessages(fUser.getUid(), userID, user.getPhotoUrl());
             }
 
             @Override
@@ -375,7 +375,7 @@ public class InChatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setUserStatus(getString(R.string.online));
+        setUserStatus(true);
         setOtherUserStatus();
     }
 
@@ -392,7 +392,11 @@ public class InChatActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
-                    statusTv.setText(user.getStatus());
+                    if (user.getStatus()) {
+                        statusTv.setText(R.string.online);
+                    } else {
+                        statusTv.setText(R.string.offline);
+                    }
                 }
             }
 
@@ -403,7 +407,7 @@ public class InChatActivity extends AppCompatActivity {
         });
     }
 
-    private void setUserStatus(String status) {
+    private void setUserStatus(Boolean status) {
         databaseReference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("status", status);

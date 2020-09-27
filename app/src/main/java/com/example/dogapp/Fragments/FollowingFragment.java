@@ -182,7 +182,7 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
     @Override
     public void onFriendClicked(int pos, View v) {
         User user = users.get(pos);
-        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUri());
+        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUrl());
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
     }
 
@@ -231,15 +231,6 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
 
             }
         });
-    }
-
-    //close fragments by tag
-    private void closeFragment(String tag) {
-        Fragment fragment = getActivity().getSupportFragmentManager().findFragmentByTag(tag);
-        if (fragment != null) {
-            getActivity().getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-            getActivity().getSupportFragmentManager().popBackStack(); //remove from back stack
-        }
     }
 
     @Override

@@ -98,13 +98,13 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
         User user = users.get(position);
         holder.usernameTv.setText(user.getFullName());
         try {
-            Glide.with(holder.itemView).asBitmap().load(user.getPhotoUri()).placeholder(R.drawable.account_icon).into(holder.profileIv);
+            Glide.with(holder.itemView).asBitmap().load(user.getPhotoUrl()).placeholder(R.drawable.account_icon).into(holder.profileIv);
         } catch (Exception ex) {
 
         }
 
         //set status symbol
-        if (user.getStatus().equals("Online") || user.getStatus().equals("מחובר")) {
+        if (user.getStatus()) {
             holder.onlineIv.setVisibility(View.VISIBLE);
             holder.offlineIv.setVisibility(View.GONE);
         } else {
@@ -132,7 +132,6 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
 
             List<User> filteredList = new ArrayList<>(); //only filtered items
 
-            System.out.println(usersFull.toString() + " !!!!!!!!!!!!!!!");
             if (constraint == null || constraint.length() == 0) {
                 filteredList.addAll(usersFull); //return full list if has no filter!
             } else {

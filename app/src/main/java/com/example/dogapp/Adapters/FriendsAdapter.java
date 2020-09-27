@@ -143,11 +143,23 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
 
         User user = users.get(position);
         holder.usernameTv.setText(user.getFullName());
-        holder.typeTv.setText(user.getTitle());
-        holder.ageGenderTv.setText(user.getGender());
+        if(user.getType()) { //walker
+            holder.typeTv.setText(R.string.dog_walker);
+        } else {
+            holder.typeTv.setText(R.string.dog_owner);
+        }
+
+        //gender rtl
+        if(user.getGender() == 0) {
+            holder.ageGenderTv.setText(R.string.male);
+        } else if(user.getGender() == 1) {
+            holder.ageGenderTv.setText(R.string.female);
+        } else {
+            holder.ageGenderTv.setText(R.string.other);
+        }
 
         try {
-            Glide.with(holder.itemView).asBitmap().load(user.getPhotoUri()).placeholder(R.drawable.account_icon).into(holder.profileIv);
+            Glide.with(holder.itemView).asBitmap().load(user.getPhotoUrl()).placeholder(R.drawable.account_icon).into(holder.profileIv);
         } catch (Exception ex) {
             ex.getMessage();
         }

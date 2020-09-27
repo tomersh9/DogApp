@@ -1,5 +1,6 @@
 package com.example.dogapp.Fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -36,6 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
+
+    private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
+
     //List
     private RecyclerView recyclerView;
     private FriendsAdapter adapter;
@@ -52,6 +56,22 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
     //UI
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+   /* public interface MyDiscoverFriendsFragmentListener {
+        void onDiscoverFriendPress();
+    }
+
+    private MyDiscoverFriendsFragmentListener listener;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            listener = (MyDiscoverFriendsFragmentListener) context;
+        } catch (ClassCastException ex) {
+            throw new ClassCastException("MainActivity must implement MyDiscoverFriendsFragmentListener interface");
+        }
+    }*/
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,7 +136,7 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
                         }
                     }
                     //adapter
-                    adapter = new FriendsAdapter(users, false,true);
+                    adapter = new FriendsAdapter(users, false, true);
                     //set adapter to recyclerview
                     recyclerView.setAdapter(adapter);
                     //adapter click events
@@ -139,8 +159,8 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
     public void onFriendClicked(int pos, View v) {
         //go to profile (activity)
         User user = users.get(pos);
-        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUri());
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment).commit();
+        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUrl());
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
     }
 
     @Override

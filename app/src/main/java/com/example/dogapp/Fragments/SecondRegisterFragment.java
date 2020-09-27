@@ -101,7 +101,7 @@ public class SecondRegisterFragment extends Fragment {
 
     private TextInputLayout dateEt, locationEt;
     private RadioGroup genderGroup, typeGroup;
-    private LottieAnimationView walkerAnim, aboutAnim;
+    private LottieAnimationView aboutAnim;
     private Button next2Btn, regBtn;
 
     private boolean isWalker;
@@ -109,7 +109,9 @@ public class SecondRegisterFragment extends Fragment {
     private boolean isLocation;
 
     //to create user
-    private String fullName, email, password, gender = "", location, type = "", dateOfBirth;
+    private String fullName, email, password, location, dateOfBirth;
+    private Boolean type;
+    private Integer age, gender;
 
     public interface OnSecondRegisterFragmentListener {
 
@@ -119,11 +121,11 @@ public class SecondRegisterFragment extends Fragment {
 
         void createConfirmDialog();
 
-        void onRegister(String name, String email, String password, String date, String gender, String title, String location);
+        void onRegister(String name, String email, String password, String date, Integer age, Integer gender, Boolean type, String location);
 
         void onBackSecond();
 
-        void onNextSecond(String name, String email, String password, String date, String gender, String title, String location);
+        void onNextSecond(String name, String email, String password, String date, Integer age, Integer gender, Boolean type, String location);
     }
 
     private OnSecondRegisterFragmentListener listener;
@@ -247,10 +249,11 @@ public class SecondRegisterFragment extends Fragment {
 
         //user type
         isWalker = getArguments().getBoolean("isWalker");
+        type = isWalker; //true for walker, false for user
 
         if (isWalker) { //walker registration options
 
-            type = getString(R.string.dog_walker);
+            //type = getString(R.string.dog_walker);
             regBtn.setVisibility(View.GONE);
             pressTv.setVisibility(View.GONE);
             notReqTv.setVisibility(View.GONE);
@@ -262,7 +265,7 @@ public class SecondRegisterFragment extends Fragment {
 
         } else { //normal user registration options
 
-            type = getString(R.string.dog_owner);
+            //type = getString(R.string.dog_owner);
             next2Btn.setVisibility(View.GONE);
             aboutAnim.setVisibility(View.GONE);
             regBtn.setVisibility(View.VISIBLE);
@@ -302,8 +305,8 @@ public class SecondRegisterFragment extends Fragment {
                     DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), android.R.style.Theme_Holo_Light_Dialog_MinWidth, new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                            //LocalDate myDate = LocalDate.of(year,month,dayOfMonth);
-                            //age = calculateAge(myDate,LocalDate.of(globalYear,globalMonth,globalDay));
+                            LocalDate myDate = LocalDate.of(year, month, dayOfMonth);
+                            age = calculateAge(myDate, LocalDate.of(globalYear, globalMonth, globalDay)); //saving user's age
                             dateOfBirth = dayOfMonth + "/" + (month + 1) + "/" + year;
                             dateEt.getEditText().setText(dateOfBirth);
                         }
@@ -358,15 +361,16 @@ public class SecondRegisterFragment extends Fragment {
         genderGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int[] arr = getResources().getIntArray(R.array.gender_values);
                 switch (checkedId) {
                     case R.id.male:
-                        gender = getString(R.string.male);
+                        gender = arr[0];
                         break;
                     case R.id.female:
-                        gender = getString(R.string.female);
+                        gender = arr[1];
                         break;
                     case R.id.other:
-                        gender = getString(R.string.other);
+                        gender = arr[2];
                         break;
                 }
             }
@@ -390,7 +394,7 @@ public class SecondRegisterFragment extends Fragment {
                 isValid = validateFields();
                 if (isValid) {
 
-                    listener.onNextSecond(fullName, email, password, dateOfBirth, gender, type, location);
+                    listener.onNextSecond(fullName, email, password, dateOfBirth, age, gender, type, location);
 
                 } else {
                     return;
@@ -469,7 +473,7 @@ public class SecondRegisterFragment extends Fragment {
                         getActivity().getContentResolver().delete(fileUri, null, null);
                     }
 
-                    listener.onRegister(fullName, email, password, dateOfBirth, gender, type, location);
+                    listener.onRegister(fullName, email, password, dateOfBirth, age, gender, type, location);
 
                 } else {
                     return;
@@ -637,7 +641,7 @@ public class SecondRegisterFragment extends Fragment {
     }
 
     private boolean validGroups() {
-        if (gender.isEmpty()) {
+        if (gender == null) {
             Toast.makeText(getActivity(), R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
             return false;
         }

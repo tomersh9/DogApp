@@ -2,17 +2,19 @@ package com.example.dogapp.Enteties;
 
 import java.util.Comparator;
 
-public class User  implements Comparable<User> {
+public class User implements Comparable<User> {
 
     private String fullName;
     private String dateOfBirth;
+    private Integer age;
     private String email;
-    private String gender;
-    private String title;
+    private Integer gender;
+    private Boolean type; //true for walker, false for user
     private String location;
-    private String photoUri;
+    private String photoUrl;
+    private String coverUrl;
     private String id;
-    private String status;
+    private Boolean status;
     private String timeStamp;
     private String aboutMe;
     private String kmRange;
@@ -20,16 +22,19 @@ public class User  implements Comparable<User> {
     private Boolean lastCall;
     private Integer paymentPerWalk;
 
-    public User() {}
+    public User() {
+    }
 
-    public User(String fullName, String dateOfBirth, String email, String gender, String title, String location, String photoUri, String id, String status, String timeStamp, String aboutMe, String kmRange, String dogSizesList, Boolean lastCall, Integer paymentPerWalk) {
+    public User(String fullName, String dateOfBirth, Integer age, String email, Integer gender, Boolean type, String location, String photoUrl, String coverUrl, String id, Boolean status, String timeStamp, String aboutMe, String kmRange, String dogSizesList, Boolean lastCall, Integer paymentPerWalk) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
+        this.age = age;
         this.email = email;
         this.gender = gender;
-        this.title = title;
+        this.type = type;
         this.location = location;
-        this.photoUri = photoUri;
+        this.photoUrl = photoUrl;
+        this.coverUrl = coverUrl;
         this.id = id;
         this.status = status;
         this.timeStamp = timeStamp;
@@ -56,6 +61,14 @@ public class User  implements Comparable<User> {
         this.dateOfBirth = dateOfBirth;
     }
 
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -64,20 +77,20 @@ public class User  implements Comparable<User> {
         this.email = email;
     }
 
-    public String getGender() {
+    public Integer getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Integer gender) {
         this.gender = gender;
     }
 
-    public String getTitle() {
-        return title;
+    public Boolean getType() {
+        return type;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setType(Boolean type) {
+        this.type = type;
     }
 
     public String getLocation() {
@@ -88,12 +101,20 @@ public class User  implements Comparable<User> {
         this.location = location;
     }
 
-    public String getPhotoUri() {
-        return photoUri;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setPhotoUri(String photoUri) {
-        this.photoUri = photoUri;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
     }
 
     public String getId() {
@@ -104,11 +125,11 @@ public class User  implements Comparable<User> {
         this.id = id;
     }
 
-    public String getStatus() {
+    public Boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 
@@ -162,11 +183,11 @@ public class User  implements Comparable<User> {
 
     @Override
     public int compareTo(User o) {
-        
+
         long time1 = Long.parseLong(timeStamp);
         long time2 = Long.parseLong(o.timeStamp);
-        int compare = Long.compare(time2,time1);
-        
-        return  compare;
+        int compare = Long.compare(time2, time1);
+
+        return compare;
     }
 }

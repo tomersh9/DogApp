@@ -22,6 +22,19 @@
        <item>@string/no</item>
     </string-array>
 
+    <string-array name="gender_key">
+        <item>@string/male</item>
+        <item>@string/female</item>
+        <item>@string/other</item>
+    </string-array>
+
+    <integer-array name="gender_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </integer-array>
+
+
 
     <string name="app_name">DogApp</string>
     <string name="welcome_to_dog_app">Welcome to Dog App</string>

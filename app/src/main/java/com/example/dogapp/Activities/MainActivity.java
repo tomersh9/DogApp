@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
     private final String FOLLOWING_FRAGMENT_TAG = "following_tag";
     private final String FOLLOWERS_FRAGMENT_TAG = "followers_tag";
+    private final String DISCOVER_FRIENDS_TAG = "discover_friends_tag";
 
     //UI Layout
     private Toolbar toolbar;
@@ -193,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
             //update user fields
             Map<String, Object> hashMap = new HashMap<>();
-            hashMap.put("photoUri", fUser.getPhotoUrl().toString());
+            hashMap.put("photoUrl", fUser.getPhotoUrl().toString());
             hashMap.put("id", fUser.getUid());
             usersRef.child(fUser.getUid()).updateChildren(hashMap);
 
@@ -238,7 +239,11 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     //update things from user data
                     User user = dataSnapshot.getValue(User.class);
                     fullNameTv.setText(user.getFullName());
-                    titleTv.setText(user.getTitle());
+                    if(user.getType()) { //true walker
+                        titleTv.setText(R.string.dog_walker);
+                    } else { //false owner
+                        titleTv.setText(R.string.dog_owner);
+                    }
                     locationTv.setText(user.getLocation());
 
                 } else {
@@ -375,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
                     case R.id.item_sign_out:
                         firebaseAuth.signOut();
-                        setUserStatus(getString(R.string.offline));
+                        setUserStatus(false);
                         Intent intent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                         finish();
@@ -434,12 +439,16 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         toolbar.setTitle(getString(R.string.followers));
                     } else if (currFragment.getTag().equals(FOLLOWING_FRAGMENT_TAG)) {
                         toolbar.setTitle(getString(R.string.following));
+                    } else if(currFragment.getTag().equals(DISCOVER_FRIENDS_TAG)) {
+                        toolbar.setTitle(getString(R.string.settings));
                     }
                     setSupportActionBar(toolbar);
                 }
             }
         }
     }
+
+
 
     private Fragment getCurrentFragment() {
         String fragmentTag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
@@ -480,7 +489,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     }
 
     //*******************UPDATE USERS STATUS************************//
-    private void setUserStatus(String status) {
+    private void setUserStatus(Boolean status) {
         usersRef = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("status", status);
@@ -490,12 +499,12 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     @Override
     protected void onResume() {
         super.onResume();
-        setUserStatus(getString(R.string.online));
+        setUserStatus(true);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        setUserStatus(getString(R.string.offline));
+        setUserStatus(false);
     }
 }

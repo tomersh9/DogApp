@@ -74,7 +74,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ChatView
         }
 
         //is seen indicator
-        System.out.println(chat.getMessage()+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + chat.getIsSeen());
         if (chat.getIsSeen().equals("true")) {
             holder.isSeenIv.setImageResource(R.drawable.blue_vv);
         } else {

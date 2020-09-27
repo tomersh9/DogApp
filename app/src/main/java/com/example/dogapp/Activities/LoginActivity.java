@@ -203,13 +203,13 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     }
 
     @Override
-    public void onNextSecond(String name, String email, String password, String date, String gender, String title, String location) {
-        WalkerFinalRegisterFragment fragment = WalkerFinalRegisterFragment.newInstance(name, email, password, date, gender, title, location);
+    public void onNextSecond(String name, String email, String password, String date, Integer age, Integer gender, Boolean title, String location) {
+        WalkerFinalRegisterFragment fragment = WalkerFinalRegisterFragment.newInstance(name, email, password, date, age, gender, title, location);
         getSupportFragmentManager().beginTransaction().add(R.id.login_container, fragment, REGISTER_FRAGMENT_3_TAG).addToBackStack(null).commit();
     }
 
     @Override
-    public void onRegister(final String name, final String email, String password, final String date, final String gender, final String title, final String location) {
+    public void onRegister(final String name, final String email, String password, final String date, final Integer age, final Integer gender, final Boolean title, final String location) {
         this.fullName = name; //for the auth listener
 
 
@@ -219,8 +219,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, email, gender, title, location, "uri", "id", "default", "0",
-                            "about","range","size",false,0);
+                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "aboutMe", "range", "size", false, 0);
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {
@@ -357,7 +356,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
     //***************Walker 3rd page fragment events****************//
     @Override
-    public void onWalkerRegisterClick(final String name, final String email, String password, final String date, final String gender, final String title, final String location,
+    public void onWalkerRegisterClick(final String name, final String email, String password, final String date, final Integer age, final Integer gender, final Boolean title, final String location,
                                       final String aboutMe, final String kmRange, final String dogSizeList, final Boolean lastCall, final Integer payPerWalk) {
 
         this.fullName = name; //for the auth listener
@@ -368,8 +367,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, email, gender, title, location, "uri", "id", "default", "0",
-                            aboutMe,kmRange,dogSizeList,lastCall,payPerWalk);
+                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", aboutMe, kmRange, dogSizeList, lastCall, payPerWalk);
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {

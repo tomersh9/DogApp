@@ -64,7 +64,9 @@ public class WalkerFinalRegisterFragment extends Fragment {
     private CircleImageView profileBtn;
     private TextView pressTv;
 
-    private String fullName, email, password, gender, location, type, dateOfBirth;
+    private String fullName, email, password, location, dateOfBirth;
+    private Integer gender, age;
+    private Boolean type;
     private boolean isValid;
 
     private TextInputLayout aboutEt;
@@ -82,15 +84,16 @@ public class WalkerFinalRegisterFragment extends Fragment {
     private boolean[] dogSizeChoices = {false, false, false, false, false};
 
 
-    public static WalkerFinalRegisterFragment newInstance(String fullName, String email, String password, String date, String gender, String title, String location) {
+    public static WalkerFinalRegisterFragment newInstance(String fullName, String email, String password, String date,Integer age, Integer gender, Boolean title, String location) {
         WalkerFinalRegisterFragment fragment = new WalkerFinalRegisterFragment();
         Bundle bundle = new Bundle();
         bundle.putString("fullName", fullName);
         bundle.putString("email", email);
         bundle.putString("password", password);
         bundle.putString("date", date);
-        bundle.putString("gender", gender);
-        bundle.putString("type", title);
+        bundle.putInt("gender", gender);
+        bundle.putInt("age", age);
+        bundle.putBoolean("type", title);
         bundle.putString("location", location);
         fragment.setArguments(bundle);
         return fragment;
@@ -98,7 +101,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
 
     public interface MyFinalWalkerFragmentListener {
 
-        void onWalkerRegisterClick(String name, String email, String password, String date, String gender, String title, String location,
+        void onWalkerRegisterClick(String name, String email, String password, String date, Integer age ,Integer gender, Boolean title, String location,
                                    String aboutMe, String kmRange, String dogSizeList, Boolean lastCall, Integer payPerWalk);
 
         void startWalkerRegisterLoader();
@@ -133,8 +136,9 @@ public class WalkerFinalRegisterFragment extends Fragment {
         fullName = getArguments().getString("fullName");
         email = getArguments().getString("email");
         password = getArguments().getString("password");
-        gender = getArguments().getString("gender");
-        type = getArguments().getString("type");
+        gender = getArguments().getInt("gender");
+        age = getArguments().getInt("age");
+        type = getArguments().getBoolean("type");
         location = getArguments().getString("location");
         dateOfBirth = getArguments().getString("dateOfBirth");
 
@@ -156,7 +160,6 @@ public class WalkerFinalRegisterFragment extends Fragment {
                 listener.onBackThird();
             }
         });
-
 
         //profile image event listener
         setProfileViewsListener();
@@ -277,7 +280,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
                         getActivity().getContentResolver().delete(fileUri, null, null);
                     }
 
-                    listener.onWalkerRegisterClick(fullName, email, password, dateOfBirth, gender, type, location,
+                    listener.onWalkerRegisterClick(fullName, email, password, dateOfBirth,age, gender, type, location,
                             aboutMe, kmRange, dogSizeString, lastCall, payPerWalk);
                 } else {
                     return;

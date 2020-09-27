@@ -77,11 +77,20 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
         //assign views with his data
         holder.nameTv.setText(walkerUser.getFullName());
         holder.locationTv.setText(walkerUser.getLocation());
-        holder.ageGenderTv.setText(walkerUser.getGender());
+
+        //gender rtl
+        if(walkerUser.getGender() == 0) {
+            holder.ageGenderTv.setText(R.string.male);
+        } else if(walkerUser.getGender() == 1) {
+            holder.ageGenderTv.setText(R.string.female);
+        } else {
+            holder.ageGenderTv.setText(R.string.other);
+        }
+
 
         //assign profile image with Glide
         try {
-            Glide.with(holder.itemView).load(walkerUser.getPhotoUri()).placeholder(R.drawable.account_icon).into(holder.profileIv);
+            Glide.with(holder.itemView).load(walkerUser.getPhotoUrl()).placeholder(R.drawable.account_icon).into(holder.profileIv);
         } catch (Exception ex) {
             ex.getMessage();
         }

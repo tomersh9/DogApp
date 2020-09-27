@@ -169,7 +169,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     name = user.getFullName();
                     location = user.getLocation();
                     try {
-                        Glide.with(rootView).load(user.getPhotoUri()).placeholder(R.drawable.account_icon).into(homeIv);
+                        Glide.with(rootView).load(user.getPhotoUrl()).placeholder(R.drawable.account_icon).into(homeIv);
                     } catch (Exception ex) {
 
                     }
