@@ -49,6 +49,8 @@ import com.example.dogapp.Activities.InChatActivity;
 import com.example.dogapp.Activities.LoginActivity;
 import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.Enteties.User;
+import com.example.dogapp.Models.ModelComment;
+import com.example.dogapp.Models.ModelPost;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -74,7 +76,9 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
@@ -832,7 +836,51 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
+                            usersRef.child(fUser.getUid()).child("photoUrl").setValue(fUser.getPhotoUrl().toString());
+                            final DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("Posts");
+                            postRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    //update my posts
+                                    if(snapshot.exists()) {
+                                        for(DataSnapshot ds : snapshot.getChildren()) {
+                                            ModelPost post = ds.getValue(ModelPost.class);
+                                            if(post.getuId().equals(fUser.getUid())) {
+                                                Map<String,Object> hashMap = new HashMap<>();
+                                                hashMap.put("uPic",fUser.getPhotoUrl().toString());
+                                                postRef.child(ds.getKey()).updateChildren(hashMap);
+                                            }
+
+                                            //update my comments
+                                            /*postRef.child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if(snapshot.exists()) {
+                                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                            ModelComment comment = dataSnapshot.getValue(ModelComment.class);
+                                                            if(comment.getuId().equals(fUser.getUid())) {
+                                                                Map<String,Object> picMap = new HashMap<>();
+                                                                picMap.put("uPic",fUser.getPhotoUrl().toString());
+                                                                postRef.child("Comments").child(comment.getcId()).updateChildren(picMap);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });*/
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
                             //listener.stopLoader();
                             //listener.createConfirmDialog();
                         }

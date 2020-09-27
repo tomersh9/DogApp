@@ -124,7 +124,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         holder.moreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showMoreOptions(holder.moreBtn, uId, myUid, pId);
+                showMoreOptions(holder.moreBtn, uId, myUid, pId,holder.getAdapterPosition());
             }
         });
 
@@ -193,7 +193,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         });
     }
 
-    private void showMoreOptions(ImageButton moreBtn, String uId, String myUid, final String pId) {
+    private void showMoreOptions(ImageButton moreBtn, String uId, String myUid, final String pId,final int pos) {
         PopupMenu popupMenu = new PopupMenu(context, moreBtn, Gravity.END);
 
         //show delete option only in the posts of the current user
@@ -209,7 +209,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                 int id = item.getItemId();
                 if (id == 0) {
                     //delete is clicked
-                    beginDelete(pId);
+                    beginDelete(pId,pos);
                 }
                 return false;
             }
@@ -218,7 +218,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         popupMenu.show();
     }
 
-    private void beginDelete(final String pId) {
+    private void beginDelete(final String pId, final int pos) {
 
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Deleting...");
@@ -229,8 +229,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    if (ds.child("pId").getValue() == pId)
+                    if (ds.child("pId").getValue() == pId) {
                         ds.getRef().removeValue();
+                        //notifyItemRemoved(pos);
+                    }
+
                     //Toast.makeText(context, ds.child("pId").getValue() + "", Toast.LENGTH_SHORT).show();
                     //if(ds.child("pId").getKey() == pId)
                     //Toast.makeText(context, "Have To delete", Toast.LENGTH_SHORT).show();
