@@ -30,12 +30,12 @@
         android:paddingBottom="35dp">
 
         <ProgressBar
+            android:id="@+id/reviews_progress_bar"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:id="@+id/reviews_progress_bar"
             android:layout_centerInParent="true"
             android:indeterminateTint="@color/colorPrimary"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
 
         <TextView
@@ -51,9 +51,9 @@
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/reviews_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/reviews_recycler"
             android:layout_below="@id/bottom_sheet_reviews_title"
             android:layout_marginTop="5dp" />
 

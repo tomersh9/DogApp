@@ -104,6 +104,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private boolean isMe;
     private boolean isWalker;
     private int ratingNum = 0;
+    private String otherUserName;
 
     //reviews list (only for walkers)
     private List<Review> reviewList = new ArrayList<>();
@@ -328,6 +329,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             }
         });
 
+        //**************//
+        loadAllReviews();
+
+
         return rootView;
     }
 
@@ -379,7 +384,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             public void onClick(View v) {
                 if (!isMe) { //can make review
                     buildReviewAddSheetDialog();
-                } else { //only can see my rating
+                } else { //can only see my rating
+
+                    //TODO put actual data
                     createCustomDialog(R.drawable.icon_star_100, getString(R.string.review_rating), getString(R.string.total_rating_reviews));
                 }
 
@@ -389,8 +396,12 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         criticsLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buildAllReviewsSheetDialog(); //build dialog first
-                loadAllReviews(); //load reviews list after
+                if(!reviewList.isEmpty()) {
+                    buildAllReviewsSheetDialog(); //build dialog first
+                } else {
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.no_curr_reviews,Snackbar.LENGTH_LONG).show();
+                }
+                //loadAllReviews(); //load reviews list after
             }
         });
     }
@@ -401,18 +412,14 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_all_reviews, null);
 
         progressBar = bottomSheetView.findViewById(R.id.reviews_progress_bar);
+        TextView title = bottomSheetView.findViewById(R.id.bottom_sheet_reviews_title);
+        title.setText(getString(R.string.all_reviews_about) + " " + otherUserName);
 
         reviewsRecyclerView = bottomSheetView.findViewById(R.id.reviews_recycler);
         reviewsRecyclerView.setHasFixedSize(true);
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        bottomSheetDialog.setContentView(bottomSheetView);
-        bottomSheetDialog.show();
-    }
-
-    //only if WALKER!!!!!!!!
-    private void loadAllReviews() {
-
+        //load posts here
         progressBar.setVisibility(View.VISIBLE);
 
         DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("Reviews");
@@ -439,6 +446,59 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 progressBar.setVisibility(View.GONE);
             }
         });
+
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+    }
+
+    //only if WALKER!!!!!!!!
+    private void loadAllReviews() {
+
+        //ONLY TAKING THE LIST OF REVIEWS WITHOUT RECYCLER
+
+        final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reviews");
+        reference.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                reviewList.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Review review = ds.getValue(Review.class);
+                    reviewList.add(review); //adding all previous reviews
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        /*progressBar.setVisibility(View.VISIBLE);
+
+        DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("Reviews");
+        reviewsRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                reviewList.clear();
+
+                if (snapshot.exists()) {
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        Review review = ds.getValue(Review.class);
+                        reviewList.add(review);
+                    }
+
+                    reviewAdapter = new ReviewAdapter(reviewList, getActivity());
+                    reviewsRecyclerView.setAdapter(reviewAdapter);
+                }
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                progressBar.setVisibility(View.GONE);
+            }
+        });*/
     }
 
     private void createCustomDialog(int icon, String title, String body) {
@@ -484,6 +544,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                     User user = snapshot.getValue(User.class);
 
+                    //for dialogs including name
+                    otherUserName = user.getFullName();
+
                     email = user.getEmail();
                     imgURL = user.getPhotoUrl();
                     int age = user.getAge();
@@ -499,19 +562,20 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     locationTv.setText(user.getLocation());
                     aboutMeTv.setText(user.getAboutMe());
 
-                    if (user.getGender() == 0) {
-                        genderAgeTv.setText(getString(R.string.male) + ", " + age);
-                        genderIv.setImageResource(R.drawable.man_icon);
-                    } else if (user.getGender() == 1) {
-                        genderAgeTv.setText(getString(R.string.female) + ", " + age);
-                        genderIv.setImageResource(R.drawable.woman_icon);
-                    } else {
-                        genderAgeTv.setText(getString(R.string.other) + ", " + age);
-                        genderIv.setImageResource(R.drawable.other_icon);
+                    if(getActivity()!=null) {
+                        if (user.getGender() == 0) {
+                            genderAgeTv.setText(getString(R.string.male) + ", " + age);
+                            genderIv.setImageResource(R.drawable.man_icon);
+                        } else if (user.getGender() == 1) {
+                            genderAgeTv.setText(getString(R.string.female) + ", " + age);
+                            genderIv.setImageResource(R.drawable.woman_icon);
+                        } else {
+                            genderAgeTv.setText(getString(R.string.other) + ", " + age);
+                            genderIv.setImageResource(R.drawable.other_icon);
+                        }
                     }
 
                     //USER TYPE
-
                     if (!user.getType()) { // NOT WALKER
                         typeTv.setText(R.string.dog_owner);
                         typeIv.setImageResource(R.drawable.dog_owner_icon);
@@ -537,15 +601,18 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         boolean lastCall = user.getLastCall();
                         int paymentPerWalk = user.getPaymentPerWalk();
 
-                        sizesTv.setText(size);
-                        rangeTv.setText(range + " " + getActivity().getString(R.string.km));
-                        if (lastCall) {
-                            lastCallTv.setText(R.string.yes);
-                        } else {
-                            lastCallTv.setText(R.string.no);
+
+                        if(getActivity()!=null) {
+                            sizesTv.setText(size);
+                            rangeTv.setText(range + " " + getActivity().getString(R.string.km));
+                            if (lastCall) {
+                                lastCallTv.setText(R.string.yes);
+                            } else {
+                                lastCallTv.setText(R.string.no);
+                            }
+                            paymentTv.setText(paymentPerWalk + " " + getString(R.string.ils));
+                            expTv.setText(exp + " " + getString(R.string.years_of_exp));
                         }
-                        paymentTv.setText(paymentPerWalk + " " + getString(R.string.ils));
-                        expTv.setText(exp + " " + getString(R.string.years_of_exp));
                         assignWalkerListeners(size, range, lastCall, paymentPerWalk, exp);
                     }
 
@@ -800,6 +867,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             }
         });
 
+        loadAllReviews(); //to fill the list first
+
         sendReviewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -808,29 +877,35 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 } else {
 
                     //dismiss this dialog
+                    loadAllReviews();
 
                     //start loading dialog
 
-                    //create a user form myself
+                    //create a user form myself to create Review instance
                     DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
                     usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                            //create review I wrote
+                            //add myself to his list
                             User user = snapshot.getValue(User.class);
-                            Review review = new Review(user.getId(), user.getFullName(), user.getLocation(), user.getPhotoUrl(), "stamp", sendReviewEt.getText().toString(), ratingNum);
+                            String timeStamp = String.valueOf(System.currentTimeMillis());
+                            Review review = new Review(user.getId(), user.getFullName(), user.getLocation(), user.getPhotoUrl(), timeStamp, sendReviewEt.getText().toString(), ratingNum);
 
+
+                            //****** LOAD REVIEWS AND UPDATE THEM*******///
                             //add to list and update firebase "Reviews"
                             reviewList.add(review);
 
                             //start loader here!!!!!!!!!!!!!!!!!!
+
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reviews").child(userID);
                             reference.setValue(reviewList).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         //end loader here!
+                                        Toast.makeText(getActivity(), reviewList.size() + "", Toast.LENGTH_SHORT).show();
                                         bottomSheetDialog.dismiss();
                                     } else {
                                         bottomSheetDialog.dismiss();

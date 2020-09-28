@@ -137,4 +137,6 @@
     <string name="pls_leave_review_and_rating">אנא השאר ביקורת ואל תשכח לדרג</string>
     <string name="review_rating">דירוג המבקרים</string>
     <string name="total_rating_reviews">הדירוג הכולל שהמשתמש קיבל ממשתמשים אחרים</string>
+    <string name="all_reviews_about">כל הביקורות על</string>
+    <string name="no_curr_reviews">אין כרגע ביקורות</string>
 </resources>

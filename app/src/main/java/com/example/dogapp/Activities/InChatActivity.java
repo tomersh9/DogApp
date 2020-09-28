@@ -78,6 +78,14 @@ public class InChatActivity extends AppCompatActivity {
     private final String BASE_URL = "https://fcm.googleapis.com/fcm/send";
     private String hisToken;
 
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        Intent intent = new Intent(InChatActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

@@ -1,6 +1,7 @@
 package com.example.dogapp.Adapters;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,9 @@ import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class ReviewAdapter  extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
 
@@ -75,8 +78,14 @@ public class ReviewAdapter  extends RecyclerView.Adapter<ReviewAdapter.ReviewVie
         holder.contentTv.setText(review.getDescription());
         holder.timeTv.setText(review.getTimeStamp());
 
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        calendar.setTimeInMillis(Long.parseLong(review.getTimeStamp()));
+        String pTime = DateFormat.format("dd/MM/yyyy hh:mm", calendar).toString();
+        //review.setTimeStamp(pTime);
+        holder.timeTv.setText(pTime);
+
         try {
-            Glide.with(holder.itemView).asBitmap().into(holder.profileIv);
+            Glide.with(holder.itemView).asBitmap().load(review.getProfileUrl()).into(holder.profileIv);
         } catch (Exception ex) {
             ex.getMessage();
         }

@@ -195,4 +195,6 @@
     <string name="pls_leave_review_and_rating">Please leave a review and a rating</string>
     <string name="review_rating">Reviewers rating</string>
     <string name="total_rating_reviews">Total rating this dog walker got from reviewers</string>
+    <string name="all_reviews_about">All the reviews about</string>
+    <string name="no_curr_reviews">No current reviews</string>
 </resources>
