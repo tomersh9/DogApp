@@ -1,5 +1,6 @@
 package com.example.dogapp.Adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +20,15 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
 
     private List<User> walkersList;
     private MyWalkerAdapterListener listener;
+    private Context context;
 
     public interface MyWalkerAdapterListener {
         void onWalkerClicked(int pos);
     }
 
-    public WalkerAdapter(List<User> walkersList) {
+    public WalkerAdapter(List<User> walkersList, Context context) {
         this.walkersList = walkersList;
+        this.context = context;
     }
 
     public void setWalkerAdapterListener(MyWalkerAdapterListener listener) {
@@ -35,7 +38,7 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
     public class WalkerViewHolder extends RecyclerView.ViewHolder {
 
         ImageView profileIv;
-        TextView nameTv, locationTv, ageGenderTv;
+        TextView nameTv, locationTv, ageGenderTv, expTv, paymentTv;
         ImageView star1, star2, star3, star4, star5;
 
         public WalkerViewHolder(@NonNull View itemView) {
@@ -45,6 +48,8 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
             nameTv = itemView.findViewById(R.id.walker_cell_name_tv);
             locationTv = itemView.findViewById(R.id.walker_cell_location_tv);
             ageGenderTv = itemView.findViewById(R.id.walker_cell_gender_age_tv);
+            expTv = itemView.findViewById(R.id.walker_cell_experience_tv);
+            paymentTv = itemView.findViewById(R.id.walker_cell_payment_tv);
             star1 = itemView.findViewById(R.id.star_1);
             star2 = itemView.findViewById(R.id.star_2);
             star3 = itemView.findViewById(R.id.star_3);
@@ -77,20 +82,23 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
         //assign views with his data
         holder.nameTv.setText(walkerUser.getFullName());
         holder.locationTv.setText(walkerUser.getLocation());
+        holder.expTv.setText(walkerUser.getExperience() + " " + context.getString(R.string.years_of_exp));
+        holder.paymentTv.setText(walkerUser.getPaymentPerWalk() + " " + context.getString(R.string.ils) + " " +context.getString(R.string.per_walk));
+        int age = walkerUser.getAge();
 
         //gender rtl
-        if(walkerUser.getGender() == 0) {
-            holder.ageGenderTv.setText(R.string.male);
-        } else if(walkerUser.getGender() == 1) {
-            holder.ageGenderTv.setText(R.string.female);
+        if (walkerUser.getGender() == 0) {
+            holder.ageGenderTv.setText(context.getString(R.string.male) + ", " + age);
+        } else if (walkerUser.getGender() == 1) {
+            holder.ageGenderTv.setText(context.getString(R.string.female) + ", " + age);
         } else {
-            holder.ageGenderTv.setText(R.string.other);
+            holder.ageGenderTv.setText(context.getString(R.string.other) + ", " + age);
         }
 
 
         //assign profile image with Glide
         try {
-            Glide.with(holder.itemView).load(walkerUser.getPhotoUrl()).placeholder(R.drawable.account_icon).into(holder.profileIv);
+            Glide.with(holder.itemView).asBitmap().load(walkerUser.getPhotoUrl()).placeholder(R.drawable.account_icon).into(holder.profileIv);
         } catch (Exception ex) {
             ex.getMessage();
         }

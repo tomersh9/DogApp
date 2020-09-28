@@ -136,7 +136,7 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
                         }
                     }
                     //adapter
-                    adapter = new FriendsAdapter(users, false, true);
+                    adapter = new FriendsAdapter(users, false, true,getActivity());
                     //set adapter to recyclerview
                     recyclerView.setAdapter(adapter);
                     //adapter click events
@@ -178,7 +178,7 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
         users.remove(user);
         adapter.notifyItemRemoved(pos);
         followingRef.child(fUser.getUid()).setValue(followingList);
-        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_LONG).show();
 
         //get user's followers list
         followersRef.child(user.getId()).addListenerForSingleValueEvent(new ValueEventListener() {

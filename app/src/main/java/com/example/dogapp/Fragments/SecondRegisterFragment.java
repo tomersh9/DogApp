@@ -100,9 +100,9 @@ public class SecondRegisterFragment extends Fragment {
     //private ProgressBar progressBar;
 
     private TextInputLayout dateEt, locationEt;
-    private RadioGroup genderGroup, typeGroup;
+    private RadioGroup genderGroup;
     private LottieAnimationView aboutAnim;
-    private Button next2Btn, regBtn;
+    private Button next2Btn, regBtn, locationBtn;
 
     private boolean isWalker;
     private boolean isValid;
@@ -242,6 +242,7 @@ public class SecondRegisterFragment extends Fragment {
         pressTv = rootView.findViewById(R.id.press_tv);
         notReqTv = rootView.findViewById(R.id.not_req_tv);
         profileBtn = rootView.findViewById(R.id.profile_btn);
+        locationBtn = rootView.findViewById(R.id.location_btn);
 
         //walker user
         next2Btn = rootView.findViewById(R.id.next_2_btn);
@@ -253,7 +254,6 @@ public class SecondRegisterFragment extends Fragment {
 
         if (isWalker) { //walker registration options
 
-            //type = getString(R.string.dog_walker);
             regBtn.setVisibility(View.GONE);
             pressTv.setVisibility(View.GONE);
             notReqTv.setVisibility(View.GONE);
@@ -265,7 +265,6 @@ public class SecondRegisterFragment extends Fragment {
 
         } else { //normal user registration options
 
-            //type = getString(R.string.dog_owner);
             next2Btn.setVisibility(View.GONE);
             aboutAnim.setVisibility(View.GONE);
             regBtn.setVisibility(View.VISIBLE);
@@ -319,7 +318,7 @@ public class SecondRegisterFragment extends Fragment {
 
         locationEt = rootView.findViewById(R.id.location_input);
         geocoder = new Geocoder(getActivity());
-        locationEt.getEditText().setOnClickListener(new View.OnClickListener() {
+        locationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -333,12 +332,9 @@ public class SecondRegisterFragment extends Fragment {
                         if (isLocation) {
                             locationEt.getEditText().clearFocus();
                             startLocation();
-                            locationEt.getEditText().setFocusable(false);
-                            locationEt.getEditText().setClickable(false);
                         } else {
+                            Toast.makeText(getActivity(), R.string.check_location_permissions, Toast.LENGTH_SHORT).show();
                             locationEt.setHint(getString(R.string.enter_loc_manual));
-                            locationEt.getEditText().setFocusable(true);
-                            locationEt.getEditText().setClickable(true);
                         }
 
                     }
@@ -346,12 +342,9 @@ public class SecondRegisterFragment extends Fragment {
                     if (isLocation) {
                         locationEt.getEditText().clearFocus();
                         startLocation();
-                        locationEt.getEditText().setFocusable(false);
-                        locationEt.getEditText().setClickable(false);
                     } else {
                         locationEt.setHint(getString(R.string.enter_loc_manual));
-                        locationEt.getEditText().setFocusable(true);
-                        locationEt.getEditText().setClickable(true);
+                        Toast.makeText(getActivity(), R.string.check_location_permissions, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -512,8 +505,7 @@ public class SecondRegisterFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     locationEt.getEditText().setText(bestAddress.getLocality() + ",  " + bestAddress.getCountryName());
-                                    location = locationEt.getEditText().getText().toString();
-                                    locationEt.getEditText().setFocusable(false);
+                                    location = locationEt.getEditText().getText().toString().trim();
                                     locationEt.setHint(getString(R.string.your_location));
                                     alertDialog.dismiss();
                                 }

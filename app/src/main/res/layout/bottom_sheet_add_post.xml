@@ -60,8 +60,7 @@
             android:layout_marginHorizontal="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/bottom_sheet_et_shape"
-            android:padding="8dp">
+            android:background="@drawable/bottom_sheet_et_shape">
 
             <EditText
                 android:id="@+id/post_et"
@@ -71,7 +70,7 @@
                 android:layout_toStartOf="@id/post_btn"
                 android:background="@android:color/transparent"
                 android:hint="@string/what_s_on_your_mind"
-                android:padding="5dp" />
+                android:padding="10dp" />
 
             <ImageButton
                 android:id="@+id/post_btn"
@@ -80,7 +79,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="5dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="15dp"
                 android:background="?attr/selectableItemBackground"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_send_black_24dp"

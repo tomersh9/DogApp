@@ -28,7 +28,8 @@
             android:layout_marginTop="8dp"
             android:background="@null"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_arrow_back_black_24dp" />
+            android:src="@drawable/ic_arrow_back_black_24dp"
+            android:tint="@color/colorPrimary" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -85,10 +86,10 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="7dp"
+                        android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
                         app:endIconMode="clear_text"
                         app:errorEnabled="true"
-                        android:padding="5dp"
                         app:helperText="ספר בהרחבה כדי לתת יותר מידע הכרחי למשתמשים"
                         app:startIconDrawable="@drawable/ic_person_outline_black_24dp">
 
@@ -96,6 +97,28 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="ספר קצת על עצמך" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/exp_et"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="7dp"
+                        android:hint="שנות ניסיון"
+                        android:padding="5dp"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:endIconMode="clear_text"
+                        app:errorEnabled="true"
+                        app:helperText="כמה שנות ניסיון צברת בתור דוג ווקר?"
+                        app:startIconDrawable="@drawable/ic_work_black_24dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:focusable="false" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -107,9 +130,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:hint="בחר טווח קילומטרים"
+                        android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
-                        android:padding="5dp"
                         app:helperText="כמה רחוק אתה מוכן ללכת כדי לבקר בבית בעלי הכלב?"
                         app:startIconDrawable="@drawable/ic_map_black_24dp">
 
@@ -127,9 +150,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:hint="גודל כלבים שאתה מקבל"
+                        android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
-                        android:padding="5dp"
                         app:helperText="בחר גודל כלבים שאתה מוכן לקחת על עצמך"
                         app:startIconDrawable="@drawable/kg_icon">
 
@@ -147,9 +170,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:hint="מוכן להזמנה ברגע האחרון?"
+                        android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
-                        android:padding="5dp"
                         app:helperText="האם אתה מאפשר הזמנה ברגע האחרון?"
                         app:startIconDrawable="@drawable/ic_directions_run_black_24dp">
 
@@ -166,8 +189,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:padding="5dp"
                         android:hint="עלות עבור כל הליכה"
+                        android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
                         app:helperText="כדי ליידע מראש משתמשים על עלות השירות שלך (בשקלים)"

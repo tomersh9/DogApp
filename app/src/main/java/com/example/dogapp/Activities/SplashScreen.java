@@ -1,6 +1,8 @@
 package com.example.dogapp.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -30,10 +32,14 @@ public class SplashScreen extends AppCompatActivity {
         firebaseAuth.removeAuthStateListener(authStateListener);
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
+
+        //fixed portrait mode
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         ImageView imageView =  findViewById(R.id.splash_bg);
         imageView.animate().scaleX(4f).scaleY(2).setDuration(1500).withEndAction(new Runnable() {

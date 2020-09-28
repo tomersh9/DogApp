@@ -1,12 +1,17 @@
 package com.example.dogapp.Activities;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -24,6 +29,7 @@ import com.example.dogapp.Fragments.WalkerFinalRegisterFragment;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,27 +40,28 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity extends AppCompatActivity implements RegisterFragment.OnRegisterFragmentListener, SecondRegisterFragment.OnSecondRegisterFragmentListener, ForgotPasswordFragment.OnForgotPasswordListener, WalkerFinalRegisterFragment.MyFinalWalkerFragmentListener {
 
-    RelativeLayout loginContainer;
+    private RelativeLayout loginContainer;
 
-    final String REGISTER_FRAGMENT_TAG = "register_fragment";
-    final String REGISTER_FRAGMENT_2_TAG = "reg_2_frag";
-    final String REGISTER_FRAGMENT_3_TAG = "reg_3_frag";
-    final String FORGOT_PASS_TAG = "forgot_pass_frag";
+    private final String REGISTER_FRAGMENT_TAG = "register_fragment";
+    private final String REGISTER_FRAGMENT_2_TAG = "reg_2_frag";
+    private final String REGISTER_FRAGMENT_3_TAG = "reg_3_frag";
+    private final String FORGOT_PASS_TAG = "forgot_pass_frag";
 
-    Button loginBtn, registerClientBtn, registerWalkerBtn, guestBtn;
-    TextInputLayout emailEt, passwordEt;
-    TextView forgotPassTv;
-    ProgressBar progressBar;
-    RelativeLayout hideLayout;
+    private Button loginBtn, registerBtn;
+    private TextInputLayout emailEt, passwordEt;
+    private TextView forgotPassTv;
+    private TextView guestTv;
+    private ProgressBar progressBar;
+    private RelativeLayout hideLayout;
 
-    AlertDialog progressDialog;
+    private AlertDialog progressDialog;
 
-    String fullName;
+    private String fullName;
 
-    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(); //sign in/up auth instance
-    FirebaseAuth.AuthStateListener authStateListener; //listens to login/out changes
-    FirebaseDatabase database = FirebaseDatabase.getInstance(); //actual database
-    DatabaseReference users = database.getReference("users"); //create new table named "users" and we get a reference to it
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(); //sign in/up auth instance
+    private FirebaseAuth.AuthStateListener authStateListener; //listens to login/out changes
+    private FirebaseDatabase database = FirebaseDatabase.getInstance(); //actual database
+    private DatabaseReference users = database.getReference("users"); //create new table named "users" and we get a reference to it
 
     @Override
     protected void onStart() {
@@ -68,15 +75,17 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
         firebaseAuth.removeAuthStateListener(authStateListener);
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_page_layout);
 
+        //fixed portrait mode
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         loginBtn = findViewById(R.id.login_btn);
-        registerClientBtn = findViewById(R.id.register_regular_btn);
-        registerWalkerBtn = findViewById(R.id.register_walker_btn);
-        guestBtn = findViewById(R.id.continue_guest_btn);
+        registerBtn = findViewById(R.id.register_btn);
         emailEt = findViewById(R.id.email_login_input);
         passwordEt = findViewById(R.id.password_login_input);
         forgotPassTv = findViewById(R.id.forgot_pass_tv);
@@ -90,7 +99,6 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                 final FirebaseUser user = firebaseAuth.getCurrentUser(); //get current user
 
                 if (user != null) {
-
 
                     if (fullName != null) { //sign up - update profile with full name
 
@@ -113,19 +121,10 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
             }
         };
 
-        registerClientBtn.setOnClickListener(new View.OnClickListener() {
+        registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RegisterFragment registerFragment = RegisterFragment.newInstance(false);
-                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, registerFragment, REGISTER_FRAGMENT_TAG).addToBackStack(null).commit();
-            }
-        });
-
-        registerWalkerBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                RegisterFragment registerFragment = RegisterFragment.newInstance(true);
-                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, registerFragment, REGISTER_FRAGMENT_TAG).addToBackStack(null).commit();
+                buildRegisterBottomSheetDialog();
             }
         });
 
@@ -219,7 +218,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "aboutMe", "range", "size", false, 0);
+                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "aboutMe","exp", 0, "size", false, 0);
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {
@@ -231,6 +230,36 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                 }
             }
         });
+    }
+
+    private void buildRegisterBottomSheetDialog() {
+
+        final BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
+        View bottomSheetView = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_registration, null);
+        Button regularRegBtn = bottomSheetView.findViewById(R.id.bottom_sheet_register_regular_btn);
+        Button walkerRegBtn = bottomSheetView.findViewById(R.id.bottom_sheet_register_walker_btn);
+
+        regularRegBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RegisterFragment registerFragment = RegisterFragment.newInstance(false);
+                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, registerFragment, REGISTER_FRAGMENT_TAG).addToBackStack(null).commit();
+                dialog.dismiss();
+            }
+        });
+
+        walkerRegBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RegisterFragment registerFragment = RegisterFragment.newInstance(true);
+                getSupportFragmentManager().beginTransaction().replace(R.id.login_container, registerFragment, REGISTER_FRAGMENT_TAG).addToBackStack(null).commit();
+                dialog.dismiss();
+            }
+        });
+
+
+        dialog.setContentView(bottomSheetView);
+        dialog.show();
     }
 
     private void buildLoaderDialog(String body) {
@@ -357,7 +386,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     //***************Walker 3rd page fragment events****************//
     @Override
     public void onWalkerRegisterClick(final String name, final String email, String password, final String date, final Integer age, final Integer gender, final Boolean title, final String location,
-                                      final String aboutMe, final String kmRange, final String dogSizeList, final Boolean lastCall, final Integer payPerWalk) {
+                                      final String aboutMe,final String exp, final Integer kmRange, final String dogSizeList, final Boolean lastCall, final Integer payPerWalk) {
 
         this.fullName = name; //for the auth listener
 
@@ -367,7 +396,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", aboutMe, kmRange, dogSizeList, lastCall, payPerWalk);
+                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", aboutMe,exp, kmRange, dogSizeList, lastCall, payPerWalk);
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {

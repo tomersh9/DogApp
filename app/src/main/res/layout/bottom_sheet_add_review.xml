@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet_reg_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_shape"
+    android:clickable="true"
+    android:focusable="true"
+    app:behavior_hideable="true"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+
+    <ImageView
+        android:id="@+id/sheet_thumb"
+        android:layout_width="50dp"
+        android:layout_height="5dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/sheet_thumb_shape" />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sheet_thumb"
+        android:layout_marginTop="20dp"
+        android:paddingHorizontal="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="35dp">
+
+
+        <TextView
+            android:id="@+id/bottom_sheet_add_review_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:text="השאר ביקורת"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/bottom_sheet_add_review_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bottom_sheet_add_review_title"
+            android:layout_centerHorizontal="true"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:padding="7dp"
+            android:text="כתוב ביקורת מכבדת על שירותיו של NAME כדי לתת פידבק לנותן השירות שגם משתמשים אחרים יוכלו לראות" />
+
+
+        <TextView
+            android:id="@+id/forget_star_bottom_sheet_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bottom_sheet_star_layout"
+            android:layout_centerHorizontal="true"
+            android:textSize="11sp"
+            android:text="(אל תשכח להשאיר דירוג התואם את השירות)" />
+
+        <LinearLayout
+            android:id="@+id/bottom_sheet_star_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:gravity="center"
+            android:layout_below="@id/bottom_sheet_add_review_desc"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <ImageView
+                android:id="@+id/star_1_sheet"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/star_empty_128" />
+
+            <ImageView
+                android:id="@+id/star_2_sheet"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/star_empty_128" />
+
+            <ImageView
+                android:id="@+id/star_3_sheet"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/star_empty_128" />
+
+            <ImageView
+                android:id="@+id/star_4_sheet"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/star_empty_128" />
+
+            <ImageView
+                android:id="@+id/star_5_sheet"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/star_empty_128" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/send_review_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/forget_star_bottom_sheet_tv"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/bottom_sheet_et_shape">
+
+            <EditText
+                android:id="@+id/review_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_toStartOf="@id/review_btn"
+                android:background="@android:color/transparent"
+                android:hint="כתוב ביקורת"
+                android:padding="10dp" />
+
+            <ImageButton
+                android:id="@+id/review_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="15dp"
+                android:background="?attr/selectableItemBackground"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_send_black_24dp"
+                android:tint="@color/colorPrimary" />
+
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+</RelativeLayout>

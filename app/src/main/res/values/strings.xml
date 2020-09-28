@@ -8,18 +8,41 @@
         <item>@string/huge</item>
     </string-array>
 
+    <integer-array name="dog_sizes_array_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </integer-array>
 
-    <string-array name="km_range">
-        <item>1-5km</item>
-        <item>5-20km</item>
-        <item>20-50km</item>
-        <item>50-100km</item>
-        <item>100km+</item>
+    <string-array name="exp_years_array">
+        <item>0-1</item>
+        <item>1-3</item>
+        <item>3-5</item>
+        <item>5+</item>
     </string-array>
 
+
+    <string-array name="km_range">
+        <item>@string/km1_range</item>
+        <item>@string/km3_range</item>
+        <item>@string/km15_range</item>
+        <item>@string/km30_range</item>
+        <item>@string/km50_range</item>
+    </string-array>
+
+    <integer-array name="km_range_values">
+        <item>1</item>
+        <item>3</item>
+        <item>15</item>
+        <item>30</item>
+        <item>50</item>
+    </integer-array>
+
     <string-array name="last_call_array">
-       <item>@string/yes</item>
-       <item>@string/no</item>
+        <item>@string/yes</item>
+        <item>@string/no</item>
     </string-array>
 
     <string-array name="gender_key">
@@ -35,7 +58,6 @@
     </integer-array>
 
 
-
     <string name="app_name">DogApp</string>
     <string name="welcome_to_dog_app">Welcome to Dog App</string>
     <string name="email">Email</string>
@@ -48,6 +70,12 @@
     <string name="not_required">*not required</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
+    <string name="km1_range">1km</string>
+    <string name="km3_range">3km</string>
+    <string name="km5_range">5km</string>
+    <string name="km15_range">15km</string>
+    <string name="km30_range">30km</string>
+    <string name="km50_range">50km+</string>
     <string name="other">Other</string>
     <string name="gender">Gender</string>
     <string name="title">Title</string>
@@ -150,6 +178,21 @@
     <string name="good_with_dogs_at_sizes">Good with dogs at sizes</string>
     <string name="is_willing_in_range_of">Is willing to travel to owner\'s house in the range of</string>
     <string name="allows_last_minute_call">Allows last minute call?</string>
-    <string name="service_cost_per_trip">Service cost for each trip</string>
+    <string name="service_cost_per_trip">Service cost for each trip (hour)</string>
     <string name="ils">ILS</string>
+    <string name="about_me">About me</string>
+    <string name="no_following_yet">No following yet</string>
+    <string name="no_chats_yet">No chats yet</string>
+    <string name="no_followers_yet">No followers yet</string>
+    <string name="was_removed_from_followers">was removed from your followers</string>
+    <string name="check_location_permissions">Check your location permissions</string>
+    <string name="km">km</string>
+    <string name="years_of_exp">years of experience</string>
+    <string name="per_walk">/ per walk (an hour)</string>
+    <string name="reviews">Reviews</string>
+    <string name="dog_walking_exp_title">Years of experience dog walking</string>
+    <string name="choose_registration_type">Choose registration type</string>
+    <string name="pls_leave_review_and_rating">Please leave a review and a rating</string>
+    <string name="review_rating">Reviewers rating</string>
+    <string name="total_rating_reviews">Total rating this dog walker got from reviewers</string>
 </resources>

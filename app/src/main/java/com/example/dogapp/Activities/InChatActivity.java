@@ -1,6 +1,8 @@
 package com.example.dogapp.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -76,10 +78,14 @@ public class InChatActivity extends AppCompatActivity {
     private final String BASE_URL = "https://fcm.googleapis.com/fcm/send";
     private String hisToken;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.in_chat_layout);
+
+        //fixed portrait mode
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //setup chat toolbar
         Toolbar toolbar = findViewById(R.id.in_chat_toolbar);
@@ -408,9 +414,11 @@ public class InChatActivity extends AppCompatActivity {
     }
 
     private void setUserStatus(Boolean status) {
-        databaseReference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
-        Map<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status", status);
-        databaseReference.updateChildren(hashMap);
+        if(fUser!=null) {
+            databaseReference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
+            Map<String, Object> hashMap = new HashMap<>();
+            hashMap.put("status", status);
+            databaseReference.updateChildren(hashMap);
+        }
     }
 }

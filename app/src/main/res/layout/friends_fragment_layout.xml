@@ -12,13 +12,15 @@
         android:indeterminateTint="@color/colorPrimary"
         android:visibility="gone" />
 
-    <!--<TextView
+    <TextView
         android:id="@+id/no_friends_msg_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="No current friends"
-        android:textSize="40sp" />-->
+        android:gravity="center"
+        android:text="@string/no_following_yet"
+        android:textSize="40sp"
+        android:visibility="gone" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/friends_swiper"

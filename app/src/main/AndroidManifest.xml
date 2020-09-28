@@ -27,7 +27,7 @@
         <activity
             android:name=".Activities.MainActivity"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".Activities.InChatActivity" />
 
         <service android:name=".Services.MyFirebaseMessagingService">

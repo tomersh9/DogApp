@@ -105,7 +105,7 @@
                 android:layout_marginTop="5dp"
                 android:textSize="25sp" />
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/follow_details_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -116,9 +116,10 @@
 
                 <LinearLayout
                     android:id="@+id/followers_layout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_toStartOf="@id/following_layout"
+                    android:layout_weight="1"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
@@ -148,10 +149,10 @@
 
                 <LinearLayout
                     android:id="@+id/following_layout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginHorizontal="50dp"
+                    android:layout_weight="1"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
@@ -181,14 +182,16 @@
 
                 <LinearLayout
                     android:id="@+id/critics_layout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/following_layout"
+                    android:layout_weight="1"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:orientation="vertical"
-                    android:translationZ="2dp">
+                    android:translationZ="2dp"
+                    android:visibility="gone">
 
                     <TextView
                         android:id="@+id/profile_frag_critics_tv"
@@ -196,7 +199,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="ביקורות"
+                        android:text="@string/reviews"
                         android:textSize="15sp" />
 
                     <TextView
@@ -211,7 +214,7 @@
 
                 </LinearLayout>
 
-            </RelativeLayout>
+            </LinearLayout>
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
@@ -250,7 +253,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
                             android:layout_toEndOf="@id/profile_about_icon"
-                            android:text="על עצמי"
+                            android:text="@string/about_me"
                             android:textColor="@color/black"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -280,7 +283,7 @@
                         <RelativeLayout
                             android:id="@+id/profile_list_age_layout_item"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="match_parent"
                             android:layout_marginVertical="5dp"
                             android:layout_marginStart="1dp"
                             android:layout_weight="2"
@@ -313,7 +316,7 @@
                         <RelativeLayout
                             android:id="@+id/profile_list_location_layout_item"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginHorizontal="10dp"
                             android:layout_marginVertical="5dp"
                             android:layout_weight="3"
@@ -348,7 +351,7 @@
                         <RelativeLayout
                             android:id="@+id/profile_list_type_layout_item"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="match_parent"
                             android:layout_marginVertical="5dp"
                             android:layout_marginEnd="1dp"
                             android:layout_weight="2"
@@ -528,6 +531,85 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/payment_icon"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="5dp"
+                                android:gravity="center"
+                                android:textColor="@color/black"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/row_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/row_2"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <RelativeLayout
+                            android:id="@+id/profile_list_experience_layout_item"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginVertical="5dp"
+                            android:layout_marginStart="1dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/profile_item_btn_selector"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="10dp"
+                            android:translationZ="3dp">
+
+                            <ImageView
+                                android:id="@+id/exp_icon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_centerHorizontal="true"
+                                android:src="@drawable/exp_icon_64" />
+
+                            <TextView
+                                android:id="@+id/profile_item_exp_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/exp_icon"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="5dp"
+                                android:gravity="center"
+                                android:textColor="@color/black"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/profile_list_rating_layout_item"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginVertical="5dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="1dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/profile_item_btn_selector"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="10dp"
+                            android:translationZ="3dp">
+
+                            <ImageView
+                                android:id="@+id/rating_icon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_centerHorizontal="true"
+                                android:src="@drawable/star_icon_64" />
+
+                            <TextView
+                                android:id="@+id/profile_item_rating_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/rating_icon"
                                 android:layout_centerHorizontal="true"
                                 android:layout_marginTop="5dp"
                                 android:gravity="center"

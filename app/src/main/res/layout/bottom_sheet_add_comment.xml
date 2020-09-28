@@ -130,8 +130,7 @@
             android:layout_marginHorizontal="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/bottom_sheet_et_shape"
-            android:padding="8dp">
+            android:background="@drawable/bottom_sheet_et_shape">
 
             <EditText
                 android:id="@+id/comment_et"
@@ -143,7 +142,7 @@
                 android:textCursorDrawable="@color/black"
                 android:layout_centerVertical="true"
                 android:hint="@string/write_a_comment"
-                android:padding="5dp" />
+                android:padding="10dp"/>
 
             <ImageButton
                 android:id="@+id/comment_btn"
@@ -152,54 +151,12 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="5dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="15dp"
                 android:background="?attr/selectableItemBackground"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_send_black_24dp"
                 android:tint="@color/colorPrimary" />
 
         </RelativeLayout>
-
-        <!--<LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/bottom_comments_recycler"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/comment_et"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="10dp"
-                android:layout_weight="3"
-                app:boxBackgroundColor="@color/white"
-                app:boxBackgroundMode="outline"
-                app:endIconMode="clear_text">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:hint="@string/write_a_comment"
-                    android:padding="13dp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <Button
-                android:id="@+id/comment_btn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="7dp"
-                android:text="@string/commit"
-                android:textAllCaps="false"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>-->
     </RelativeLayout>
 </RelativeLayout>

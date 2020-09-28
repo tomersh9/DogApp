@@ -86,17 +86,38 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/forgot_pass_tv"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="50dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:text="@string/forgot_password"
-            android:textSize="15sp" />
+            android:layout_marginHorizontal="50dp">
+
+            <TextView
+                android:id="@+id/forgot_pass_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="5dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="@string/forgot_password"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/continue_guest_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="5dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="@string/continue_as_guest"
+                android:textSize="15sp" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
@@ -124,14 +145,14 @@
             app:cornerRadius="40dp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/register_regular_btn"
+            android:id="@+id/register_btn"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_marginTop="7dp"
             android:paddingVertical="12dp"
-            android:text="@string/register_as_client"
+            android:text="@string/register"
             android:textAllCaps="false"
             android:textColor="@color/colorPrimary"
             android:textSize="18sp"
@@ -149,19 +170,7 @@
             android:textAllCaps="false"
             android:textColor="@color/colorPrimary"
             android:textSize="18sp"
-            app:cornerRadius="40dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/continue_guest_btn"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="7dp"
-            android:paddingVertical="12dp"
-            android:text="@string/continue_as_guest"
-            android:textAllCaps="false"
-            android:textSize="18sp"
+            android:visibility="gone"
             app:cornerRadius="40dp" />
 
     </LinearLayout>

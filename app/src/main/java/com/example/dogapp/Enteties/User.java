@@ -17,7 +17,8 @@ public class User implements Comparable<User> {
     private Boolean status;
     private String timeStamp;
     private String aboutMe;
-    private String kmRange;
+    private String experience;
+    private Integer kmRange;
     private String dogSizesList;
     private Boolean lastCall;
     private Integer paymentPerWalk;
@@ -25,7 +26,7 @@ public class User implements Comparable<User> {
     public User() {
     }
 
-    public User(String fullName, String dateOfBirth, Integer age, String email, Integer gender, Boolean type, String location, String photoUrl, String coverUrl, String id, Boolean status, String timeStamp, String aboutMe, String kmRange, String dogSizesList, Boolean lastCall, Integer paymentPerWalk) {
+    public User(String fullName, String dateOfBirth, Integer age, String email, Integer gender, Boolean type, String location, String photoUrl, String coverUrl, String id, Boolean status, String timeStamp, String aboutMe, String experience, Integer kmRange, String dogSizesList, Boolean lastCall, Integer paymentPerWalk) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
         this.age = age;
@@ -39,6 +40,7 @@ public class User implements Comparable<User> {
         this.status = status;
         this.timeStamp = timeStamp;
         this.aboutMe = aboutMe;
+        this.experience = experience;
         this.kmRange = kmRange;
         this.dogSizesList = dogSizesList;
         this.lastCall = lastCall;
@@ -149,11 +151,19 @@ public class User implements Comparable<User> {
         this.aboutMe = aboutMe;
     }
 
-    public String getKmRange() {
+    public String getExperience() {
+        return experience;
+    }
+
+    public void setExperience(String experience) {
+        this.experience = experience;
+    }
+
+    public Integer getKmRange() {
         return kmRange;
     }
 
-    public void setKmRange(String kmRange) {
+    public void setKmRange(Integer kmRange) {
         this.kmRange = kmRange;
     }
 

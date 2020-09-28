@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -55,6 +56,7 @@ public class ChatsFragment extends Fragment implements ChatUsersAdapter.MyChatUs
 
     //UI
     private ProgressBar progressBar;
+    private TextView noChatsTv;
 
     //MainActivity must implement first
     @Override
@@ -74,6 +76,7 @@ public class ChatsFragment extends Fragment implements ChatUsersAdapter.MyChatUs
 
         View rootView = inflater.inflate(R.layout.chats_page_fragment, container, false);
         progressBar = rootView.findViewById(R.id.chat_fragment_progress_bar);
+        noChatsTv = rootView.findViewById(R.id.no_chats_yet);
 
         //init recyclerview
         recyclerView = rootView.findViewById(R.id.chat_fragment_recycler);
@@ -101,7 +104,7 @@ public class ChatsFragment extends Fragment implements ChatUsersAdapter.MyChatUs
                     ChatList chatList = ds.getValue(ChatList.class);
                     allChatsList.add(chatList);
                 }
-               // updateUserWithTimeStamp();
+                // updateUserWithTimeStamp();
                 createChatList(); //create users list with recyclerview
             }
 
@@ -175,27 +178,27 @@ public class ChatsFragment extends Fragment implements ChatUsersAdapter.MyChatUs
                     User user = ds.getValue(User.class);
                     for (ChatList chatList : allChatsList) {
                         if (user.getId().equals(chatList.getId())) {
-
                             users.add(user);
-//                            Collections.sort(users);
-//                            Toast.makeText(getActivity(), users.size() + "", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
 
                 Collections.sort(users);
-                //Toast.makeText(getActivity(), users.size() + "", Toast.LENGTH_SHORT).show();
-                //Toast.makeText(getActivity(), users.size()+"", Toast.LENGTH_SHORT).show();
                 userAdapter = new ChatUsersAdapter(users, getActivity());
                 userAdapter.setMyChatUserListener(ChatsFragment.this);
                 recyclerView.setAdapter(userAdapter);
                 progressBar.setVisibility(View.GONE);
+
+                if (users.isEmpty()) {
+                    noChatsTv.setVisibility(View.VISIBLE);
+                } else {
+                    noChatsTv.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 progressBar.setVisibility(View.GONE);
-                //Toast.makeText(getActivity(), "cancel", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -25,6 +25,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -39,6 +41,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -48,12 +52,16 @@ import com.bumptech.glide.request.target.Target;
 import com.example.dogapp.Activities.InChatActivity;
 import com.example.dogapp.Activities.LoginActivity;
 import com.example.dogapp.Activities.MainActivity;
+import com.example.dogapp.Adapters.ReviewAdapter;
+import com.example.dogapp.Enteties.Review;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Models.ModelComment;
 import com.example.dogapp.Models.ModelPost;
 import com.example.dogapp.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -95,16 +103,23 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private String userID, imgURL; //for any user of the app
     private boolean isMe;
     private boolean isWalker;
+    private int ratingNum = 0;
+
+    //reviews list (only for walkers)
+    private List<Review> reviewList = new ArrayList<>();
+    private RecyclerView reviewsRecyclerView;
+    private ReviewAdapter reviewAdapter;
+    private ProgressBar progressBar;
 
     //views
     private ImageView profileIv, genderIv, typeIv;
-    private TextView nameTv, followingTv, followersTv, criticsTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
-    private LinearLayout followersLayoutBtn, followingLayoutBtn;
+    private TextView nameTv, followingTv, followersTv, criticsCountTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
+    private LinearLayout followersLayoutBtn, followingLayoutBtn, criticsLayoutBtn;
     private RelativeLayout aboutMeLayout;
     private FloatingActionButton chatFab, followFab, profileFab;
-    private LinearLayout row1, row2;
-    private RelativeLayout dogSizeLayoutBtn, rangeLayoutBtn, lastCallLayoutBtn, paymentLayoutBtn;
-    private TextView sizesTv, rangeTv, lastCallTv, paymentTv;
+    private LinearLayout row1, row2, row3;
+    private RelativeLayout dogSizeLayoutBtn, rangeLayoutBtn, lastCallLayoutBtn, paymentLayoutBtn, expLayoutBtn, ratingLayoutBtn;
+    private TextView sizesTv, rangeTv, lastCallTv, paymentTv, expTv, ratingTv;
 
 
     private AppBarLayout appBarLayout;
@@ -175,6 +190,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
 
         //assign views
+        row1 = rootView.findViewById(R.id.row_1);
+        row2 = rootView.findViewById(R.id.row_2);
+        row3 = rootView.findViewById(R.id.row_3);
         profileIv = rootView.findViewById(R.id.profile_frag_iv);
         nameTv = rootView.findViewById(R.id.profile_frag_name_tv);
         genderAgeTv = rootView.findViewById(R.id.profile_item_gender_age_tv);
@@ -193,16 +211,20 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         profileFab = rootView.findViewById(R.id.profile_fab);
 
         //dog walker relevant
-        row1 = rootView.findViewById(R.id.row_1);
-        row2 = rootView.findViewById(R.id.row_2);
         dogSizeLayoutBtn = rootView.findViewById(R.id.profile_list_dog_sizes_layout_item);
         rangeLayoutBtn = rootView.findViewById(R.id.profile_list_km_range_layout_item);
         lastCallLayoutBtn = rootView.findViewById(R.id.profile_list_last_call_layout_item);
         paymentLayoutBtn = rootView.findViewById(R.id.profile_list_payment_layout_item);
+        expLayoutBtn = rootView.findViewById(R.id.profile_list_experience_layout_item);
+        ratingLayoutBtn = rootView.findViewById(R.id.profile_list_rating_layout_item);
+        criticsLayoutBtn = rootView.findViewById(R.id.critics_layout);
+        criticsCountTv = rootView.findViewById(R.id.critics_count_tv);
         sizesTv = rootView.findViewById(R.id.profile_item_dog_sizes_tv);
         rangeTv = rootView.findViewById(R.id.profile_item_km_range_tv);
         lastCallTv = rootView.findViewById(R.id.profile_item_last_call_tv);
         paymentTv = rootView.findViewById(R.id.profile_item_payment_tv);
+        expTv = rootView.findViewById(R.id.profile_item_exp_tv);
+        ratingTv = rootView.findViewById(R.id.profile_item_rating_tv);
 
         //profile assign
         loadProfileViews();
@@ -309,7 +331,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         return rootView;
     }
 
-    private void assignWalkerListeners(final String sizes, final String range, final boolean lastCall, final int paymentPerWalk) {
+    private void assignWalkerListeners(final String sizes, final Integer range, final boolean lastCall, final int paymentPerWalk, final String exp) {
 
         dogSizeLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -321,7 +343,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         rangeLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createCustomDialog(R.drawable.trek_icon_128, getString(R.string.is_willing_in_range_of), range);
+                createCustomDialog(R.drawable.trek_icon_128, getString(R.string.is_willing_in_range_of), range + " " + getString(R.string.km));
             }
         });
 
@@ -342,6 +364,79 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             @Override
             public void onClick(View v) {
                 createCustomDialog(R.drawable.pay_icon_128, getString(R.string.service_cost_per_trip), paymentPerWalk + " " + getString(R.string.ils));
+            }
+        });
+
+        expLayoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createCustomDialog(R.drawable.exp_icon_128, getString(R.string.dog_walking_exp_title), exp + " " + getString(R.string.years_of_exp));
+            }
+        });
+
+        ratingLayoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isMe) { //can make review
+                    buildReviewAddSheetDialog();
+                } else { //only can see my rating
+                    createCustomDialog(R.drawable.icon_star_100, getString(R.string.review_rating), getString(R.string.total_rating_reviews));
+                }
+
+            }
+        });
+
+        criticsLayoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buildAllReviewsSheetDialog(); //build dialog first
+                loadAllReviews(); //load reviews list after
+            }
+        });
+    }
+
+    private void buildAllReviewsSheetDialog() {
+
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+        View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_all_reviews, null);
+
+        progressBar = bottomSheetView.findViewById(R.id.reviews_progress_bar);
+
+        reviewsRecyclerView = bottomSheetView.findViewById(R.id.reviews_recycler);
+        reviewsRecyclerView.setHasFixedSize(true);
+        reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+    }
+
+    //only if WALKER!!!!!!!!
+    private void loadAllReviews() {
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("Reviews");
+        reviewsRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                reviewList.clear();
+
+                if (snapshot.exists()) {
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        Review review = ds.getValue(Review.class);
+                        reviewList.add(review);
+                    }
+
+                    reviewAdapter = new ReviewAdapter(reviewList, getActivity());
+                    reviewsRecyclerView.setAdapter(reviewAdapter);
+                }
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -391,6 +486,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                     email = user.getEmail();
                     imgURL = user.getPhotoUrl();
+                    int age = user.getAge();
 
                     try {
                         Glide.with(getActivity()).asBitmap().load(imgURL).placeholder(R.drawable.account_icon).into(profileIv);
@@ -403,25 +499,27 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     locationTv.setText(user.getLocation());
                     aboutMeTv.setText(user.getAboutMe());
 
-                    if(user.getGender() == 0) {
-                        genderAgeTv.setText(R.string.male);
+                    if (user.getGender() == 0) {
+                        genderAgeTv.setText(getString(R.string.male) + ", " + age);
                         genderIv.setImageResource(R.drawable.man_icon);
-                    } else if(user.getGender() == 1) {
-                        genderAgeTv.setText(R.string.female);
+                    } else if (user.getGender() == 1) {
+                        genderAgeTv.setText(getString(R.string.female) + ", " + age);
                         genderIv.setImageResource(R.drawable.woman_icon);
                     } else {
-                        genderAgeTv.setText(R.string.other);
+                        genderAgeTv.setText(getString(R.string.other) + ", " + age);
                         genderIv.setImageResource(R.drawable.other_icon);
                     }
 
                     //USER TYPE
 
-                    if(!user.getType()) { // NOT WALKER
+                    if (!user.getType()) { // NOT WALKER
                         typeTv.setText(R.string.dog_owner);
                         typeIv.setImageResource(R.drawable.dog_owner_icon);
                         isWalker = false;
                         row1.setVisibility(View.GONE);
                         row2.setVisibility(View.GONE);
+                        row3.setVisibility(View.GONE);
+                        criticsLayoutBtn.setVisibility(View.GONE);
 
                     } else { //WALKER
                         typeTv.setText(R.string.dog_walker);
@@ -429,22 +527,26 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         isWalker = true;
                         row1.setVisibility(View.VISIBLE);
                         row2.setVisibility(View.VISIBLE);
+                        row3.setVisibility(View.VISIBLE);
+                        criticsLayoutBtn.setVisibility(View.VISIBLE);
 
-                        String sizes = user.getDogSizesList();
+                        String sizes = user.getDogSizesList(); // 0 2 4
                         String size = sizes.substring(1, sizes.length() - 1);
-                        String range = user.getKmRange();
+                        Integer range = user.getKmRange();
+                        String exp = user.getExperience();
                         boolean lastCall = user.getLastCall();
                         int paymentPerWalk = user.getPaymentPerWalk();
 
                         sizesTv.setText(size);
-                        rangeTv.setText(range);
+                        rangeTv.setText(range + " " + getActivity().getString(R.string.km));
                         if (lastCall) {
                             lastCallTv.setText(R.string.yes);
                         } else {
                             lastCallTv.setText(R.string.no);
                         }
                         paymentTv.setText(paymentPerWalk + " " + getString(R.string.ils));
-                        assignWalkerListeners(size, range, lastCall, paymentPerWalk);
+                        expTv.setText(exp + " " + getString(R.string.years_of_exp));
+                        assignWalkerListeners(size, range, lastCall, paymentPerWalk, exp);
                     }
 
                     //setting icons
@@ -596,6 +698,160 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
             }
         });
+
+        //only for walkers
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reviews");
+        reference.child(userID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    criticsCountTv.setText(snapshot.getChildrenCount() + "");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void buildReviewAddSheetDialog() {
+
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+        View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_add_review, null);
+
+        ImageButton sendReviewBtn = bottomSheetView.findViewById(R.id.review_btn);
+        final EditText sendReviewEt = bottomSheetView.findViewById(R.id.review_et);
+        final ImageView star1 = bottomSheetView.findViewById(R.id.star_1_sheet);
+        final ImageView star2 = bottomSheetView.findViewById(R.id.star_2_sheet);
+        final ImageView star3 = bottomSheetView.findViewById(R.id.star_3_sheet);
+        final ImageView star4 = bottomSheetView.findViewById(R.id.star_4_sheet);
+        final ImageView star5 = bottomSheetView.findViewById(R.id.star_5_sheet);
+
+        final List<ImageView> starsImgList = new ArrayList<>();
+        starsImgList.add(star1);
+        starsImgList.add(star2);
+        starsImgList.add(star3);
+        starsImgList.add(star4);
+        starsImgList.add(star5);
+
+        ratingNum = 0;
+
+        //**********Rating Click Listeners*************//
+        star1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                star1.setImageResource(R.drawable.star_full_128);
+                star2.setImageResource(R.drawable.star_empty_128);
+                star3.setImageResource(R.drawable.star_empty_128);
+                star4.setImageResource(R.drawable.star_empty_128);
+                star5.setImageResource(R.drawable.star_empty_128);
+
+                ratingNum = 1;
+            }
+        });
+        star2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                star1.setImageResource(R.drawable.star_full_128);
+                star2.setImageResource(R.drawable.star_full_128);
+                star3.setImageResource(R.drawable.star_empty_128);
+                star4.setImageResource(R.drawable.star_empty_128);
+                star5.setImageResource(R.drawable.star_empty_128);
+
+                ratingNum = 2;
+            }
+        });
+        star3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                star1.setImageResource(R.drawable.star_full_128);
+                star2.setImageResource(R.drawable.star_full_128);
+                star3.setImageResource(R.drawable.star_full_128);
+                star4.setImageResource(R.drawable.star_empty_128);
+                star5.setImageResource(R.drawable.star_empty_128);
+
+                ratingNum = 3;
+            }
+        });
+        star4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                star1.setImageResource(R.drawable.star_full_128);
+                star2.setImageResource(R.drawable.star_full_128);
+                star3.setImageResource(R.drawable.star_full_128);
+                star4.setImageResource(R.drawable.star_full_128);
+                star5.setImageResource(R.drawable.star_empty_128);
+
+                ratingNum = 4;
+            }
+        });
+        star5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                star1.setImageResource(R.drawable.star_full_128);
+                star2.setImageResource(R.drawable.star_full_128);
+                star3.setImageResource(R.drawable.star_full_128);
+                star4.setImageResource(R.drawable.star_full_128);
+                star5.setImageResource(R.drawable.star_full_128);
+
+                ratingNum = 5;
+            }
+        });
+
+        sendReviewBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sendReviewEt.getText().equals("") || ratingNum == 0) {
+                    Toast.makeText(getActivity(), R.string.pls_leave_review_and_rating, Toast.LENGTH_SHORT).show();
+                } else {
+
+                    //dismiss this dialog
+
+                    //start loading dialog
+
+                    //create a user form myself
+                    DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
+                    usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                            //create review I wrote
+                            User user = snapshot.getValue(User.class);
+                            Review review = new Review(user.getId(), user.getFullName(), user.getLocation(), user.getPhotoUrl(), "stamp", sendReviewEt.getText().toString(), ratingNum);
+
+                            //add to list and update firebase "Reviews"
+                            reviewList.add(review);
+
+                            //start loader here!!!!!!!!!!!!!!!!!!
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reviews").child(userID);
+                            reference.setValue(reviewList).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        //end loader here!
+                                        bottomSheetDialog.dismiss();
+                                    } else {
+                                        bottomSheetDialog.dismiss();
+                                    }
+                                }
+                            });
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+            }
+        });
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+
     }
 
     private void buildProfileSheetDialog() {
@@ -703,7 +959,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        if(!isMe) {
+        if (!isMe) {
             inflater.inflate(R.menu.profile_menu, menu);
         }
         super.onCreateOptionsMenu(menu, inflater);
@@ -842,12 +1098,12 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     //update my posts
-                                    if(snapshot.exists()) {
-                                        for(DataSnapshot ds : snapshot.getChildren()) {
+                                    if (snapshot.exists()) {
+                                        for (DataSnapshot ds : snapshot.getChildren()) {
                                             ModelPost post = ds.getValue(ModelPost.class);
-                                            if(post.getuId().equals(fUser.getUid())) {
-                                                Map<String,Object> hashMap = new HashMap<>();
-                                                hashMap.put("uPic",fUser.getPhotoUrl().toString());
+                                            if (post.getuId().equals(fUser.getUid())) {
+                                                Map<String, Object> hashMap = new HashMap<>();
+                                                hashMap.put("uPic", fUser.getPhotoUrl().toString());
                                                 postRef.child(ds.getKey()).updateChildren(hashMap);
                                             }
 

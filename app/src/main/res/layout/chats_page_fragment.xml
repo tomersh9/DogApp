@@ -12,6 +12,16 @@
         android:indeterminateTint="@color/colorPrimary"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/no_chats_yet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="@string/no_chats_yet"
+        android:textSize="40sp"
+        android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_fragment_recycler"
         android:layout_width="match_parent"

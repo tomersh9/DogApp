@@ -29,7 +29,8 @@
             android:layout_marginTop="8dp"
             android:background="@null"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_arrow_back_black_24dp" />
+            android:src="@drawable/ic_arrow_back_black_24dp"
+            android:tint="@color/colorPrimary" />
 
         <LinearLayout
             android:id="@+id/reg_2_head_layout"
@@ -82,9 +83,9 @@
                     android:layout_height="200dp"
                     android:layout_gravity="center"
                     android:scaleType="centerInside"
+                    android:visibility="gone"
                     app:lottie_autoPlay="true"
                     app:lottie_loop="true"
-                    android:visibility="gone"
                     app:lottie_rawRes="@raw/about_anim" />
 
                 <de.hdodenhof.circleimageview.CircleImageView
@@ -141,29 +142,41 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/location_input"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    app:boxStrokeErrorColor="@color/red"
-                    app:endIconMode="clear_text"
-                    app:errorEnabled="true"
-                    app:startIconDrawable="@drawable/ic_location_on_black_24dp">
+                    android:orientation="vertical">
 
-                    <com.google.android.material.textfield.TextInputEditText
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/location_input"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/your_location" />
+                        android:layout_marginTop="10dp"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:endIconMode="clear_text"
+                        app:errorEnabled="true"
+                        app:startIconDrawable="@drawable/ic_location_on_black_24dp">
 
-                </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/your_location" />
 
-                <!-- <View
-                     android:layout_width="match_parent"
-                     android:layout_height="1dp"
-                     android:layout_marginTop="10dp"
-                     android:background="@android:color/darker_gray" />-->
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/location_btn"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:src="@drawable/ic_location_on_black_24dp"
+                        android:text="שליפת מיקום אוטומטית"
+                        app:icon="@drawable/ic_location_on_black_24dp" />
+
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"

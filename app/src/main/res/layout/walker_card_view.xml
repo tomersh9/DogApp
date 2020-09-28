@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/round_bg__dialog_shape"
+    android:background="@drawable/profile_item_shape"
     android:clickable="true"
     android:focusable="true"
-    app:cardElevation="10dp"
+    app:cardElevation="5dp"
     app:cardUseCompatPadding="true">
 
     <RelativeLayout
@@ -14,23 +14,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:paddingVertical="15dp">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/walker_cell_image"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/shutterstock_648907024" />
+        android:paddingVertical="7dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/walker_cell_image"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="5dp"
             android:gravity="center"
             android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/walker_cell_image"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center" />
 
             <TextView
                 android:id="@+id/walker_cell_name_tv"
@@ -38,7 +35,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:gravity="center"
-                android:text="תומר שטרית"
                 android:textColor="@color/black"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -47,29 +43,35 @@
                 android:id="@+id/walker_cell_gender_age_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="גבר, 25" />
+                android:gravity="center" />
 
             <TextView
                 android:id="@+id/walker_cell_location_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="חולון, ישראל" />
+                android:gravity="center" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginVertical="6.5dp"
+                android:src="@color/nav_bar_item_color" />
 
             <TextView
                 android:id="@+id/walker_cell_payment_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="80 שח / שעה" />
+                android:text="120 / hour"
+                android:textColor="@color/black" />
 
             <TextView
                 android:id="@+id/walker_cell_experience_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="שנות ניסיון: 1-2" />
+                android:text="5+ years experience"
+                android:textColor="@color/black" />
 
             <LinearLayout
                 android:id="@+id/walker_cell_star_layout"
@@ -81,36 +83,36 @@
 
                 <ImageView
                     android:id="@+id/star_1"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
                     android:layout_marginHorizontal="2dp"
                     android:src="@drawable/star_full_128" />
 
                 <ImageView
                     android:id="@+id/star_2"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
                     android:layout_marginHorizontal="2dp"
                     android:src="@drawable/star_full_128" />
 
                 <ImageView
                     android:id="@+id/star_3"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
                     android:layout_marginHorizontal="2dp"
                     android:src="@drawable/star_full_128" />
 
                 <ImageView
                     android:id="@+id/star_4"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
                     android:layout_marginHorizontal="2dp"
                     android:src="@drawable/star_full_128" />
 
                 <ImageView
                     android:id="@+id/star_5"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
                     android:layout_marginHorizontal="2dp"
                     android:src="@drawable/star_empty_128" />
 

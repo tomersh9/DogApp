@@ -1,5 +1,6 @@
 package com.example.dogapp.Adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
     private MyUserListener listener;
     private boolean isMyFriend;
     private boolean isMe;
+    private Context context;
 
     public interface MyUserListener {
         void onFriendClicked(int pos, View v);
@@ -45,10 +47,11 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         this.listener = listener;
     }
 
-    public FriendsAdapter(List<User> users, boolean isMyFriend, boolean isMe) {
+    public FriendsAdapter(List<User> users, boolean isMyFriend, boolean isMe, Context context) {
         this.users = users;
         this.isMyFriend = isMyFriend;
         this.isMe = isMe;
+        this.context = context;
         usersFull = new ArrayList<>(users); //for filtering (copy of list)
     }
 
@@ -149,13 +152,15 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
             holder.typeTv.setText(R.string.dog_owner);
         }
 
+        int age = user.getAge();
+
         //gender rtl
         if(user.getGender() == 0) {
-            holder.ageGenderTv.setText(R.string.male);
+            holder.ageGenderTv.setText(context.getString(R.string.male) + ", " + age);
         } else if(user.getGender() == 1) {
-            holder.ageGenderTv.setText(R.string.female);
+            holder.ageGenderTv.setText(context.getString(R.string.female) + ", " + age);
         } else {
-            holder.ageGenderTv.setText(R.string.other);
+            holder.ageGenderTv.setText(context.getString(R.string.other) + ", " + age);
         }
 
         try {

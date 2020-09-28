@@ -10,12 +10,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -121,10 +123,14 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //fixed portrait mode
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //create channel once
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -239,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     //update things from user data
                     User user = dataSnapshot.getValue(User.class);
                     fullNameTv.setText(user.getFullName());
-                    if(user.getType()) { //true walker
+                    if (user.getType()) { //true walker
                         titleTv.setText(R.string.dog_walker);
                     } else { //false owner
                         titleTv.setText(R.string.dog_owner);
@@ -271,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     MenuItem menuItem = menu.findItem(R.id.bottom_chat); //chats item
                     BadgeDrawable badgeDrawable = bottomNavBar.getOrCreateBadge(menuItem.getItemId());
                     badgeDrawable.setVisible(true);
+                    //badgeDrawable.setBackgroundColor(getResources().getColor(R.color.red));
                 }
             };
         }
@@ -303,10 +310,9 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         drawerProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProfileFragment profileFragment = ProfileFragment.newInstance(fUser.getUid(), fUser.getPhotoUrl().toString());
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment).commit();
-                drawerLayout.closeDrawers();
                 bottomNavBar.setSelectedItemId(R.id.bottom_profile);
+                drawerLayout.closeDrawers();
+
             }
         });
 
@@ -370,8 +376,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 switch (item.getItemId()) {
 
                     case R.id.item_profile:
-                        profileFragment = ProfileFragment.newInstance(fUser.getUid(), fUser.getPhotoUrl().toString());
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment).commit();
                         bottomNavBar.setSelectedItemId(R.id.bottom_profile);
                         break;
 
@@ -379,8 +383,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         break;
 
                     case R.id.item_sign_out:
-                        firebaseAuth.signOut();
                         setUserStatus(false);
+                        firebaseAuth.signOut();
                         Intent intent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                         finish();
@@ -433,13 +437,13 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 //get current fragment after
                 Fragment currFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-                if(currFragment!=null) {
+                if (currFragment != null) {
 
                     if (currFragment.getTag().equals(FOLLOWERS_FRAGMENT_TAG)) {
                         toolbar.setTitle(getString(R.string.followers));
                     } else if (currFragment.getTag().equals(FOLLOWING_FRAGMENT_TAG)) {
                         toolbar.setTitle(getString(R.string.following));
-                    } else if(currFragment.getTag().equals(DISCOVER_FRIENDS_TAG)) {
+                    } else if (currFragment.getTag().equals(DISCOVER_FRIENDS_TAG)) {
                         toolbar.setTitle(getString(R.string.settings));
                     }
                     setSupportActionBar(toolbar);
@@ -447,7 +451,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
             }
         }
     }
-
 
 
     private Fragment getCurrentFragment() {
@@ -490,10 +493,14 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
     //*******************UPDATE USERS STATUS************************//
     private void setUserStatus(Boolean status) {
-        usersRef = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
-        Map<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status", status);
-        usersRef.updateChildren(hashMap);
+
+        if (fUser != null) {
+            usersRef = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
+            Map<String, Object> hashMap = new HashMap<>();
+            hashMap.put("status", status);
+            usersRef.updateChildren(hashMap);
+        }
+
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -60,6 +61,7 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeRefreshLayout;
     private boolean isRefreshing = false;
+    private TextView noFollowersTv;
 
     public static FollowersFragment newInstance(String userID) {
         FollowersFragment fragment = new FollowersFragment();
@@ -97,6 +99,8 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
         View rootView = inflater.inflate(R.layout.friends_fragment_layout, container, false);
+        noFollowersTv = rootView.findViewById(R.id.no_friends_msg_tv);
+        noFollowersTv.setText(R.string.no_followers_yet);
 
         //get other users to user this fragment
         userID = getArguments().getString("userID");
@@ -159,12 +163,18 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
                         }
                     }
                     //adapter
-                    adapter = new FriendsAdapter(users, true, isMe);
+                    adapter = new FriendsAdapter(users, true, isMe, getActivity());
                     //set adapter to recyclerview
                     recyclerView.setAdapter(adapter);
                     //adapter click events
                     adapter.setMyUserListener(FollowersFragment.this);
                     adapter.notifyDataSetChanged();
+
+                    if(users.isEmpty()) {
+                        noFollowersTv.setVisibility(View.VISIBLE);
+                    } else {
+                        noFollowersTv.setVisibility(View.GONE);
+                    }
                 }
                 progressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
@@ -214,7 +224,7 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
     public void onFriendDeleteClicked(int pos, View v) {
         final User user = users.get(pos);
         //remove from following list
-        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), user.getFullName() + "removed from followers", Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), user.getFullName() + " " + getString(R.string.was_removed_from_followers), Snackbar.LENGTH_LONG).show();
 
         //remove him from my followers list
         if (followersList.contains(user.getId())) {

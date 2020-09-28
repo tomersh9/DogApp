@@ -16,6 +16,7 @@
         android:layout_marginTop="8dp"
         android:background="@null"
         android:scaleType="fitCenter"
+        android:tint="@color/colorPrimary"
         android:src="@drawable/ic_arrow_back_black_24dp" />
 
     <LinearLayout

@@ -74,17 +74,21 @@ public class WalkerFinalRegisterFragment extends Fragment {
     private TextInputLayout sizeEt;
     private TextInputLayout lastCallEt;
     private TextInputLayout paymentEt;
+    private TextInputLayout expEt;
 
 
     private Integer payPerWalk;
     private Boolean lastCall;
-    private String kmRange;
+    private Integer kmRange;
+    private String rangeResult;
+    private String experience;
     private List<String> dogSizeList = new ArrayList<>();
     private String dogSizeString;
     private boolean[] dogSizeChoices = {false, false, false, false, false};
+    private int[] dogSizeIntArr = {-1,-1,-1,-1,-1};
 
 
-    public static WalkerFinalRegisterFragment newInstance(String fullName, String email, String password, String date,Integer age, Integer gender, Boolean title, String location) {
+    public static WalkerFinalRegisterFragment newInstance(String fullName, String email, String password, String date, Integer age, Integer gender, Boolean title, String location) {
         WalkerFinalRegisterFragment fragment = new WalkerFinalRegisterFragment();
         Bundle bundle = new Bundle();
         bundle.putString("fullName", fullName);
@@ -101,8 +105,8 @@ public class WalkerFinalRegisterFragment extends Fragment {
 
     public interface MyFinalWalkerFragmentListener {
 
-        void onWalkerRegisterClick(String name, String email, String password, String date, Integer age ,Integer gender, Boolean title, String location,
-                                   String aboutMe, String kmRange, String dogSizeList, Boolean lastCall, Integer payPerWalk);
+        void onWalkerRegisterClick(String name, String email, String password, String date, Integer age, Integer gender, Boolean title, String location,
+                                   String aboutMe, String exp, Integer kmRange, String dogSizeList, Boolean lastCall, Integer payPerWalk);
 
         void startWalkerRegisterLoader();
 
@@ -146,6 +150,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
         ImageButton backBtn = rootView.findViewById(R.id.back_frag_btn_3);
         Button regBtn = rootView.findViewById(R.id.reg_3_btn);
         aboutEt = rootView.findViewById(R.id.about_me_et);
+        expEt = rootView.findViewById(R.id.exp_et);
         rangeEt = rootView.findViewById(R.id.range_km_et);
         sizeEt = rootView.findViewById(R.id.dog_size_et);
         lastCallEt = rootView.findViewById(R.id.last_call_et);
@@ -164,6 +169,29 @@ public class WalkerFinalRegisterFragment extends Fragment {
         //profile image event listener
         setProfileViewsListener();
 
+        expEt.getEditText().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Years of experience of dog walking")
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (experience != null) {
+                                    expEt.getEditText().setText(experience);
+                                }
+                            }
+                        }).setSingleChoiceItems(R.array.exp_years_array, -1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String[] arr = getActivity().getResources().getStringArray(R.array.exp_years_array);
+                        experience = arr[which];
+                    }
+                }).show();
+            }
+        });
+
         //handling user inputs
         sizeEt.getEditText().setOnClickListener(new View.OnClickListener() {
 
@@ -181,6 +209,10 @@ public class WalkerFinalRegisterFragment extends Fragment {
                                     sizeEt.getEditText().setText(dogSizeList.toString());
                                     dogSizeString = dogSizeList.toString();
                                 }
+                                for(int i = 0 ; i < 5 ; i ++) {
+                                    System.out.println(dogSizeIntArr[i] + "!!!!!!!!!!!!!");
+
+                                }
                             }
                         })
                         .setMultiChoiceItems(R.array.dog_sizes_array, dogSizeChoices, new DialogInterface.OnMultiChoiceClickListener() {
@@ -190,9 +222,11 @@ public class WalkerFinalRegisterFragment extends Fragment {
                                 if (isChecked) {
                                     dogSizeList.add(sizeArr[which]);
                                     dogSizeChoices[which] = true;
+                                    dogSizeIntArr[which] = which;
                                 } else {
                                     dogSizeList.remove(sizeArr[which]);
                                     dogSizeChoices[which] = false;
+                                    dogSizeIntArr[which] = -1; //no choice
                                 }
                             }
                         }).show();
@@ -202,20 +236,22 @@ public class WalkerFinalRegisterFragment extends Fragment {
         rangeEt.getEditText().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final String[] rangeStringArray = getActivity().getResources().getStringArray(R.array.km_range);
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle(R.string.choose_km_range)
                         .setCancelable(false)
                         .setSingleChoiceItems(R.array.km_range, -1, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String[] kmArr = getActivity().getResources().getStringArray(R.array.km_range);
-                                kmRange = kmArr[which];
+                                int[] kmArr = getActivity().getResources().getIntArray(R.array.km_range_values);
+                                kmRange = kmArr[which]; //save actual data
+                                rangeResult = rangeStringArray[which];
                             }
                         }).setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (kmRange != null) {
-                            rangeEt.getEditText().setText(kmRange);
+                        if (rangeResult != null) {
+                            rangeEt.getEditText().setText(rangeResult);
                         }
                     }
                 }).show();
@@ -260,7 +296,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
                 paymentEt.clearFocus();
                 aboutEt.clearFocus();
 
-                isValid = validateFields(aboutMe, kmRange, dogSizeList);
+                isValid = validateFields(aboutMe, experience, kmRange, dogSizeList);
 
                 if (isValid) {
 
@@ -280,8 +316,8 @@ public class WalkerFinalRegisterFragment extends Fragment {
                         getActivity().getContentResolver().delete(fileUri, null, null);
                     }
 
-                    listener.onWalkerRegisterClick(fullName, email, password, dateOfBirth,age, gender, type, location,
-                            aboutMe, kmRange, dogSizeString, lastCall, payPerWalk);
+                    listener.onWalkerRegisterClick(fullName, email, password, dateOfBirth, age, gender, type, location,
+                            aboutMe, experience, kmRange, dogSizeString, lastCall, payPerWalk);
                 } else {
                     return;
                 }
@@ -291,8 +327,8 @@ public class WalkerFinalRegisterFragment extends Fragment {
         return rootView;
     }
 
-    private boolean validateFields(String about, String range, List<String> sizeList) {
-        if (!validateAboutMe(about) | !validateRange(range) | !validateSizes(sizeList) | !validateLastCall() | !validatePayment()) {
+    private boolean validateFields(String about, String exp, Integer range, List<String> sizeList) {
+        if (!validateAboutMe(about) | !validateExperience(exp) | !validateRange(range) | !validateSizes(sizeList) | !validateLastCall() | !validatePayment()) {
             return false;
         }
         return true;
@@ -308,7 +344,17 @@ public class WalkerFinalRegisterFragment extends Fragment {
         }
     }
 
-    private boolean validateRange(String range) {
+    private boolean validateExperience(String exp) {
+        if (experience == null) {
+            expEt.setError(getString(R.string.field_empty_error));
+            return false;
+        } else {
+            expEt.setError(null);
+            return true;
+        }
+    }
+
+    private boolean validateRange(Integer range) {
         if (range == null) {
             rangeEt.setError(getString(R.string.field_empty_error));
             return false;
