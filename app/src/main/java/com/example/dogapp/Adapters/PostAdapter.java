@@ -110,12 +110,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
 
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.setTimeInMillis(Long.parseLong(pTimeStamp));
-        String pTime = DateFormat.format("dd/MM/yyyy hh:mm  aa", calendar).toString();
+        String pTime = DateFormat.format("dd/MM/yyyy HH:mm  aa", calendar).toString();
 
         holder.nameTv.setText(uName);
         holder.timeTv.setText(pTime);
         holder.descTv.setText(pDesc);
-        Glide.with(holder.itemView).asBitmap().load(Uri.parse(uPic)).placeholder(R.drawable.account_icon).into(holder.postIv);
+        Glide.with(holder.itemView).asBitmap().load(Uri.parse(uPic)).placeholder(R.drawable.user_icon_png_64).into(holder.postIv);
         holder.likesTv.setText(pLikes + " " + context.getString(R.string.likes));
         holder.comTv.setText(pComments + " " + context.getString(R.string.comments));
 

@@ -44,7 +44,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="20dp"
         android:background="@color/colorPrimary"
-        android:src="@drawable/ic_add_black_24dp"
+        android:src="@drawable/ic_filter_list_black_24dp"
         app:tint="@color/whitish" />-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

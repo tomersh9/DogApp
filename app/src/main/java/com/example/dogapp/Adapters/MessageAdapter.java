@@ -1,5 +1,6 @@
 package com.example.dogapp.Adapters;
 
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,9 @@ import com.example.dogapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ChatViewHolder> {
 
@@ -38,6 +41,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ChatView
         TextView messageTv;
         ImageView userProfileIv;
         ImageView isSeenIv;
+        TextView timeTv;
 
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -45,6 +49,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ChatView
             messageTv = itemView.findViewById(R.id.chat_message);
             userProfileIv = itemView.findViewById(R.id.chat_item_profile);
             isSeenIv = itemView.findViewById(R.id.chat_seen_iv);
+            timeTv = itemView.findViewById(R.id.chat_item_time_tv);
         }
     }
 
@@ -66,9 +71,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ChatView
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
 
         Chat chat = chats.get(position);
+
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        calendar.setTimeInMillis(Long.parseLong(chat.getTimeStamp()));
+        String chatTime = DateFormat.format("dd/MM/yyyy HH:mm", calendar).toString();
+
+        holder.timeTv.setText(chatTime);
+
         holder.messageTv.setText(chat.getMessage());
         try {
-            Glide.with(holder.itemView).load(imgUrl).placeholder(R.drawable.account_icon).into(holder.userProfileIv);
+            Glide.with(holder.itemView).asBitmap().load(imgUrl).placeholder(R.drawable.user_icon_png_64).into(holder.userProfileIv);
         } catch (Exception ex) {
 
         }

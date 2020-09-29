@@ -139,4 +139,13 @@
     <string name="total_rating_reviews">הדירוג הכולל שהמשתמש קיבל ממשתמשים אחרים</string>
     <string name="all_reviews_about">כל הביקורות על</string>
     <string name="no_curr_reviews">אין כרגע ביקורות</string>
+    <string name="got_it">הבנתי</string>
+    <string name="profile_pho_change">תמונת הפרופיל עודכנה</string>
+    <string name="profile_photo_update_fail">עדכון תמונת הפרופיל נכשל</string>
+    <string name="display_cover_image">הצג תמונת נושא</string>
+    <string name="take_a_new_cover_picture">צלם תמונת נושא חדשה</string>
+    <string name="choose_a_new_cover_picture">בחר תמונת נושא חדשה</string>
+    <string name="no_cover_to_show">אין תמונת נושא להצגה</string>
+    <string name="failed_update_cover">עדכון תמונת הנושא נכשל</string>
+    <string name="cover_photo_updated">תמונת הנושא עודכנה בהצלחה</string>
 </resources>

@@ -96,18 +96,10 @@
 
         </RelativeLayout>
 
-        <!--<ImageView
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_marginTop="5dp"
-            android:src="@color/nav_bar_item_color"
-            android:layout_below="@id/post_owner_layout"
-            android:layout_marginHorizontal="10dp"/>-->
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bottom_comments_recycler"
             android:layout_width="match_parent"
-            android:layout_height="350dp"
+            android:layout_height="280dp"
             android:layout_below="@id/post_owner_layout"
             android:layout_marginHorizontal="5dp"
             android:layout_marginTop="7dp"

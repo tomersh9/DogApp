@@ -38,6 +38,8 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.List;
+
 public class LoginActivity extends AppCompatActivity implements RegisterFragment.OnRegisterFragmentListener, SecondRegisterFragment.OnSecondRegisterFragmentListener, ForgotPasswordFragment.OnForgotPasswordListener, WalkerFinalRegisterFragment.MyFinalWalkerFragmentListener {
 
     private RelativeLayout loginContainer;
@@ -218,7 +220,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "aboutMe","exp", 0, "size", false, 0);
+                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "aboutMe","exp", 0, null, false, 0);
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {
@@ -386,7 +388,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     //***************Walker 3rd page fragment events****************//
     @Override
     public void onWalkerRegisterClick(final String name, final String email, String password, final String date, final Integer age, final Integer gender, final Boolean title, final String location,
-                                      final String aboutMe,final String exp, final Integer kmRange, final String dogSizeList, final Boolean lastCall, final Integer payPerWalk) {
+                                      final String aboutMe, final String exp, final Integer kmRange, final List<Integer> dogSizeList, final Boolean lastCall, final Integer payPerWalk) {
 
         this.fullName = name; //for the auth listener
 

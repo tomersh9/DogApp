@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
@@ -41,6 +42,7 @@ import androidx.core.location.LocationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.dogapp.Adapters.AutoCompleteAdapter;
 import com.example.dogapp.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -99,10 +101,12 @@ public class SecondRegisterFragment extends Fragment {
 
     //private ProgressBar progressBar;
 
-    private TextInputLayout dateEt, locationEt;
+    private TextInputLayout dateEt;
+    private TextInputLayout locationInputLayout;
     private RadioGroup genderGroup;
     private LottieAnimationView aboutAnim;
     private Button next2Btn, regBtn, locationBtn;
+    private AutoCompleteTextView locationEt;
 
     private boolean isWalker;
     private boolean isValid;
@@ -243,6 +247,7 @@ public class SecondRegisterFragment extends Fragment {
         notReqTv = rootView.findViewById(R.id.not_req_tv);
         profileBtn = rootView.findViewById(R.id.profile_btn);
         locationBtn = rootView.findViewById(R.id.location_btn);
+        locationInputLayout = rootView.findViewById(R.id.location_input_layout);
 
         //walker user
         next2Btn = rootView.findViewById(R.id.next_2_btn);
@@ -316,7 +321,12 @@ public class SecondRegisterFragment extends Fragment {
             }
         });
 
-        locationEt = rootView.findViewById(R.id.location_input);
+        locationEt = rootView.findViewById(R.id.location_auto_complete);
+
+        //auto complete google api
+        AutoCompleteAdapter autoCompleteAdapter = new AutoCompleteAdapter(getActivity(), android.R.layout.simple_list_item_1);
+        locationEt.setAdapter(autoCompleteAdapter);
+
         geocoder = new Geocoder(getActivity());
         locationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -330,7 +340,7 @@ public class SecondRegisterFragment extends Fragment {
                         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
                     else {
                         if (isLocation) {
-                            locationEt.getEditText().clearFocus();
+                            locationEt.clearFocus();
                             startLocation();
                         } else {
                             Toast.makeText(getActivity(), R.string.check_location_permissions, Toast.LENGTH_SHORT).show();
@@ -340,7 +350,7 @@ public class SecondRegisterFragment extends Fragment {
                     }
                 } else {
                     if (isLocation) {
-                        locationEt.getEditText().clearFocus();
+                        locationEt.clearFocus();
                         startLocation();
                     } else {
                         locationEt.setHint(getString(R.string.enter_loc_manual));
@@ -458,7 +468,7 @@ public class SecondRegisterFragment extends Fragment {
                         handleUpload(bitmap2);
                     } else {
                         //TODO fix register without photo
-                        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.account_icon);
+                        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.user_icon_jpg_128);
                         handleUpload(bitmap);
                     }
 
@@ -504,8 +514,8 @@ public class SecondRegisterFragment extends Fragment {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    locationEt.getEditText().setText(bestAddress.getLocality() + ",  " + bestAddress.getCountryName());
-                                    location = locationEt.getEditText().getText().toString().trim();
+                                    locationEt.setText(bestAddress.getLocality() + ",  " + bestAddress.getCountryName());
+                                    location = locationEt.getText().toString().trim();
                                     locationEt.setHint(getString(R.string.your_location));
                                     alertDialog.dismiss();
                                 }
@@ -567,7 +577,7 @@ public class SecondRegisterFragment extends Fragment {
     private void handleUpload(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Images").child(email + ".jpeg");
+        final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Profiles").child(email + ".jpeg");
 
         storage.putBytes(baos.toByteArray())
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -641,11 +651,12 @@ public class SecondRegisterFragment extends Fragment {
     }
 
     private boolean validLocation() {
-        if (locationEt.getEditText().getText().toString().isEmpty()) {
-            locationEt.setError(getString(R.string.field_empty_error));
+        if (locationEt.getText().toString().isEmpty()) {
+            locationInputLayout.setError(getString(R.string.field_empty_error));
             return false;
         } else {
-            locationEt.setError(null);
+            locationInputLayout.setError(null);
+            location = locationEt.getText().toString().trim();
             return true;
         }
     }

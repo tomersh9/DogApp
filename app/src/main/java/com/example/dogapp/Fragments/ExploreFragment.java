@@ -14,12 +14,16 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.dogapp.Adapters.BoardsPagerAdapter;
 import com.example.dogapp.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
 public class ExploreFragment extends Fragment {
 
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private FloatingActionButton fab;
+    private TabItem tab;
 
     @Nullable
     @Override

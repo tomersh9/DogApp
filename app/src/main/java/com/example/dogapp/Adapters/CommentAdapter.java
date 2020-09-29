@@ -58,12 +58,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.myHolder
 
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.setTimeInMillis(Long.parseLong(timeStamp));
-        String pTime = DateFormat.format("dd/MM/yyyy hh:mm  aa", calendar).toString();
+        String pTime = DateFormat.format("dd/MM/yyyy HH:mm  aa", calendar).toString();
 
         holder.nameTv.setText(uName);
         holder.descTv.setText(comment);
         holder.timeTv.setText(pTime);
-        Glide.with(holder.itemView).asBitmap().load(Uri.parse(uPic)).placeholder(R.drawable.account_icon).into(holder.picIv);
+        Glide.with(holder.itemView).asBitmap().load(Uri.parse(uPic)).into(holder.picIv);
 
 
 

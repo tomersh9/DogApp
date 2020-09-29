@@ -29,6 +29,16 @@
             android:textColor="@color/white"
             android:textSize="18sp" />
 
+        <TextView
+            android:id="@+id/chat_item_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/chat_message"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@id/chat_seen_iv"
+            android:text="11/4/1995 07:30"
+            android:textSize="13sp" />
+
         <ImageView
             android:id="@+id/chat_seen_iv"
             android:layout_width="17dp"

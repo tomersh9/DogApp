@@ -169,7 +169,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     name = user.getFullName();
                     location = user.getLocation();
                     try {
-                        Glide.with(rootView).load(user.getPhotoUrl()).placeholder(R.drawable.account_icon).into(homeIv);
+                        Glide.with(rootView).load(user.getPhotoUrl()).placeholder(R.drawable.user_icon_png_64).into(homeIv);
                     } catch (Exception ex) {
 
                     }
@@ -340,17 +340,15 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     }
                 });
 
-        if(s == true) {
+        if (s == true) {
             firebaseMessaging.subscribeToTopic(pId);
-            sendToToken(pId, comment,true);
+            sendToToken(pId, comment, true);
             Toast.makeText(getActivity(), "MINE!!!!", Toast.LENGTH_SHORT).show();
-        }
-
-        else {
+        } else {
             Toast.makeText(getActivity(), "NOT MINE!!!!", Toast.LENGTH_SHORT).show();
             firebaseMessaging.subscribeToTopic(pId + "COMMENTS");
-            sendToToken(pId + "COMMENTS", comment,false);
-            sendToToken(pId, comment,true);
+            sendToToken(pId + "COMMENTS", comment, false);
+            sendToToken(pId, comment, true);
         }
 
     }
@@ -629,10 +627,9 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
             if (pId != null) {
 
                 dataJson.put("message", comment);
-                if(isMyComment) {
+                if (isMyComment) {
                     dataJson.put("isCom", "check");
-                }
-                else {
+                } else {
                     dataJson.put("isComFriend", "check");
                 }
 
@@ -682,8 +679,8 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         queue.add(stringRequest);
     }
-    private boolean isMyPost(String pId)
-    {
+
+    private boolean isMyPost(String pId) {
 
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Posts").child(pId).child("uId");
         final String isMyPost;
@@ -694,9 +691,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
                 if (snapshot.getValue().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                     s = true;
-                    //Toast.makeText(getActivity(), s + "%%111111%%", Toast.LENGTH_SHORT).show();
-                }
-                else
+                } else
                     s = false;
 
 
@@ -707,8 +702,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
             }
         });
-
-        //Toast.makeText(getActivity(), s + "%%%%", Toast.LENGTH_SHORT).show();
         return s;
     }
 

@@ -24,6 +24,7 @@
         android:layout_centerHorizontal="true"
         style="@style/TextAppearance.AppCompat.Body2"
         android:layout_marginTop="10dp"
+        android:paddingHorizontal="10dp"
         android:gravity="center"
         android:text="@string/success"
         android:textSize="35sp" />

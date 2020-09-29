@@ -80,7 +80,7 @@ public class ReviewAdapter  extends RecyclerView.Adapter<ReviewAdapter.ReviewVie
 
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.setTimeInMillis(Long.parseLong(review.getTimeStamp()));
-        String pTime = DateFormat.format("dd/MM/yyyy hh:mm", calendar).toString();
+        String pTime = DateFormat.format("dd/MM/yyyy HH:mm", calendar).toString();
         //review.setTimeStamp(pTime);
         holder.timeTv.setText(pTime);
 

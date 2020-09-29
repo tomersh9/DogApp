@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     MenuItem menuItem = menu.findItem(R.id.bottom_chat); //chats item
                     BadgeDrawable badgeDrawable = bottomNavBar.getOrCreateBadge(menuItem.getItemId());
                     badgeDrawable.setVisible(true);
-                    //badgeDrawable.setBackgroundColor(getResources().getColor(R.color.red));
+                    badgeDrawable.setBackgroundColor(getResources().getColor(R.color.red));
                 }
             };
         }
@@ -312,7 +312,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
             public void onClick(View v) {
                 bottomNavBar.setSelectedItemId(R.id.bottom_profile);
                 drawerLayout.closeDrawers();
-
             }
         });
 
@@ -379,9 +378,6 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         bottomNavBar.setSelectedItemId(R.id.bottom_profile);
                         break;
 
-                    case R.id.item_friends:
-                        break;
-
                     case R.id.item_sign_out:
                         setUserStatus(false);
                         firebaseAuth.signOut();
@@ -404,7 +400,13 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            //super.onBackPressed();
+            //get current fragment after
+            Fragment currFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (currFragment != null) {
+                closeFragment(currFragment.getTag());
+            }
+
         }
     }
 

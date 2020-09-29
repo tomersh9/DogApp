@@ -95,7 +95,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"
                     android:padding="5dp"
-                    android:src="@drawable/account_icon"
+                    android:src="@drawable/user_icon_png_128"
                     android:visibility="gone" />
 
                 <TextView
@@ -117,12 +117,6 @@
                     android:text="@string/not_required"
                     android:textSize="12sp" />
 
-                <!--<View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@android:color/darker_gray" />-->
-
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/date_input"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -138,7 +132,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:focusable="false"
-                        android:hint="@string/date_of_birth" />
+                        android:hint="@string/date_of_birth"
+                        android:textSize="17sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -149,7 +144,7 @@
 
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/location_input"
+                        android:id="@+id/location_input_layout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -159,10 +154,15 @@
                         app:errorEnabled="true"
                         app:startIconDrawable="@drawable/ic_location_on_black_24dp">
 
-                        <com.google.android.material.textfield.TextInputEditText
+                        <AutoCompleteTextView
+                            android:id="@+id/location_auto_complete"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/your_location" />
+                            android:completionThreshold="1"
+                            android:hint="@string/your_location"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="15dp"
+                            android:textSize="17sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -172,6 +172,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
+                        android:layout_marginTop="3dp"
                         android:src="@drawable/ic_location_on_black_24dp"
                         android:text="שליפת מיקום אוטומטית"
                         app:icon="@drawable/ic_location_on_black_24dp" />
@@ -218,39 +219,6 @@
                         android:paddingHorizontal="5dp"
                         android:text="@string/other" />
                 </RadioGroup>
-
-                <!--<TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/title"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <RadioGroup
-                    android:id="@+id/type_radio_group"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/dog_owner"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/colorPrimary"
-                        android:paddingHorizontal="5dp"
-                        android:text="@string/dog_owner" />
-
-                    <RadioButton
-                        android:id="@+id/dog_walker"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/colorPrimary"
-                        android:paddingHorizontal="5dp"
-                        android:text="@string/dog_walker" />
-                </RadioGroup>-->
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/reg_2_btn"

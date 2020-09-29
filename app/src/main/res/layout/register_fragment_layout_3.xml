@@ -51,7 +51,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="5dp"
                     android:padding="5dp"
-                    android:src="@drawable/account_icon" />
+                    android:src="@drawable/user_icon_png_128" />
 
                 <TextView
                     android:id="@+id/press_tv_2"

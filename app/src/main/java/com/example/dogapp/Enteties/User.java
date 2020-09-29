@@ -1,6 +1,7 @@
 package com.example.dogapp.Enteties;
 
 import java.util.Comparator;
+import java.util.List;
 
 public class User implements Comparable<User> {
 
@@ -19,14 +20,14 @@ public class User implements Comparable<User> {
     private String aboutMe;
     private String experience;
     private Integer kmRange;
-    private String dogSizesList;
+    private List<Integer> dogSizesList;
     private Boolean lastCall;
     private Integer paymentPerWalk;
 
     public User() {
     }
 
-    public User(String fullName, String dateOfBirth, Integer age, String email, Integer gender, Boolean type, String location, String photoUrl, String coverUrl, String id, Boolean status, String timeStamp, String aboutMe, String experience, Integer kmRange, String dogSizesList, Boolean lastCall, Integer paymentPerWalk) {
+    public User(String fullName, String dateOfBirth, Integer age, String email, Integer gender, Boolean type, String location, String photoUrl, String coverUrl, String id, Boolean status, String timeStamp, String aboutMe, String experience, Integer kmRange, List<Integer> dogSizesList, Boolean lastCall, Integer paymentPerWalk) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
         this.age = age;
@@ -167,11 +168,11 @@ public class User implements Comparable<User> {
         this.kmRange = kmRange;
     }
 
-    public String getDogSizesList() {
+    public List<Integer> getDogSizesList() {
         return dogSizesList;
     }
 
-    public void setDogSizesList(String dogSizesList) {
+    public void setDogSizesList(List<Integer> dogSizesList) {
         this.dogSizesList = dogSizesList;
     }
 

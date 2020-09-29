@@ -197,4 +197,13 @@
     <string name="total_rating_reviews">Total rating this dog walker got from reviewers</string>
     <string name="all_reviews_about">All the reviews about</string>
     <string name="no_curr_reviews">No current reviews</string>
+    <string name="got_it">Got it</string>
+    <string name="profile_pho_change">Profile photo changed</string>
+    <string name="profile_photo_update_fail">Profile photo update failed</string>
+    <string name="display_cover_image">Display cover image</string>
+    <string name="take_a_new_cover_picture">Take a new cover picture</string>
+    <string name="choose_a_new_cover_picture">Choose a new cover picture</string>
+    <string name="no_cover_to_show">No cover picture to display</string>
+    <string name="failed_update_cover">Failed to update cover photo</string>
+    <string name="cover_photo_updated">Cover photo updated</string>
 </resources>

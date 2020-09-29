@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageDecoder;
 import android.graphics.drawable.ColorDrawable;
@@ -50,8 +49,6 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.dogapp.Activities.InChatActivity;
-import com.example.dogapp.Activities.LoginActivity;
-import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.Adapters.ReviewAdapter;
 import com.example.dogapp.Enteties.Review;
 import com.example.dogapp.Enteties.User;
@@ -64,11 +61,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -100,7 +95,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
     private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
     private DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers");
-    private String userID, imgURL; //for any user of the app
+    private String userID, imgURL, coverURL; //for any user of the app
     private boolean isMe;
     private boolean isWalker;
     private int ratingNum = 0;
@@ -113,7 +108,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private ProgressBar progressBar;
 
     //views
-    private ImageView profileIv, genderIv, typeIv;
+    private float scaleXProfile, scaleYProfile;
+    private ImageView profileIv, genderIv, typeIv, coverIv;
     private TextView nameTv, followingTv, followersTv, criticsCountTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
     private LinearLayout followersLayoutBtn, followingLayoutBtn, criticsLayoutBtn;
     private RelativeLayout aboutMeLayout;
@@ -121,11 +117,15 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private LinearLayout row1, row2, row3;
     private RelativeLayout dogSizeLayoutBtn, rangeLayoutBtn, lastCallLayoutBtn, paymentLayoutBtn, expLayoutBtn, ratingLayoutBtn;
     private TextView sizesTv, rangeTv, lastCallTv, paymentTv, expTv, ratingTv;
+    private TextView displayNameTv;
 
 
     private AppBarLayout appBarLayout;
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
+    private ProgressBar profileProgressBar;
+    private ProgressBar coverProgressBar;
+    private boolean isProfilePicture; //to define clicks form profile and cover
 
     //Dialogs
     private AlertDialog alertDialog;
@@ -194,7 +194,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         row1 = rootView.findViewById(R.id.row_1);
         row2 = rootView.findViewById(R.id.row_2);
         row3 = rootView.findViewById(R.id.row_3);
+        displayNameTv = rootView.findViewById(R.id.profile_frag_name_tv);
         profileIv = rootView.findViewById(R.id.profile_frag_iv);
+        coverIv = rootView.findViewById(R.id.profile_cover_iv);
+        scaleXProfile = profileIv.getScaleX();
+        scaleYProfile = profileIv.getScaleY();
         nameTv = rootView.findViewById(R.id.profile_frag_name_tv);
         genderAgeTv = rootView.findViewById(R.id.profile_item_gender_age_tv);
         locationTv = rootView.findViewById(R.id.profile_item_location_tv);
@@ -210,6 +214,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         chatFab = rootView.findViewById(R.id.chat_fab);
         followFab = rootView.findViewById(R.id.follow_fab);
         profileFab = rootView.findViewById(R.id.profile_fab);
+        profileProgressBar = rootView.findViewById(R.id.app_bar_progress_bar);
+        coverProgressBar = rootView.findViewById(R.id.cover_progress_bar);
 
         //dog walker relevant
         dogSizeLayoutBtn = rootView.findViewById(R.id.profile_list_dog_sizes_layout_item);
@@ -280,8 +286,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         profileIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                isProfilePicture = true; //entering profile picture
+
                 if (isMe) {
-                    buildProfileSheetDialog();
+                    buildProfileSheetDialog(true); //dialog for profile image, else cover image
                 } else {
                     View dialogView = getLayoutInflater().inflate(R.layout.image_display_dialog, null);
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -315,6 +324,26 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             }
         });
 
+        coverIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                isProfilePicture = false; //entering cover picture
+
+                if (isMe) {
+                    buildProfileSheetDialog(false); //cover photo not profile
+                } else {
+                    //load picture on dialog
+                }
+            }
+        });
+
+        try { //profile picture load
+            Glide.with(getActivity()).asBitmap().load(imgURL).into(profileIv);
+        } catch (Exception ex) {
+            ex.getMessage();
+        }
+
         //followers listeners
         followingLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -331,7 +360,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         //**************//
         loadAllReviews();
-
 
         return rootView;
     }
@@ -396,10 +424,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         criticsLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!reviewList.isEmpty()) {
+                if (!reviewList.isEmpty()) {
                     buildAllReviewsSheetDialog(); //build dialog first
                 } else {
-                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.no_curr_reviews,Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.no_curr_reviews, Snackbar.LENGTH_LONG).show();
                 }
                 //loadAllReviews(); //load reviews list after
             }
@@ -452,11 +480,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         bottomSheetDialog.show();
     }
 
-    //only if WALKER!!!!!!!!
+    //only if walker
     private void loadAllReviews() {
 
         //ONLY TAKING THE LIST OF REVIEWS WITHOUT RECYCLER
-
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reviews");
         reference.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -473,32 +500,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
             }
         });
-        /*progressBar.setVisibility(View.VISIBLE);
-
-        DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("Reviews");
-        reviewsRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                reviewList.clear();
-
-                if (snapshot.exists()) {
-                    for (DataSnapshot ds : snapshot.getChildren()) {
-                        Review review = ds.getValue(Review.class);
-                        reviewList.add(review);
-                    }
-
-                    reviewAdapter = new ReviewAdapter(reviewList, getActivity());
-                    reviewsRecyclerView.setAdapter(reviewAdapter);
-                }
-                progressBar.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                progressBar.setVisibility(View.GONE);
-            }
-        });*/
     }
 
     private void createCustomDialog(int icon, String title, String body) {
@@ -549,10 +550,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                     email = user.getEmail();
                     imgURL = user.getPhotoUrl();
+                    coverURL = user.getCoverUrl();
                     int age = user.getAge();
 
-                    try {
-                        Glide.with(getActivity()).asBitmap().load(imgURL).placeholder(R.drawable.account_icon).into(profileIv);
+                    try { //cover picture load
+                        Glide.with(getActivity()).asBitmap().load(coverURL).into(coverIv);
                     } catch (Exception ex) {
                         ex.getMessage();
                     }
@@ -562,7 +564,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     locationTv.setText(user.getLocation());
                     aboutMeTv.setText(user.getAboutMe());
 
-                    if(getActivity()!=null) {
+                    if (getActivity() != null) {
+
                         if (user.getGender() == 0) {
                             genderAgeTv.setText(getString(R.string.male) + ", " + age);
                             genderIv.setImageResource(R.drawable.man_icon);
@@ -577,6 +580,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                     //USER TYPE
                     if (!user.getType()) { // NOT WALKER
+
                         typeTv.setText(R.string.dog_owner);
                         typeIv.setImageResource(R.drawable.dog_owner_icon);
                         isWalker = false;
@@ -586,6 +590,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         criticsLayoutBtn.setVisibility(View.GONE);
 
                     } else { //WALKER
+
                         typeTv.setText(R.string.dog_walker);
                         typeIv.setImageResource(R.drawable.dog_walker_icon);
                         isWalker = true;
@@ -594,16 +599,25 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         row3.setVisibility(View.VISIBLE);
                         criticsLayoutBtn.setVisibility(View.VISIBLE);
 
-                        String sizes = user.getDogSizesList(); // 0 2 4
-                        String size = sizes.substring(1, sizes.length() - 1);
-                        Integer range = user.getKmRange();
-                        String exp = user.getExperience();
-                        boolean lastCall = user.getLastCall();
-                        int paymentPerWalk = user.getPaymentPerWalk();
+                        if (getActivity() != null) {
 
+                            Integer range = user.getKmRange();
+                            String exp = user.getExperience();
+                            boolean lastCall = user.getLastCall();
+                            int paymentPerWalk = user.getPaymentPerWalk();
 
-                        if(getActivity()!=null) {
-                            sizesTv.setText(size);
+                            //get values of the integer-array keys to present in display
+                            List<Integer> indexList = user.getDogSizesList(); //keys
+                            List<String> valuesList = new ArrayList<>(); //values
+
+                            String[] keysArr = getResources().getStringArray(R.array.dog_sizes_array);
+                            for (Integer index : indexList) {
+                                valuesList.add(keysArr[index]); //get actual RTL values of list
+                            }
+                            String result = valuesList.toString();
+                            result = result.substring(1, result.length() - 1);
+
+                            sizesTv.setText(result);
                             rangeTv.setText(range + " " + getActivity().getString(R.string.km));
                             if (lastCall) {
                                 lastCallTv.setText(R.string.yes);
@@ -612,13 +626,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                             }
                             paymentTv.setText(paymentPerWalk + " " + getString(R.string.ils));
                             expTv.setText(exp + " " + getString(R.string.years_of_exp));
-                        }
-                        assignWalkerListeners(size, range, lastCall, paymentPerWalk, exp);
-                    }
 
-                    //setting icons
-                    if (getActivity() != null) {
-                        //move here maybe
+                            assignWalkerListeners(result, range, lastCall, paymentPerWalk, exp);
+                        }
                     }
                 }
             }
@@ -877,7 +887,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 } else {
 
                     //dismiss this dialog
-                    loadAllReviews();
+                    //loadAllReviews();
 
                     //start loading dialog
 
@@ -899,6 +909,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                             //start loader here!!!!!!!!!!!!!!!!!!
 
+                            //update reviews list
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reviews").child(userID);
                             reference.setValue(reviewList).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -929,7 +940,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     }
 
-    private void buildProfileSheetDialog() {
+    private void buildProfileSheetDialog(boolean isProfile) {
+
+        //MOVE THIS
         if (Build.VERSION.SDK_INT >= 23) {
             int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
             int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -938,91 +951,202 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
 
 
-        final BottomSheetDialog bottomDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
-        View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_profile, null);
+        if (isProfile) {
+            final BottomSheetDialog bottomDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+            View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_profile, null);
 
-        LinearLayout showPic, takePic, selectPic;
-        showPic = bottomSheetView.findViewById(R.id.select_display);
-        takePic = bottomSheetView.findViewById(R.id.select_take_pic);
-        selectPic = bottomSheetView.findViewById(R.id.select_choose_pic);
+            LinearLayout showPic, takePic, selectPic;
+            showPic = bottomSheetView.findViewById(R.id.select_display);
+            takePic = bottomSheetView.findViewById(R.id.select_take_pic);
+            selectPic = bottomSheetView.findViewById(R.id.select_choose_pic);
 
-        showPic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                View dialogView = getLayoutInflater().inflate(R.layout.image_display_dialog, null);
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                alertDialog = builder.setView(dialogView).show();
-                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            showPic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    View dialogView = getLayoutInflater().inflate(R.layout.image_display_dialog, null);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    alertDialog = builder.setView(dialogView).show();
+                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-                final ProgressBar progressBar = dialogView.findViewById(R.id.img_loader_bar);
-                final ImageView imageView = dialogView.findViewById(R.id.img_display);
-                progressBar.setVisibility(View.VISIBLE);
+                    final ProgressBar progressBar = dialogView.findViewById(R.id.img_loader_bar);
+                    final ImageView imageView = dialogView.findViewById(R.id.img_display);
+                    progressBar.setVisibility(View.VISIBLE);
 
-                try {
-                    Glide.with(dialogView).load(imgURL).listener(new RequestListener<Drawable>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_upload_image, Snackbar.LENGTH_SHORT).show();
-                            progressBar.setVisibility(View.GONE);
-                            return false;
+                    try {
+                        Glide.with(dialogView).load(fUser.getPhotoUrl()).listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_upload_image, Snackbar.LENGTH_SHORT).show();
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                imageView.setVisibility(View.VISIBLE);
+                                return false;
+                            }
+                        }).into(imageView);
+                    } catch (Exception e) {
+
+                    }
+                    bottomDialog.dismiss();
+                }
+            });
+
+            takePic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, "Picture");
+                    values.put(MediaStore.Images.Media.DESCRIPTION, "from");
+                    fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                    startActivityForResult(intent, CAMERA_REQUEST);
+                    bottomDialog.dismiss();
+                }
+            });
+
+            selectPic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    //TODO ask permissions here!!!
+
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/*");
+                    startActivityForResult(intent, SELECT_IMAGE);
+                    bottomDialog.dismiss();
+                }
+            });
+
+            bottomDialog.setContentView(bottomSheetView);
+            bottomDialog.show();
+
+        } else { //cover photo
+
+            final BottomSheetDialog bottomDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+            View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_cover, null);
+
+            LinearLayout showPic, takePic, selectPic;
+            showPic = bottomSheetView.findViewById(R.id.cover_show_pic);
+            takePic = bottomSheetView.findViewById(R.id.cover_take_pic);
+            selectPic = bottomSheetView.findViewById(R.id.cover_choose_pic);
+
+            showPic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    if (!coverURL.equals("coverUrl")) {
+                        View dialogView = getLayoutInflater().inflate(R.layout.image_display_dialog, null);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        alertDialog = builder.setView(dialogView).show();
+                        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                        final ProgressBar progressBar = dialogView.findViewById(R.id.img_loader_bar);
+                        final ImageView imageView = dialogView.findViewById(R.id.img_display);
+                        progressBar.setVisibility(View.VISIBLE);
+
+                        try {
+                            Glide.with(dialogView).load(coverURL).listener(new RequestListener<Drawable>() {
+                                @Override
+                                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_upload_image, Snackbar.LENGTH_SHORT).show();
+                                    progressBar.setVisibility(View.GONE);
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                    progressBar.setVisibility(View.GONE);
+                                    imageView.setVisibility(View.VISIBLE);
+                                    return false;
+                                }
+                            }).into(imageView);
+                        } catch (Exception e) {
+
                         }
-
-                        @Override
-                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            progressBar.setVisibility(View.GONE);
-                            imageView.setVisibility(View.VISIBLE);
-                            return false;
-                        }
-                    }).into(imageView);
-                } catch (Exception e) {
+                        bottomDialog.dismiss();
+                    } else {
+                        bottomDialog.dismiss();
+                        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.no_cover_to_show, Snackbar.LENGTH_SHORT).show();
+                    }
 
                 }
-                bottomDialog.dismiss();
-            }
-        });
+            });
 
-        takePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Images.Media.TITLE, "Picture");
-                values.put(MediaStore.Images.Media.DESCRIPTION, "from");
-                fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            takePic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, "Picture");
+                    values.put(MediaStore.Images.Media.DESCRIPTION, "from");
+                    fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent, CAMERA_REQUEST);
-                bottomDialog.dismiss();
-            }
-        });
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                    startActivityForResult(intent, CAMERA_REQUEST);
+                    bottomDialog.dismiss();
+                }
+            });
 
-        selectPic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            selectPic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setType("image/*");
-                startActivityForResult(intent, SELECT_IMAGE);
-                bottomDialog.dismiss();
-            }
-        });
+                    //TODO ask permissions here!!!
 
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/*");
+                    startActivityForResult(intent, SELECT_IMAGE);
+                    bottomDialog.dismiss();
+                }
+            });
 
-        bottomDialog.setContentView(bottomSheetView);
-        bottomDialog.show();
+            bottomDialog.setContentView(bottomSheetView);
+            bottomDialog.show();
+
+        }
+
     }
 
     //profile pic animation transition
     @Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+    public void onOffsetChanged(final AppBarLayout appBarLayout, int verticalOffset) {
 
         if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
+
             // Collapsed
+            profileIv.animate().scaleX(scaleXProfile / 1.5f).scaleY(scaleYProfile / 1.5f).setDuration(300).start();
+            if (isMe) {
+                profileFab.hide();
+            } else {
+
+                if (followersList.contains(fUser.getUid())) {
+                    chatFab.hide();
+                }
+
+                followFab.hide();
+            }
 
 
         } else if (verticalOffset == 0) {
             // Expanded
+            profileIv.animate().scaleX(1f).scaleY(1f).setDuration(300).start();
+            if (isMe) {
+                profileFab.show();
+            } else {
+                if (followersList.contains(fUser.getUid())) {
+                    chatFab.show();
+                }
+                followFab.show();
+            }
 
+        } else {
+            //in the middle
         }
     }
 
@@ -1056,20 +1180,22 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == CAMERA_REQUEST) {
+
             if (resultCode == Activity.RESULT_OK) {
+
                 bitmap2 = null;
                 try {
                     bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                profileIv.setImageBitmap(bitmap1);
+                //profileIv.setImageBitmap(bitmap1);
                 //getActivity().getContentResolver().delete(fileUri,null, null); // have to transfer to register button
                 //pressTv.setVisibility(View.GONE);
                 isFromCamera = true;
                 if (bitmap1 != null) {
-                    profileIv.setImageBitmap(bitmap1);
-                    handleUpload(bitmap1);
+                    //profileIv.setImageBitmap(bitmap1);
+                    handleUpload(bitmap1, isProfilePicture);
 
                 }
                 //alertDialog.dismiss();
@@ -1080,7 +1206,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
 
         if (requestCode == SELECT_IMAGE) {
+
             if (resultCode == Activity.RESULT_OK && permission == true) {
+
                 fileUri = data.getData();
                 bitmap1 = null;
                 try {
@@ -1089,8 +1217,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     e.printStackTrace();
                 }
                 if (bitmap2 != null) {
-                    profileIv.setImageBitmap(bitmap2);
-                    handleUpload(bitmap2);
+                    //profileIv.setImageBitmap(bitmap2);
+                    handleUpload(bitmap2, isProfilePicture);
 
                 }
 
@@ -1099,6 +1227,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 if (isFromCamera)
                     getActivity().getContentResolver().delete(fileUri, null, null);
                 //alertDialog.dismiss();
+            } else {
+                //profileIv.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -1118,33 +1248,66 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     }
 
-    private void handleUpload(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Images").child(email + ".jpeg");
+    private void handleUpload(Bitmap bitmap, final boolean isProfilePicture) {
 
-        storage.putBytes(baos.toByteArray())
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        getDownloadUrl(storage);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+        if (isProfilePicture) {
 
-                    }
-                });
+            profileProgressBar.setVisibility(View.VISIBLE);
+            profileIv.setVisibility(View.INVISIBLE);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Profiles").child(email + ".jpeg");
+
+            storage.putBytes(baos.toByteArray())
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            getDownloadUrl(storage, true);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                        }
+                    });
+        } else {
+
+            coverProgressBar.setVisibility(View.VISIBLE);
+            coverIv.setVisibility(View.INVISIBLE);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Covers").child(email + ".jpeg");
+
+            storage.putBytes(baos.toByteArray())
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            getDownloadUrl(storage, false);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                        }
+                    });
+        }
 
     }
 
-    private void getDownloadUrl(StorageReference storage) {
+    private void getDownloadUrl(StorageReference storage, final boolean isProfilePicture) {
         storage.getDownloadUrl()
                 .addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        setUserProfileUrl(uri);
+                        if (isProfilePicture) {
+                            //update firebase user profile photo
+                            setUserProfileUrl(uri);
+                        } else {
+                            //update user field cover photo
+                            setUserCoverUrl(uri);
+                        }
 
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -1155,6 +1318,51 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         });
     }
 
+    //update cover photo url
+    private void setUserCoverUrl(final Uri uri) {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("coverUrl", uri.toString());
+        reference.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if (task.isSuccessful()) { //TODO local
+
+                    coverURL = uri.toString();
+
+                    try {
+                        Glide.with(getActivity()).asBitmap().load(uri).listener(new RequestListener<Bitmap>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_update_cover, Snackbar.LENGTH_SHORT).show();
+                                coverProgressBar.setVisibility(View.GONE);
+                                coverIv.setVisibility(View.VISIBLE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.cover_photo_updated, Snackbar.LENGTH_SHORT).show();
+                                coverProgressBar.setVisibility(View.GONE);
+                                coverIv.setVisibility(View.VISIBLE);
+                                return false;
+                            }
+                        }).into(coverIv);
+                    } catch (Exception ex) {
+                        ex.getMessage();
+                    }
+
+                } else {
+                    coverIv.setVisibility(View.VISIBLE);
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_update_cover, Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    //update profile photo url
     private void setUserProfileUrl(Uri uri) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -1167,7 +1375,36 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            usersRef.child(fUser.getUid()).child("photoUrl").setValue(fUser.getPhotoUrl().toString());
+                            usersRef.child(fUser.getUid()).child("photoUrl").setValue(fUser.getPhotoUrl().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+
+                                    if (task.isSuccessful()) {
+                                        try {
+                                            Glide.with(getActivity()).asBitmap().load(fUser.getPhotoUrl()).listener(new RequestListener<Bitmap>() {
+                                                @Override
+                                                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                                                    profileProgressBar.setVisibility(View.GONE);
+                                                    profileIv.setVisibility(View.VISIBLE);
+                                                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.profile_photo_update_fail, Snackbar.LENGTH_SHORT).show();
+                                                    return false;
+                                                }
+
+                                                @Override
+                                                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                                                    profileProgressBar.setVisibility(View.GONE);
+                                                    profileIv.setVisibility(View.VISIBLE);
+                                                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.profile_pho_change, Snackbar.LENGTH_SHORT).show();
+                                                    return false;
+                                                }
+                                            }).into(profileIv);
+                                        } catch (Exception ex) {
+                                            ex.getMessage();
+                                        }
+                                    }
+                                }
+                            });
+
                             final DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("Posts");
                             postRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
@@ -1175,7 +1412,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                     //update my posts
                                     if (snapshot.exists()) {
                                         for (DataSnapshot ds : snapshot.getChildren()) {
-                                            ModelPost post = ds.getValue(ModelPost.class);
+                                            final ModelPost post = ds.getValue(ModelPost.class);
                                             if (post.getuId().equals(fUser.getUid())) {
                                                 Map<String, Object> hashMap = new HashMap<>();
                                                 hashMap.put("uPic", fUser.getPhotoUrl().toString());
@@ -1183,16 +1420,18 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                             }
 
                                             //update my comments
-                                            /*postRef.child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
+                                            postRef.child(post.getpId()).child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                    if(snapshot.exists()) {
-                                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
+                                                    if (snapshot.exists()) {
+                                                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                                             ModelComment comment = dataSnapshot.getValue(ModelComment.class);
-                                                            if(comment.getuId().equals(fUser.getUid())) {
-                                                                Map<String,Object> picMap = new HashMap<>();
-                                                                picMap.put("uPic",fUser.getPhotoUrl().toString());
-                                                                postRef.child("Comments").child(comment.getcId()).updateChildren(picMap);
+                                                            if (comment.getuId().equals(fUser.getUid())) {
+
+                                                                Map<String, Object> picMap = new HashMap<>();
+                                                                picMap.put("uPic", fUser.getPhotoUrl().toString());
+                                                                postRef.child(post.getpId()).child("Comments").child(comment.getcId()).updateChildren(picMap);
                                                             }
                                                         }
                                                     }
@@ -1202,7 +1441,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                                 public void onCancelled(@NonNull DatabaseError error) {
 
                                                 }
-                                            });*/
+                                            });
+
                                         }
                                     }
                                 }
@@ -1212,14 +1452,12 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                                 }
                             });
-                            //listener.stopLoader();
-                            //listener.createConfirmDialog();
+
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            //listener.stopLoader();
                         }
                     });
         }

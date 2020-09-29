@@ -233,7 +233,7 @@ public class InChatActivity extends AppCompatActivity {
                 usernameTv.setText(user.getFullName());
                 //set icon image of user
                 try {
-                    Glide.with(InChatActivity.this).load(user.getPhotoUrl()).placeholder(R.drawable.account_icon).into(profileIv);
+                    Glide.with(InChatActivity.this).asBitmap().load(user.getPhotoUrl()).into(profileIv);
                 } catch (Exception ex) {
 
                 }
@@ -311,6 +311,7 @@ public class InChatActivity extends AppCompatActivity {
     private void sendMessage(String sender, String receiver, final String message) {
 
         String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+        String timeStamp = String.valueOf(System.currentTimeMillis());
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         //is seen default to false
@@ -319,6 +320,7 @@ public class InChatActivity extends AppCompatActivity {
         hashMap.put("receiver", receiver);
         hashMap.put("message", message);
         hashMap.put("time", currentTime);
+        hashMap.put("timeStamp", timeStamp);
         hashMap.put("isSeen", "false");
         reference.child("chats").push().setValue(hashMap);
 
@@ -396,6 +398,7 @@ public class InChatActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        setUserStatus(false);
         databaseReference.removeEventListener(isSeenListener);
     }
 

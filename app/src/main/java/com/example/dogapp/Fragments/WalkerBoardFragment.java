@@ -84,7 +84,6 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
 
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     User user = ds.getValue(User.class);
-                    System.out.println(user.getType() + " 77777777777777777777777777777");
                     //get only walkers
                     if (user.getType()) {
                         walkersList.add(user);

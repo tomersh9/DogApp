@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="8dp"
-    android:layout_marginStart="5dp">
+    android:layout_marginStart="5dp"
+    android:padding="8dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/chat_item_profile"
@@ -24,14 +24,24 @@
         android:textColor="@color/black"
         android:textSize="18sp" />
 
+    <TextView
+        android:id="@+id/chat_item_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/chat_message"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@id/chat_item_profile"
+        android:text="11/4/1995 07:30"
+        android:textSize="13sp" />
+
     <ImageView
         android:id="@+id/chat_seen_iv"
         android:layout_width="17dp"
         android:layout_height="17dp"
         android:layout_below="@id/chat_message"
         android:layout_alignParentStart="true"
-        android:src="@drawable/grey_vv"
         android:layout_marginStart="2dp"
-        android:visibility="gone"/>
+        android:src="@drawable/grey_vv"
+        android:visibility="gone" />
 
 </RelativeLayout>

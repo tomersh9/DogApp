@@ -164,7 +164,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         }
 
         try {
-            Glide.with(holder.itemView).asBitmap().load(user.getPhotoUrl()).placeholder(R.drawable.account_icon).into(holder.profileIv);
+            Glide.with(holder.itemView).asBitmap().load(user.getPhotoUrl()).placeholder(R.drawable.user_icon_png_128).into(holder.profileIv);
         } catch (Exception ex) {
             ex.getMessage();
         }

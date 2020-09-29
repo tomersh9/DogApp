@@ -98,7 +98,7 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
 
         //assign profile image with Glide
         try {
-            Glide.with(holder.itemView).asBitmap().load(walkerUser.getPhotoUrl()).placeholder(R.drawable.account_icon).into(holder.profileIv);
+            Glide.with(holder.itemView).asBitmap().load(walkerUser.getPhotoUrl()).placeholder(R.drawable.user_icon_png_128).into(holder.profileIv);
         } catch (Exception ex) {
             ex.getMessage();
         }

@@ -44,6 +44,8 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -82,10 +84,11 @@ public class WalkerFinalRegisterFragment extends Fragment {
     private Integer kmRange;
     private String rangeResult;
     private String experience;
-    private List<String> dogSizeList = new ArrayList<>();
-    private String dogSizeString;
+    private List<String> dogSizeList = new ArrayList<>(); //display on edit text
+    private List<Integer> dogValueList = new ArrayList<>(); //data to firebase list
     private boolean[] dogSizeChoices = {false, false, false, false, false};
-    private int[] dogSizeIntArr = {-1,-1,-1,-1,-1};
+    //private String dogSizeString;
+    //private int[] dogSizeIntArr = {-1, -1, -1, -1, -1};
 
 
     public static WalkerFinalRegisterFragment newInstance(String fullName, String email, String password, String date, Integer age, Integer gender, Boolean title, String location) {
@@ -106,7 +109,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
     public interface MyFinalWalkerFragmentListener {
 
         void onWalkerRegisterClick(String name, String email, String password, String date, Integer age, Integer gender, Boolean title, String location,
-                                   String aboutMe, String exp, Integer kmRange, String dogSizeList, Boolean lastCall, Integer payPerWalk);
+                                   String aboutMe, String exp, Integer kmRange, List<Integer> dogSizeList, Boolean lastCall, Integer payPerWalk);
 
         void startWalkerRegisterLoader();
 
@@ -203,31 +206,59 @@ public class WalkerFinalRegisterFragment extends Fragment {
                         .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (dogSizeList.isEmpty()) {
+
+                                /*StringBuffer sb = new StringBuffer();
+
+                                for (int i = 0; i < 5; i++) {
+                                    if (dogSizeIntArr[i] != -1) {
+                                        sb.append(dogSizeIntArr[i] + ",");
+                                    }
+                                }
+
+                                if (sb.length() == 0) {
+                                    sizeEt.getEditText().setText("");
+                                    dogSizeString = null;
+                                } else {
+                                    dogSizeString = sb.toString();
+                                    dogSizeString = dogSizeString.substring(0, dogSizeString.length() - 1); //remove ,
+                                    sizeEt.getEditText().setText(dogSizeList.toString());
+                                    Toast.makeText(getActivity(), dogSizeString + "", Toast.LENGTH_SHORT).show();
+                                }*/
+
+                                if(dogValueList.isEmpty()) {
                                     sizeEt.getEditText().setText("");
                                 } else {
+                                    //Collections.sort(dogSizeList);
+                                    Collections.sort(dogValueList);
+                                    //Collections.reverse(dogValueList); //small to big
                                     sizeEt.getEditText().setText(dogSizeList.toString());
-                                    dogSizeString = dogSizeList.toString();
                                 }
-                                for(int i = 0 ; i < 5 ; i ++) {
-                                    System.out.println(dogSizeIntArr[i] + "!!!!!!!!!!!!!");
 
-                                }
                             }
                         })
                         .setMultiChoiceItems(R.array.dog_sizes_array, dogSizeChoices, new DialogInterface.OnMultiChoiceClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                                 String[] sizeArr = getActivity().getResources().getStringArray(R.array.dog_sizes_array);
+                                if(isChecked) {
+                                    dogValueList.add((Integer) which); //actual data to store
+                                    dogSizeChoices[which] = true; //remember choices
+                                    dogSizeList.add(sizeArr[which]); //display only
+                                } else {
+                                    dogValueList.remove((Integer) which); //actual data to store
+                                    dogSizeChoices[which] = false; //remember choices
+                                    dogSizeList.remove(sizeArr[which]); //for display only
+                                }
+                                /*String[] sizeArr = getActivity().getResources().getStringArray(R.array.dog_sizes_array);
                                 if (isChecked) {
-                                    dogSizeList.add(sizeArr[which]);
-                                    dogSizeChoices[which] = true;
                                     dogSizeIntArr[which] = which;
+                                    dogSizeList.add(sizeArr[which]); //String list of numbers
+                                    dogSizeChoices[which] = true;
                                 } else {
                                     dogSizeList.remove(sizeArr[which]);
                                     dogSizeChoices[which] = false;
                                     dogSizeIntArr[which] = -1; //no choice
-                                }
+                                }*/
                             }
                         }).show();
             }
@@ -296,7 +327,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
                 paymentEt.clearFocus();
                 aboutEt.clearFocus();
 
-                isValid = validateFields(aboutMe, experience, kmRange, dogSizeList);
+                isValid = validateFields(aboutMe, experience, kmRange, dogValueList);
 
                 if (isValid) {
 
@@ -308,7 +339,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
                         handleUpload(bitmap2);
                     } else {
                         //TODO fix register without photo
-                        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.account_icon);
+                        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.user_icon_jpg_128);
                         handleUpload(bitmap);
                     }
 
@@ -317,7 +348,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
                     }
 
                     listener.onWalkerRegisterClick(fullName, email, password, dateOfBirth, age, gender, type, location,
-                            aboutMe, experience, kmRange, dogSizeString, lastCall, payPerWalk);
+                            aboutMe, experience, kmRange, dogValueList, lastCall, payPerWalk);
                 } else {
                     return;
                 }
@@ -327,7 +358,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
         return rootView;
     }
 
-    private boolean validateFields(String about, String exp, Integer range, List<String> sizeList) {
+    private boolean validateFields(String about, String exp, Integer range, List<Integer> sizeList) {
         if (!validateAboutMe(about) | !validateExperience(exp) | !validateRange(range) | !validateSizes(sizeList) | !validateLastCall() | !validatePayment()) {
             return false;
         }
@@ -364,7 +395,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
         }
     }
 
-    private boolean validateSizes(List<String> list) {
+    private boolean validateSizes(List<Integer> list) {
         if (list.isEmpty()) {
             sizeEt.setError(getString(R.string.field_empty_error));
             return false;
@@ -517,7 +548,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
     private void handleUpload(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Images").child(getArguments().getString("email") + ".jpeg");
+        final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Profiles").child(getArguments().getString("email") + ".jpeg");
 
         storage.putBytes(baos.toByteArray())
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
