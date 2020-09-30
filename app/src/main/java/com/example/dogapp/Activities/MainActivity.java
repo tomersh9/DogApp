@@ -1,6 +1,7 @@
 package com.example.dogapp.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -9,6 +10,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -17,6 +19,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
@@ -66,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     private final String FOLLOWERS_FRAGMENT_TAG = "followers_tag";
     private final String DISCOVER_FRIENDS_TAG = "discover_friends_tag";
 
+    //settings activity request
+    private final int SETTINGS_REQUEST = 1;
+
     //UI Layout
     private Toolbar toolbar;
     private AppBarLayout appBarLayout;
@@ -97,7 +103,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     //Change UI from notification
     BroadcastReceiver receiver;
 
-    @Override
+    //TODO check if there are problems
+    /*@Override
     protected void onStart() {
         super.onStart();
         firebaseAuth.addAuthStateListener(authStateListener);
@@ -107,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     protected void onStop() {
         super.onStop();
         firebaseAuth.removeAuthStateListener(authStateListener);
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -142,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         //initial set up of referencing
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setPopupTheme(R.style.PopupMenuItems);
 
         //references
         frameLayout = findViewById(R.id.fragment_container);
@@ -178,8 +186,9 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
         toolbar.setTitle(R.string.home);
 
+        //TODO check if there are problems
         //listens to events of fire base instances
-        authStateListener = new FirebaseAuth.AuthStateListener() {
+        /*authStateListener = new FirebaseAuth.AuthStateListener() {
 
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -189,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
                 }
             }
-        };
+        };*/
 
         //************* UPDATE USER FIELDS RETROACTIVE TO CREATION IN DATABASE*******************//
         //***************UPDATE DRAWER UI WITH USER FIELDS**************************//
@@ -378,6 +387,10 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         bottomNavBar.setSelectedItemId(R.id.bottom_profile);
                         break;
 
+                    case R.id.item_settings:
+                        startActivityForResult(new Intent(MainActivity.this,SettingsActivity.class),SETTINGS_REQUEST);
+                        break;
+
                     case R.id.item_sign_out:
                         setUserStatus(false);
                         firebaseAuth.signOut();
@@ -394,13 +407,23 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         });
     }
 
+    //change from settings activity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == SETTINGS_REQUEST) {
+            //save and update user fields in firebase
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        }
+    }
+
     //close drawer
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            //super.onBackPressed();
+        } else  {
             //get current fragment after
             Fragment currFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (currFragment != null) {

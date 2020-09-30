@@ -36,6 +36,8 @@
             </intent-filter>
         </service>
 
+        <activity android:name=".Activities.SettingsActivity"/>
+
     </application>
 
 </manifest>

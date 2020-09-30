@@ -2,9 +2,13 @@ package com.example.dogapp.Fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +22,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.dogapp.Adapters.WalkerAdapter;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -27,6 +33,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, WalkerAdapter.MyWalkerAdapterListener {
@@ -41,7 +49,7 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
     private SwipeRefreshLayout swipeRefreshLayout;
 
     //Firebase
-    private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+    //private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +75,25 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
         //init list of walkers
         walkersList = new ArrayList<>();
         getAllWalkers();
+
+       /* priceFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Collections.sort(walkersList, new Comparator<User>() {
+                    @Override
+                    public int compare(User user1, User user2) {
+                        if(user1.getPaymentPerWalk() > user2.getPaymentPerWalk()) {
+                            return 1;
+                        } else if(user1.getPaymentPerWalk() < user2.getPaymentPerWalk() ) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                adapter.notifyDataSetChanged();
+            }
+        });*/
 
         return rootView;
     }
@@ -107,9 +134,68 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
         });
     }
 
+
+
     @Override
     public void onWalkerClicked(int pos) {
         //move to walker's profile fragment
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.walker_board_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.price_low_to_high_item_sub_menu:
+                Collections.sort(walkersList, new Comparator<User>() {
+                    @Override
+                    public int compare(User user1, User user2) {
+                        if(user1.getPaymentPerWalk() > user2.getPaymentPerWalk()) {
+                            return 1;
+                        } else if (user1.getPaymentPerWalk() < user2.getPaymentPerWalk()) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                adapter.notifyDataSetChanged();
+                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.pricing_low_to_high,Snackbar.LENGTH_SHORT).show();
+                break;
+
+            case R.id.price_high_to_low_item_sub_menu:
+                Collections.sort(walkersList, new Comparator<User>() {
+                    @Override
+                    public int compare(User user1, User user2) {
+                        if(user1.getPaymentPerWalk() < user2.getPaymentPerWalk()) {
+                            return 1;
+                        } else if (user1.getPaymentPerWalk() > user2.getPaymentPerWalk()) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                adapter.notifyDataSetChanged();
+                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.pricing_high_to_low,Snackbar.LENGTH_SHORT).show();
+                break;
+
+            case R.id.rating_high_to_low_item_sub_menu:
+                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.rating_high_to_low,Snackbar.LENGTH_SHORT).show();
+                break;
+
+            case R.id.rating_low_to_high_item_sub_menu:
+                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.rating_low_to_high,Snackbar.LENGTH_SHORT).show();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

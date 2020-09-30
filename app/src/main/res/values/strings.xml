@@ -51,6 +51,12 @@
         <item>@string/other</item>
     </string-array>
 
+    <string-array name="genders_pref_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <integer-array name="gender_values">
         <item>0</item>
         <item>1</item>
@@ -206,4 +212,34 @@
     <string name="no_cover_to_show">No cover picture to display</string>
     <string name="failed_update_cover">Failed to update cover photo</string>
     <string name="cover_photo_updated">Cover photo updated</string>
+    <string name="sort_by_price_low_to_high">Sort by price (low to high)</string>
+    <string name="sort_by_price_high_to_low">Sort by price (high to low)</string>
+    <string name="sort_by_rating_low_to_high">Sort by rating (low to high)</string>
+    <string name="sort_by_rating_high_to_low">Sort by rating (high to low)</string>
+    <string name="pricing_low_to_high">Pricing low to high</string>
+    <string name="pricing_high_to_low">Pricing high to low</string>
+    <string name="rating_high_to_low">Rating high to low</string>
+    <string name="rating_low_to_high">Rating low to high</string>
+    <string name="change_your_disp_name">Change your display name</string>
+    <string name="edit_your_about_me">Edit your About Me</string>
+    <string name="display_name">Display name</string>
+    <string name="update_dis_name">Updating you display name</string>
+    <string name="dis_name_update_succ">Display name updated successfully!</string>
+    <string name="now_displayed_as">Now displayed as</string>
+    <string name="change_success">Change successful!</string>
+    <string name="applying_change">Applying change...</string>
+    <string name="about_me_changed">About me has changed</string>
+    <string name="not_found">not found</string>
+    <string name="invalid_address">Invalid email address</string>
+    <string name="the_address">The address</string>
+    <string name="account_settings">Account settings</string>
+    <string name="personal_info">Personal information</string>
+    <string name="here_can_change_name">Here you can change your display name</string>
+    <string name="identify_different">Identify differently</string>
+    <string name="let_people_know_more">Let people know more about you</string>
+    <string name="here_can_change_email">Here you can change your account email address</string>
+    <string name="we_send_you_email_with_pass_reset">We\'ll send you an email with a password reset</string>
+    <string name="change_email_add">Change Email address</string>
+    <string name="enter_new_email_address">Enter new email address</string>
+    <string name="pass_reset">Password reset</string>
 </resources>

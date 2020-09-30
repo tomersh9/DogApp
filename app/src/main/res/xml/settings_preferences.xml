@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="@string/personal_info"
+        app:iconSpaceReserved="false">
+
+        <EditTextPreference
+            android:dialogTitle="@string/change_your_disp_name"
+            android:key="name_et_preference"
+            android:summary="@string/here_can_change_name"
+            android:title="@string/display_name"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:dialogTitle="@string/select_gender"
+            android:key="gender_list_preference"
+            android:summary="@string/identify_different"
+            android:title="@string/gender"
+            app:entries="@array/gender_key"
+            app:entryValues="@array/genders_pref_values"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:dialogMessage="@string/edit_your_about_me"
+            android:dialogTitle="@string/about_me"
+            android:key="about_me_et_preference"
+            android:summary="@string/let_people_know_more"
+            android:title="@string/about_me"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/account_settings"
+        app:iconSpaceReserved="false">
+
+        <!--<EditTextPreference
+            android:dialogTitle="@string/enter_new_email_address"
+            android:key="change_email_pref_et"
+            android:summary="@string/here_can_change_email"
+            android:title="@string/change_email_add"
+            app:iconSpaceReserved="false" />-->
+
+        <EditTextPreference
+            android:dialogMessage="@string/hint_forgot_pass"
+            android:dialogTitle="@string/pass_reset"
+            android:key="send_pass_reset_pref"
+            android:summary="@string/we_send_you_email_with_pass_reset"
+            android:title="@string/pass_reset"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -22,11 +22,11 @@
         android:layout_below="@id/fail_dialog_icon"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
+        android:paddingHorizontal="10dp"
         android:gravity="center"
-        style="@style/TextAppearance.AppCompat.Body2"
+        style="@style/TextAppearance.AppCompat.Body1"
         android:text="@string/went_wrong"
-
-        android:textSize="35sp" />
+        android:textSize="30sp" />
 
     <TextView
         android:id="@+id/fail_body_tv"

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/filter_item_menu"
+        android:icon="@drawable/ic_filter_list_black_24dp"
+        android:title="filter"
+        app:showAsAction="always"
+        app:iconTint="@color/white">
+
+        <menu>
+
+            <item android:id="@+id/price_low_to_high_item_sub_menu"
+                android:title="@string/sort_by_price_low_to_high" />
+
+            <item android:id="@+id/price_high_to_low_item_sub_menu"
+                android:title="@string/sort_by_price_high_to_low" />
+
+            <item android:id="@+id/rating_low_to_high_item_sub_menu"
+                android:title="@string/sort_by_rating_low_to_high" />
+
+            <item android:id="@+id/rating_high_to_low_item_sub_menu"
+                android:title="@string/sort_by_rating_high_to_low" />
+
+        </menu>
+    </item>
+</menu>

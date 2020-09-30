@@ -96,7 +96,8 @@
                         <com.google.android.material.textfield.TextInputEditText
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="ספר קצת על עצמך" />
+                            android:hint="ספר קצת על עצמך"
+                            android:minLines="4" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -110,7 +111,6 @@
                         android:hint="שנות ניסיון"
                         android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
-                        app:endIconMode="clear_text"
                         app:errorEnabled="true"
                         app:helperText="כמה שנות ניסיון צברת בתור דוג ווקר?"
                         app:startIconDrawable="@drawable/ic_work_black_24dp">
