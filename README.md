@@ -1,5 +1,5 @@
 # DogApp
-Social Media Android App for Dog Owners.
+Social Media Android App for Dog Owners.\n
 Technology Used: Android Development, Java.
 Functionality:
 The DogApp is basically like a social media platform for dog owners and dog walkers, which allows users to connect with one another in order to have a good time for their dog and themselves.
