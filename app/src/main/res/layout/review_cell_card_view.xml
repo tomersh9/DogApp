@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="5dp"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
+    android:paddingHorizontal="5dp"
     android:paddingTop="10dp">
 
     <LinearLayout
@@ -16,8 +16,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:paddingVertical="15dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingVertical="15dp">
 
 
             <de.hdodenhof.circleimageview.CircleImageView
@@ -58,21 +58,24 @@
 
             </RelativeLayout>
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/rating_and_time_layout_cell"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/review_card_content_layout"
                 android:layout_marginStart="15dp"
-                android:layout_toEndOf="@id/review_img">
+                android:layout_toEndOf="@id/review_img"
+                android:gravity="center"
+                android:orientation="horizontal">
 
 
                 <LinearLayout
                     android:id="@+id/details_review_layout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:orientation="horizontal">
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/time_review_tv"
@@ -80,25 +83,27 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:paddingHorizontal="2dp"
-                        android:text="10/10/2020" />
+                        />
 
                     <TextView
                         android:id="@+id/location_review_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="3dp"
-                        android:gravity="center"
-                        android:paddingHorizontal="2dp"
-                        android:text="חולון, ישראל" />
+                        android:layout_gravity="start"
+                        android:gravity="start"
+                        android:paddingHorizontal="2dp" />
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/review_cell_stars_layout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
+                    android:layout_weight="1"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="5dp">
 
@@ -149,7 +154,7 @@
 
                 </LinearLayout>
 
-            </RelativeLayout>
+            </LinearLayout>
 
         </RelativeLayout>
 
@@ -159,7 +164,7 @@
             android:layout_height="0.3dp"
             android:layout_gravity="bottom"
             android:layout_marginTop="2dp"
-            android:background="@android:color/darker_gray"/>
+            android:background="@android:color/darker_gray" />
 
     </LinearLayout>
 

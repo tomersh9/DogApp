@@ -1,5 +1,6 @@
 package com.example.dogapp.Fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -48,8 +50,24 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    //Firebase
-    //private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+    //firebase
+    private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+
+    public interface MyWalkerBoardFragmentListener {
+        void onWalkerClicked(String userID, String imgURL);
+    }
+
+    private MyWalkerBoardFragmentListener listener;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            listener = (MyWalkerBoardFragmentListener) context; //the activity is the callback
+        } catch (ClassCastException ex) {
+            throw new ClassCastException("The Activity must implement MyWalkerBoardFragmentListener interface");
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,25 +94,6 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
         walkersList = new ArrayList<>();
         getAllWalkers();
 
-       /* priceFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Collections.sort(walkersList, new Comparator<User>() {
-                    @Override
-                    public int compare(User user1, User user2) {
-                        if(user1.getPaymentPerWalk() > user2.getPaymentPerWalk()) {
-                            return 1;
-                        } else if(user1.getPaymentPerWalk() < user2.getPaymentPerWalk() ) {
-                            return -1;
-                        } else {
-                            return 0;
-                        }
-                    }
-                });
-                adapter.notifyDataSetChanged();
-            }
-        });*/
-
         return rootView;
     }
 
@@ -118,7 +117,7 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
                 }
 
                 //assign list to recyclerview
-                adapter = new WalkerAdapter(walkersList, getActivity());
+                adapter = new WalkerAdapter(walkersList, getActivity(),fUser.getUid());
                 recyclerView.setAdapter(adapter);
                 adapter.setWalkerAdapterListener(WalkerBoardFragment.this);
                 adapter.notifyDataSetChanged();
@@ -135,16 +134,17 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
     }
 
 
-
     @Override
     public void onWalkerClicked(int pos) {
         //move to walker's profile fragment
+        User user = walkersList.get(pos);
+        listener.onWalkerClicked(user.getId(), user.getPhotoUrl());
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.walker_board_menu,menu);
+        inflater.inflate(R.menu.walker_board_menu, menu);
     }
 
     @Override
@@ -152,11 +152,27 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
 
         switch (item.getItemId()) {
 
+            case R.id.walker_menu_item_search:
+                SearchView searchView = (SearchView) item.getActionView();
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        adapter.getFilter().filter(newText);
+                        return false;
+                    }
+                });
+                break;
+
             case R.id.price_low_to_high_item_sub_menu:
                 Collections.sort(walkersList, new Comparator<User>() {
                     @Override
                     public int compare(User user1, User user2) {
-                        if(user1.getPaymentPerWalk() > user2.getPaymentPerWalk()) {
+                        if (user1.getPaymentPerWalk() > user2.getPaymentPerWalk()) {
                             return 1;
                         } else if (user1.getPaymentPerWalk() < user2.getPaymentPerWalk()) {
                             return -1;
@@ -165,15 +181,15 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
                         }
                     }
                 });
-                adapter.notifyDataSetChanged();
-                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.pricing_low_to_high,Snackbar.LENGTH_SHORT).show();
+                adapter.notifyItemRangeChanged(0, walkersList.size());
+                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.pricing_low_to_high, Snackbar.LENGTH_SHORT).show();
                 break;
 
             case R.id.price_high_to_low_item_sub_menu:
                 Collections.sort(walkersList, new Comparator<User>() {
                     @Override
                     public int compare(User user1, User user2) {
-                        if(user1.getPaymentPerWalk() < user2.getPaymentPerWalk()) {
+                        if (user1.getPaymentPerWalk() < user2.getPaymentPerWalk()) {
                             return 1;
                         } else if (user1.getPaymentPerWalk() > user2.getPaymentPerWalk()) {
                             return -1;
@@ -182,16 +198,77 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
                         }
                     }
                 });
-                adapter.notifyDataSetChanged();
-                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.pricing_high_to_low,Snackbar.LENGTH_SHORT).show();
+                adapter.notifyItemRangeChanged(0, walkersList.size());
+                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.pricing_high_to_low, Snackbar.LENGTH_SHORT).show();
                 break;
 
             case R.id.rating_high_to_low_item_sub_menu:
-                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.rating_high_to_low,Snackbar.LENGTH_SHORT).show();
+                Collections.sort(walkersList, new Comparator<User>() {
+                    @Override
+                    public int compare(User user1, User user2) {
+                        if (user1.getRating() < user2.getRating()) {
+                            return 1;
+                        } else if (user1.getRating() > user2.getRating()) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                adapter.notifyItemRangeChanged(0, walkersList.size());
+                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.rating_high_to_low, Snackbar.LENGTH_SHORT).show();
                 break;
 
             case R.id.rating_low_to_high_item_sub_menu:
-                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.rating_low_to_high,Snackbar.LENGTH_SHORT).show();
+                Collections.sort(walkersList, new Comparator<User>() {
+                    @Override
+                    public int compare(User user1, User user2) {
+                        if (user1.getRating() > user2.getRating()) {
+                            return 1;
+                        } else if (user1.getRating() < user2.getRating()) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                adapter.notifyItemRangeChanged(0, walkersList.size());
+                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.rating_low_to_high, Snackbar.LENGTH_SHORT).show();
+                break;
+
+            case R.id.exp_high_to_low_item_sub_menu:
+                Collections.sort(walkersList, new Comparator<User>() {
+                    @Override
+                    public int compare(User user1, User user2) {
+
+                        if (user1.getExperience() < user2.getExperience()) {
+                            return 1;
+                        } else if (user1.getExperience() > user2.getExperience()) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                adapter.notifyItemRangeChanged(0, walkersList.size());
+                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.exp_high_to_low, Snackbar.LENGTH_SHORT).show();
+                break;
+
+            case R.id.exp_low_to_high_item_sub_menu:
+                Collections.sort(walkersList, new Comparator<User>() {
+                    @Override
+                    public int compare(User user1, User user2) {
+                        if (user1.getExperience() > user2.getExperience()) {
+                            return 1;
+                        } else if (user1.getExperience() < user2.getExperience()) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                adapter.notifyItemRangeChanged(0, walkersList.size());
+                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.exp_low_to_high, Snackbar.LENGTH_SHORT).show();
                 break;
         }
 

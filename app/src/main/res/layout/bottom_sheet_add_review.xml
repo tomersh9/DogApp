@@ -54,78 +54,93 @@
             android:padding="7dp"
             android:text="כתוב ביקורת מכבדת על שירותיו של NAME כדי לתת פידבק לנותן השירות שגם משתמשים אחרים יוכלו לראות" />
 
+        <ProgressBar
+            android:id="@+id/review_sheet_progress_bar"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/colorPrimary"
+            android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/forget_star_bottom_sheet_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/bottom_sheet_star_layout"
-            android:layout_centerHorizontal="true"
-            android:textSize="11sp"
-            android:text="(אל תשכח להשאיר דירוג התואם את השירות)" />
-
-        <LinearLayout
-            android:id="@+id/bottom_sheet_star_layout"
+        <RelativeLayout
+            android:id="@+id/hide_bottom_review"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="5dp"
-            android:gravity="center"
-            android:layout_below="@id/bottom_sheet_add_review_desc"
-            android:orientation="horizontal"
-            android:padding="5dp">
+            android:layout_below="@id/bottom_sheet_add_review_desc">
 
-            <ImageView
-                android:id="@+id/star_1_sheet"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginHorizontal="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:src="@drawable/star_empty_128" />
+            <TextView
+                android:id="@+id/forget_star_bottom_sheet_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bottom_sheet_star_layout"
+                android:layout_centerHorizontal="true"
+                android:text="(אל תשכח להשאיר דירוג התואם את השירות)"
+                android:textSize="11sp" />
 
-            <ImageView
-                android:id="@+id/star_2_sheet"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginHorizontal="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:src="@drawable/star_empty_128" />
 
-            <ImageView
-                android:id="@+id/star_3_sheet"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginHorizontal="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:src="@drawable/star_empty_128" />
+            <LinearLayout
+                android:id="@+id/bottom_sheet_star_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="5dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="5dp">
 
-            <ImageView
-                android:id="@+id/star_4_sheet"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginHorizontal="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:src="@drawable/star_empty_128" />
+                <ImageView
+                    android:id="@+id/star_1_sheet"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/star_empty_128" />
 
-            <ImageView
-                android:id="@+id/star_5_sheet"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginHorizontal="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:src="@drawable/star_empty_128" />
+                <ImageView
+                    android:id="@+id/star_2_sheet"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/star_empty_128" />
 
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/star_3_sheet"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/star_empty_128" />
+
+                <ImageView
+                    android:id="@+id/star_4_sheet"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/star_empty_128" />
+
+                <ImageView
+                    android:id="@+id/star_5_sheet"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/star_empty_128" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/send_review_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/forget_star_bottom_sheet_tv"
+            android:layout_below="@id/hide_bottom_review"
             android:layout_marginHorizontal="10dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"

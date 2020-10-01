@@ -24,6 +24,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/profile_dialog_icon"
         android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:padding="3dp"
         android:text="@string/good_with_dogs_at_sizes"
         android:textSize="17sp" />
 

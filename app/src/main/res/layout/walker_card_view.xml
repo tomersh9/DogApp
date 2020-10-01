@@ -16,6 +16,17 @@
         android:background="?attr/selectableItemBackground"
         android:paddingVertical="7dp">
 
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/walker_cell_me_icon"
+            android:layout_width="15dp"
+            android:visibility="visible"
+            android:layout_height="15dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"
+            android:src="@color/colorPrimary" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -86,28 +97,28 @@
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginHorizontal="2dp"
-                    android:src="@drawable/star_full_128" />
+                    android:src="@drawable/star_empty_128" />
 
                 <ImageView
                     android:id="@+id/star_2"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginHorizontal="2dp"
-                    android:src="@drawable/star_full_128" />
+                    android:src="@drawable/star_empty_128" />
 
                 <ImageView
                     android:id="@+id/star_3"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginHorizontal="2dp"
-                    android:src="@drawable/star_full_128" />
+                    android:src="@drawable/star_empty_128" />
 
                 <ImageView
                     android:id="@+id/star_4"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginHorizontal="2dp"
-                    android:src="@drawable/star_full_128" />
+                    android:src="@drawable/star_empty_128" />
 
                 <ImageView
                     android:id="@+id/star_5"

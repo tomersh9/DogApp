@@ -18,16 +18,17 @@ public class User implements Comparable<User> {
     private Boolean status;
     private String timeStamp;
     private String aboutMe;
-    private String experience;
+    private Integer experience;
     private Integer kmRange;
     private List<Integer> dogSizesList;
     private Boolean lastCall;
     private Integer paymentPerWalk;
+    private Integer rating;
 
     public User() {
     }
 
-    public User(String fullName, String dateOfBirth, Integer age, String email, Integer gender, Boolean type, String location, String photoUrl, String coverUrl, String id, Boolean status, String timeStamp, String aboutMe, String experience, Integer kmRange, List<Integer> dogSizesList, Boolean lastCall, Integer paymentPerWalk) {
+    public User(String fullName, String dateOfBirth, Integer age, String email, Integer gender, Boolean type, String location, String photoUrl, String coverUrl, String id, Boolean status, String timeStamp, String aboutMe, Integer experience, Integer kmRange, List<Integer> dogSizesList, Boolean lastCall, Integer paymentPerWalk, Integer rating) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
         this.age = age;
@@ -46,6 +47,7 @@ public class User implements Comparable<User> {
         this.dogSizesList = dogSizesList;
         this.lastCall = lastCall;
         this.paymentPerWalk = paymentPerWalk;
+        this.rating = rating;
     }
 
     public String getFullName() {
@@ -152,11 +154,11 @@ public class User implements Comparable<User> {
         this.aboutMe = aboutMe;
     }
 
-    public String getExperience() {
+    public Integer getExperience() {
         return experience;
     }
 
-    public void setExperience(String experience) {
+    public void setExperience(Integer experience) {
         this.experience = experience;
     }
 
@@ -190,6 +192,14 @@ public class User implements Comparable<User> {
 
     public void setPaymentPerWalk(Integer paymentPerWalk) {
         this.paymentPerWalk = paymentPerWalk;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
     }
 
     @Override

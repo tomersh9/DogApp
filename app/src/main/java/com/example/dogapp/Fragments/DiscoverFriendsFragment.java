@@ -178,7 +178,14 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
         users.remove(user);
         adapter.notifyItemRemoved(pos);
         followingRef.child(fUser.getUid()).setValue(followingList);
-        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_LONG)
+                .setAction(R.string.visit_profile, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUrl());
+                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+                    }
+                }).show();
 
         //get user's followers list
         followersRef.child(user.getId()).addListenerForSingleValueEvent(new ValueEventListener() {

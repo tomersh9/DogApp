@@ -79,6 +79,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +101,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private boolean isWalker;
     private int ratingNum = 0;
     private String otherUserName;
+    private Integer walkerRating;
 
     //reviews list (only for walkers)
     private List<Review> reviewList = new ArrayList<>();
@@ -115,9 +117,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private RelativeLayout aboutMeLayout;
     private FloatingActionButton chatFab, followFab, profileFab;
     private LinearLayout row1, row2, row3;
-    private RelativeLayout dogSizeLayoutBtn, rangeLayoutBtn, lastCallLayoutBtn, paymentLayoutBtn, expLayoutBtn, ratingLayoutBtn;
+    private RelativeLayout dogSizeLayoutBtn, rangeLayoutBtn, lastCallLayoutBtn, paymentLayoutBtn, expLayoutBtn, locationLayoutBtn;
     private TextView sizesTv, rangeTv, lastCallTv, paymentTv, expTv, ratingTv;
     private TextView displayNameTv;
+
+    //rating stars
+    private RelativeLayout  toolbarStarsLayout;
+    private ImageView starView1, starView2, starView3, starView4, starView5;
 
 
     private AppBarLayout appBarLayout;
@@ -151,6 +157,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         void onProfileFollowersClick(String userID);
 
         void onProfileBackPress();
+
+        void onProfileSettingsClick();
     }
 
     private OnProfileFragmentListener listener;
@@ -216,14 +224,16 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         profileFab = rootView.findViewById(R.id.profile_fab);
         profileProgressBar = rootView.findViewById(R.id.app_bar_progress_bar);
         coverProgressBar = rootView.findViewById(R.id.cover_progress_bar);
+        locationLayoutBtn = rootView.findViewById(R.id.profile_list_location_layout_item);
 
+        //TODO assign only needed!
         //dog walker relevant
         dogSizeLayoutBtn = rootView.findViewById(R.id.profile_list_dog_sizes_layout_item);
         rangeLayoutBtn = rootView.findViewById(R.id.profile_list_km_range_layout_item);
         lastCallLayoutBtn = rootView.findViewById(R.id.profile_list_last_call_layout_item);
         paymentLayoutBtn = rootView.findViewById(R.id.profile_list_payment_layout_item);
         expLayoutBtn = rootView.findViewById(R.id.profile_list_experience_layout_item);
-        ratingLayoutBtn = rootView.findViewById(R.id.profile_list_rating_layout_item);
+        //ratingLayoutBtn = rootView.findViewById(R.id.profile_list_rating_layout_item);
         criticsLayoutBtn = rootView.findViewById(R.id.critics_layout);
         criticsCountTv = rootView.findViewById(R.id.critics_count_tv);
         sizesTv = rootView.findViewById(R.id.profile_item_dog_sizes_tv);
@@ -231,7 +241,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         lastCallTv = rootView.findViewById(R.id.profile_item_last_call_tv);
         paymentTv = rootView.findViewById(R.id.profile_item_payment_tv);
         expTv = rootView.findViewById(R.id.profile_item_exp_tv);
-        ratingTv = rootView.findViewById(R.id.profile_item_rating_tv);
+        //ratingTv = rootView.findViewById(R.id.profile_item_rating_tv);
+        toolbarStarsLayout = rootView.findViewById(R.id.profile_toolbar_stars_hide);
+        starView1 = rootView.findViewById(R.id.star_1_bar);
+        starView2 = rootView.findViewById(R.id.star_2_bar);
+        starView3 = rootView.findViewById(R.id.star_3_bar);
+        starView4 = rootView.findViewById(R.id.star_4_bar);
+        starView5 = rootView.findViewById(R.id.star_5_bar);
 
         //profile assign
         loadProfileViews();
@@ -244,7 +260,15 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             profileFab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Settings", Snackbar.LENGTH_LONG).show();
+                    listener.onProfileSettingsClick();
+                }
+            });
+
+            //change location in profile
+            locationLayoutBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
                 }
             });
 
@@ -281,6 +305,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         appBarLayout = rootView.findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(this);
         toolbar.setTitle("");
+
 
         //profile pic click event
         profileIv.setOnClickListener(new View.OnClickListener() {
@@ -332,8 +357,37 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                 if (isMe) {
                     buildProfileSheetDialog(false); //cover photo not profile
+
+                } else if (!coverURL.equals("coverUrl")) {
+                    View dialogView = getLayoutInflater().inflate(R.layout.image_display_dialog, null);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    alertDialog = builder.setView(dialogView).show();
+                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                    final ProgressBar progressBar = dialogView.findViewById(R.id.img_loader_bar);
+                    final ImageView imageView = dialogView.findViewById(R.id.img_display);
+                    progressBar.setVisibility(View.VISIBLE);
+
+                    try {
+                        Glide.with(dialogView).load(coverURL).listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                imageView.setVisibility(View.VISIBLE);
+                                return false;
+                            }
+                        }).into(imageView);
+                    } catch (Exception e) {
+
+                    }
                 } else {
-                    //load picture on dialog
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.no_cover_to_show, Snackbar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -407,28 +461,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             }
         });
 
-        ratingLayoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isMe) { //can make review
-                    buildReviewAddSheetDialog();
-                } else { //can only see my rating
-
-                    //TODO put actual data
-                    createCustomDialog(R.drawable.icon_star_100, getString(R.string.review_rating), getString(R.string.total_rating_reviews));
-                }
-
-            }
-        });
-
         criticsLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!reviewList.isEmpty()) {
-                    buildAllReviewsSheetDialog(); //build dialog first
-                } else {
-                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.no_curr_reviews, Snackbar.LENGTH_LONG).show();
-                }
+                buildAllReviewsSheetDialog();
                 //loadAllReviews(); //load reviews list after
             }
         });
@@ -440,8 +476,24 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_all_reviews, null);
 
         progressBar = bottomSheetView.findViewById(R.id.reviews_progress_bar);
+        Button addReviewBtn = bottomSheetView.findViewById(R.id.add_review_btn);
         TextView title = bottomSheetView.findViewById(R.id.bottom_sheet_reviews_title);
         title.setText(getString(R.string.all_reviews_about) + " " + otherUserName);
+        final TextView noCurrReviews = bottomSheetView.findViewById(R.id.no_curr_reviews);
+
+        if (!isMe) {
+            addReviewBtn.setVisibility(View.VISIBLE);
+            addReviewBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    buildReviewAddSheetDialog();
+                    bottomSheetDialog.dismiss();
+                }
+            });
+
+        } else {
+            addReviewBtn.setVisibility(View.GONE);
+        }
 
         reviewsRecyclerView = bottomSheetView.findViewById(R.id.reviews_recycler);
         reviewsRecyclerView.setHasFixedSize(true);
@@ -463,10 +515,17 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         reviewList.add(review);
                     }
 
+                    Collections.reverse(reviewList);
                     reviewAdapter = new ReviewAdapter(reviewList, getActivity());
                     reviewsRecyclerView.setAdapter(reviewAdapter);
                 }
                 progressBar.setVisibility(View.GONE);
+
+                if(!reviewList.isEmpty()) {
+                    noCurrReviews.setVisibility(View.GONE);
+                } else {
+                    noCurrReviews.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -588,6 +647,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         row2.setVisibility(View.GONE);
                         row3.setVisibility(View.GONE);
                         criticsLayoutBtn.setVisibility(View.GONE);
+                        toolbarStarsLayout.setVisibility(View.GONE);
 
                     } else { //WALKER
 
@@ -598,11 +658,20 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         row2.setVisibility(View.VISIBLE);
                         row3.setVisibility(View.VISIBLE);
                         criticsLayoutBtn.setVisibility(View.VISIBLE);
+                        toolbarStarsLayout.setVisibility(View.VISIBLE);
+                        walkerRating = user.getRating();
+
+                        assignStarts(walkerRating);
 
                         if (getActivity() != null) {
 
                             Integer range = user.getKmRange();
-                            String exp = user.getExperience();
+
+                            //key-value
+                            Integer exp = user.getExperience();
+                            String[] expArr = getResources().getStringArray(R.array.exp_years_array);
+                            String expString = expArr[exp];
+
                             boolean lastCall = user.getLastCall();
                             int paymentPerWalk = user.getPaymentPerWalk();
 
@@ -625,9 +694,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                 lastCallTv.setText(R.string.no);
                             }
                             paymentTv.setText(paymentPerWalk + " " + getString(R.string.ils));
-                            expTv.setText(exp + " " + getString(R.string.years_of_exp));
+                            expTv.setText(expString + " " + getString(R.string.years_of_exp));
 
-                            assignWalkerListeners(result, range, lastCall, paymentPerWalk, exp);
+                            assignWalkerListeners(result, range, lastCall, paymentPerWalk, expString);
                         }
                     }
                 }
@@ -639,6 +708,18 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             }
         });
 
+    }
+
+    private void assignStarts(Integer walkerRating) {
+        List<ImageView> stars = new ArrayList<>();
+        stars.add(starView1);
+        stars.add(starView2);
+        stars.add(starView3);
+        stars.add(starView4);
+        stars.add(starView5);
+        for(int i = 0 ; i < walkerRating ; i++) {
+            stars.get(i).setImageResource(R.drawable.star_full_128);
+        }
     }
 
     //loading MYSELF (fUSer) following list to see if i follow this user already
@@ -798,6 +879,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
         View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_add_review, null);
 
+        final ProgressBar bottomSheetReviewProgressBar = bottomSheetView.findViewById(R.id.review_sheet_progress_bar);
+        final RelativeLayout hideBottomSheetReview = bottomSheetView.findViewById(R.id.hide_bottom_review);
+
         ImageButton sendReviewBtn = bottomSheetView.findViewById(R.id.review_btn);
         final EditText sendReviewEt = bottomSheetView.findViewById(R.id.review_et);
         final ImageView star1 = bottomSheetView.findViewById(R.id.star_1_sheet);
@@ -886,10 +970,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     Toast.makeText(getActivity(), R.string.pls_leave_review_and_rating, Toast.LENGTH_SHORT).show();
                 } else {
 
-                    //dismiss this dialog
-                    //loadAllReviews();
-
                     //start loading dialog
+                    hideBottomSheetReview.setVisibility(View.INVISIBLE);
+                    bottomSheetReviewProgressBar.setVisibility(View.VISIBLE);
 
                     //create a user form myself to create Review instance
                     DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
@@ -907,7 +990,29 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                             //add to list and update firebase "Reviews"
                             reviewList.add(review);
 
-                            //start loader here!!!!!!!!!!!!!!!!!!
+                            //getting all previous ratings
+                            Toast.makeText(getActivity(), reviewList.size() + " before", Toast.LENGTH_SHORT).show();
+                            int avg = 0;
+                            for (Review review1 : reviewList) {
+                                avg += review1.getRateNumber();
+                            }
+                            walkerRating = avg / reviewList.size();
+
+                            //update walker's review
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(userID);
+                            Map<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("rating", walkerRating);
+                            ref.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(getActivity(), walkerRating + " success", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(getActivity(), walkerRating + " fail", Toast.LENGTH_SHORT).show();
+                                    }
+                                    assignStarts(walkerRating);
+                                }
+                            });
 
                             //update reviews list
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reviews").child(userID);
@@ -916,11 +1021,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         //end loader here!
-                                        Toast.makeText(getActivity(), reviewList.size() + "", Toast.LENGTH_SHORT).show();
                                         bottomSheetDialog.dismiss();
                                     } else {
                                         bottomSheetDialog.dismiss();
                                     }
+                                    bottomSheetReviewProgressBar.setVisibility(View.GONE);
+                                    hideBottomSheetReview.setVisibility(View.VISIBLE);
+                                    buildAllReviewsSheetDialog();
                                 }
                             });
 
@@ -1125,9 +1232,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 profileFab.hide();
             } else {
 
-                if (followersList.contains(fUser.getUid())) {
-                    chatFab.hide();
-                }
+                /*if (followersList.contains(fUser.getUid())) {
+
+                }*/
+                chatFab.hide();
 
                 followFab.hide();
             }

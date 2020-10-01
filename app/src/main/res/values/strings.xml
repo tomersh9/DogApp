@@ -8,6 +8,14 @@
         <item>@string/huge</item>
     </string-array>
 
+    <string-array name="dog_sizes_array_values_pref">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
     <integer-array name="dog_sizes_array_values">
         <item>0</item>
         <item>1</item>
@@ -23,6 +31,20 @@
         <item>5+</item>
     </string-array>
 
+    <integer-array name="exp_years_array_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </integer-array>
+
+    <string-array name="exp_years_array_preference_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
 
     <string-array name="km_range">
         <item>@string/km1_range</item>
@@ -30,6 +52,14 @@
         <item>@string/km15_range</item>
         <item>@string/km30_range</item>
         <item>@string/km50_range</item>
+    </string-array>
+
+    <string-array name="km_range_preference_values">
+        <item>1</item>
+        <item>3</item>
+        <item>15</item>
+        <item>30</item>
+        <item>50</item>
     </string-array>
 
     <integer-array name="km_range_values">
@@ -158,13 +188,13 @@
     <string name="what_s_on_your_mind">What\'s on your mind?</string>
     <string name="choose_action">Choose action</string>
     <string name="discover_friends">Discover new people</string>
-    <string name="unfollow_from">\"Unfollowed from \"</string>
-    <string name="you_now_follow">\"You now follow \"</string>
+    <string name="unfollow_from">Unfollowed from</string>
+    <string name="you_now_follow">You now follow</string>
     <string name="followers">Followers</string>
     <string name="following">Following</string>
     <string name="comments">Comments</string>
     <string name="likes">Likes</string>
-    <string name="new_msg_from">\"New message from \"</string>
+    <string name="new_msg_from">New message from</string>
     <string name="register_as_client">Register as client</string>
     <string name="register_as_dog_walker">Register as dog walker</string>
     <string name="continue_as_guest">Continue as guest</string>
@@ -175,7 +205,7 @@
     <string name="huge">Huge</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="choose_dog_size">Choose dog sizes</string>
+    <string name="choose_dog_size">Choose dog sizes you are willing to accept</string>
     <string name="choose_km_range">Choose km range</string>
     <string name="allow_last_call">Are you allowing last minute call?</string>
     <string name="must_take_charge">You must take charge</string>
@@ -212,8 +242,7 @@
     <string name="no_cover_to_show">No cover picture to display</string>
     <string name="failed_update_cover">Failed to update cover photo</string>
     <string name="cover_photo_updated">Cover photo updated</string>
-    <string name="sort_by_price_low_to_high">Sort by price (low to high)</string>
-    <string name="sort_by_price_high_to_low">Sort by price (high to low)</string>
+    <string name="high_to_low">high to low</string>
     <string name="sort_by_rating_low_to_high">Sort by rating (low to high)</string>
     <string name="sort_by_rating_high_to_low">Sort by rating (high to low)</string>
     <string name="pricing_low_to_high">Pricing low to high</string>
@@ -242,4 +271,38 @@
     <string name="change_email_add">Change Email address</string>
     <string name="enter_new_email_address">Enter new email address</string>
     <string name="pass_reset">Password reset</string>
+    <string name="commented_on_your_post">Commented on your post</string>
+    <string name="liked_your_post">Liked your post</string>
+    <string name="also_commented_on">also commented on</string>
+    <string name="post_notif">post</string>
+    <string name="auto_location_pull">Auto pull location</string>
+    <string name="years_of_experience">Years of experience</string>
+    <string name="how_long_travel">How long are you willing to travel to get to the owner\'s house?</string>
+    <string name="dog_sizes_your_e_ok_with">Dog sizes your\'e ok with</string>
+    <string name="choose_dog_sizes_you_ok_with">Choose the sizes of dogs you are ok with</string>
+    <string name="are_you_ok_with_last_minute_call">Last minute call?</string>
+    <string name="payment_per_walk_hour">Payment per walk</string>
+    <string name="pay_per_walk_usual_hour">Payment per walk are usually for an hour</string>
+    <string name="allow_last_min_call">Are you allowing last minute call?</string>
+    <string name="years_of_exp_dog_walk">Years of experience of dog walking</string>
+    <string name="comment_empty">Comment is empty</string>
+    <string name="write_about_yourself">Write about yourself</string>
+    <string name="write_extended">Write extensively to give more necessary information to potential customers</string>
+    <string name="how_many_years_dog_walking">How many years do you have as a dog walker?</string>
+    <string name="sort_by_price">Sort by price</string>
+    <string name="sort_by_rating">Sort by rating</string>
+    <string name="low_to_high">low to high</string>
+    <string name="write_a_review">Write a review</string>
+    <string name="sort_by_experience">Sort by experience</string>
+    <string name="exp_high_to_low">Experience high to low</string>
+    <string name="exp_low_to_high">Experience low to high</string>
+    <string name="visit_profile">Visit profile</string>
+    <string name="here_can_change_location">Here you can change your location</string>
+    <string name="my_location">My location</string>
+    <string name="cancel">Cancel</string>
+    <string name="unable_make_change">Failed to make change</string>
+    <string name="change_successful">Change successful</string>
+    <string name="properties">Properties</string>
+    <string name="km_travel_range">Km travel range</string>
+    <string name="enter_pay_p_walk_ils">Enter payment per walk in ILS</string>
 </resources>

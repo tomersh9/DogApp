@@ -50,11 +50,31 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/add_review_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bottom_sheet_reviews_title"
+            android:layout_centerHorizontal="true"
+            android:text="@string/write_a_review"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:cornerRadius="20dp"
+            app:icon="@drawable/ic_chat_black_24dp" />
+
+        <TextView
+            android:id="@+id/no_curr_reviews"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/no_curr_reviews"
+            android:textSize="35sp"
+            android:visibility="gone" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/reviews_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/bottom_sheet_reviews_title"
+            android:layout_below="@id/add_review_btn"
             android:layout_marginTop="5dp" />
 
     </RelativeLayout>

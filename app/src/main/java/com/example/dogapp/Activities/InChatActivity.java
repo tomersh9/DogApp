@@ -69,6 +69,7 @@ public class InChatActivity extends AppCompatActivity {
     //firebase
     private FirebaseUser fUser;
     private DatabaseReference databaseReference;
+    private DatabaseReference chatsRef;
     private String userID; //to whom i send messages
     private ValueEventListener isSeenListener;
     private String tempStamp;
@@ -176,6 +177,7 @@ public class InChatActivity extends AppCompatActivity {
             if (hisToken != null) {
 
                 dataJson.put("message", msg);
+                dataJson.put("isMsg",msg);
                 dataJson.put("fullName", fUser.getDisplayName());
                 dataJson.put("uID", fUser.getUid());
                 rootJson.put("to", hisToken);
@@ -284,8 +286,8 @@ public class InChatActivity extends AppCompatActivity {
     }
 
     private void seenMessage(final String userID) {
-        databaseReference = FirebaseDatabase.getInstance().getReference("chats");
-        isSeenListener = databaseReference.addValueEventListener(new ValueEventListener() {
+        chatsRef = FirebaseDatabase.getInstance().getReference("chats");
+        isSeenListener = chatsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot ds : snapshot.getChildren()) {
@@ -393,13 +395,14 @@ public class InChatActivity extends AppCompatActivity {
         super.onResume();
         setUserStatus(true);
         setOtherUserStatus();
+        //databaseReference.addValueEventListener(isSeenListener);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         setUserStatus(false);
-        databaseReference.removeEventListener(isSeenListener);
+        chatsRef.removeEventListener(isSeenListener);
     }
 
     private void setOtherUserStatus() {

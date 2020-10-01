@@ -468,7 +468,7 @@ public class SecondRegisterFragment extends Fragment {
                         handleUpload(bitmap2);
                     } else {
                         //TODO fix register without photo
-                        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.user_icon_jpg_128);
+                        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.user_drawer_icon_256);
                         handleUpload(bitmap);
                     }
 

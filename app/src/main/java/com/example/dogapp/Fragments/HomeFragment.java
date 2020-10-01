@@ -301,7 +301,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         String comment = commentEt.getText().toString();
 
         if (TextUtils.isEmpty(comment)) {
-            Toast.makeText(getActivity(), "Comment is empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.comment_empty, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -343,9 +343,9 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         if (s == true) {
             firebaseMessaging.subscribeToTopic(pId);
             sendToToken(pId, comment, true);
-            Toast.makeText(getActivity(), "MINE!!!!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "MINE!!!!", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getActivity(), "NOT MINE!!!!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "NOT MINE!!!!", Toast.LENGTH_SHORT).show();
             firebaseMessaging.subscribeToTopic(pId + "COMMENTS");
             sendToToken(pId + "COMMENTS", comment, false);
             sendToToken(pId, comment, true);
@@ -380,7 +380,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
     @Override
     public void onLikeClicked() {
-        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "LIKE", Snackbar.LENGTH_LONG).show();
+        //Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "LIKE", Snackbar.LENGTH_LONG).show();
     }
 
     //get all of your followers

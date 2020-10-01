@@ -6,23 +6,73 @@
         android:id="@+id/filter_item_menu"
         android:icon="@drawable/ic_filter_list_black_24dp"
         android:title="filter"
-        app:showAsAction="always"
-        app:iconTint="@color/white">
+        app:iconTint="@color/white"
+        app:showAsAction="always">
 
         <menu>
 
-            <item android:id="@+id/price_low_to_high_item_sub_menu"
-                android:title="@string/sort_by_price_low_to_high" />
+            <item
+                android:id="@+id/sort_by_price_item"
+                android:title="@string/sort_by_price">
 
-            <item android:id="@+id/price_high_to_low_item_sub_menu"
-                android:title="@string/sort_by_price_high_to_low" />
+                <menu>
 
-            <item android:id="@+id/rating_low_to_high_item_sub_menu"
-                android:title="@string/sort_by_rating_low_to_high" />
+                    <item
+                        android:id="@+id/price_low_to_high_item_sub_menu"
+                        android:title="@string/low_to_high" />
 
-            <item android:id="@+id/rating_high_to_low_item_sub_menu"
-                android:title="@string/sort_by_rating_high_to_low" />
+                    <item
+                        android:id="@+id/price_high_to_low_item_sub_menu"
+                        android:title="@string/high_to_low" />
+
+                </menu>
+
+            </item>
+
+            <item
+                android:id="@+id/sort_by_rating_item"
+                android:title="@string/sort_by_rating">
+
+                <menu>
+
+                    <item
+                        android:id="@+id/rating_low_to_high_item_sub_menu"
+                        android:title="@string/low_to_high" />
+
+                    <item
+                        android:id="@+id/rating_high_to_low_item_sub_menu"
+                        android:title="@string/high_to_low" />
+
+                </menu>
+
+            </item>
+
+            <item
+                android:id="@+id/sort_by_experience_item"
+                android:title="@string/sort_by_experience">
+
+                <menu>
+
+                    <item
+                        android:id="@+id/exp_low_to_high_item_sub_menu"
+                        android:title="@string/low_to_high" />
+
+                    <item
+                        android:id="@+id/exp_high_to_low_item_sub_menu"
+                        android:title="@string/high_to_low" />
+
+                </menu>
+
+            </item>
+
 
         </menu>
     </item>
+
+    <item android:title="search"
+        android:id="@+id/walker_menu_item_search"
+        android:icon="@drawable/ic_search_black_24dp"
+        app:showAsAction="collapseActionView|always"
+        app:iconTint="#fff"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
 </menu>

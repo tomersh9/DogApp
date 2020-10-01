@@ -5,7 +5,7 @@
 
         <item
             android:id="@+id/item_profile"
-            android:icon="@drawable/user_icon_png_64"
+            android:icon="@drawable/user_drawer_icon_64"
             android:title="@string/profile" />
         <item
             android:id="@+id/item_rate_us"

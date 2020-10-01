@@ -86,7 +86,7 @@
                     android:visibility="gone"
                     app:lottie_autoPlay="true"
                     app:lottie_loop="true"
-                    app:lottie_rawRes="@raw/about_anim" />
+                    app:lottie_rawRes="@raw/lottie_walker_girl" />
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_btn"
@@ -95,7 +95,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"
                     android:padding="5dp"
-                    android:src="@drawable/user_icon_png_128"
+                    android:src="@drawable/user_drawer_icon_256"
                     android:visibility="gone" />
 
                 <TextView
@@ -174,7 +174,8 @@
                         android:layout_gravity="start"
                         android:layout_marginTop="3dp"
                         android:src="@drawable/ic_location_on_black_24dp"
-                        android:text="שליפת מיקום אוטומטית"
+                        android:text="@string/auto_location_pull"
+                        android:textAllCaps="false"
                         app:icon="@drawable/ic_location_on_black_24dp" />
 
                 </LinearLayout>

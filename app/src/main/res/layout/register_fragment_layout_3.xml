@@ -51,7 +51,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="5dp"
                     android:padding="5dp"
-                    android:src="@drawable/user_icon_png_128" />
+                    android:src="@drawable/user_drawer_icon_256" />
 
                 <TextView
                     android:id="@+id/press_tv_2"
@@ -90,14 +90,13 @@
                         app:boxStrokeErrorColor="@color/red"
                         app:endIconMode="clear_text"
                         app:errorEnabled="true"
-                        app:helperText="ספר בהרחבה כדי לתת יותר מידע הכרחי למשתמשים"
+                        app:helperText="@string/write_extended"
                         app:startIconDrawable="@drawable/ic_person_outline_black_24dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="ספר קצת על עצמך"
-                            android:minLines="4" />
+                            android:hint="@string/write_about_yourself" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -108,11 +107,11 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="7dp"
-                        android:hint="שנות ניסיון"
+                        android:hint="@string/years_of_experience"
                         android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
-                        app:helperText="כמה שנות ניסיון צברת בתור דוג ווקר?"
+                        app:helperText="@string/how_many_years_dog_walking"
                         app:startIconDrawable="@drawable/ic_work_black_24dp">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -129,11 +128,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:hint="בחר טווח קילומטרים"
+                        android:hint="@string/choose_km_range"
                         android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
-                        app:helperText="כמה רחוק אתה מוכן ללכת כדי לבקר בבית בעלי הכלב?"
+                        app:helperText="@string/how_long_travel"
                         app:startIconDrawable="@drawable/ic_map_black_24dp">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -149,11 +148,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:hint="גודל כלבים שאתה מקבל"
+                        android:hint="@string/dog_sizes_your_e_ok_with"
                         android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
-                        app:helperText="בחר גודל כלבים שאתה מוכן לקחת על עצמך"
+                        app:helperText="@string/choose_dog_sizes_you_ok_with"
                         app:startIconDrawable="@drawable/kg_icon">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -169,11 +168,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:hint="מוכן להזמנה ברגע האחרון?"
+                        android:hint="@string/are_you_ok_with_last_minute_call"
                         android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
-                        app:helperText="האם אתה מאפשר הזמנה ברגע האחרון?"
+                        app:helperText="@string/allow_last_min_call"
                         app:startIconDrawable="@drawable/ic_directions_run_black_24dp">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -189,11 +188,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:hint="עלות עבור כל הליכה"
+                        android:hint="@string/payment_per_walk_hour"
                         android:padding="5dp"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
-                        app:helperText="כדי ליידע מראש משתמשים על עלות השירות שלך (בשקלים)"
+                        app:helperText="@string/pay_per_walk_usual_hour"
                         app:startIconDrawable="@drawable/payment_icon">
 
                         <com.google.android.material.textfield.TextInputEditText

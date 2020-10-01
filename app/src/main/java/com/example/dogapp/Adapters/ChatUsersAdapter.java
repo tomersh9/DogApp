@@ -158,7 +158,7 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
 
     private void setLastMessage(final String userID, final TextView lastMessageTv, final TextView timeTv, final ImageView iconIv) {
         lastMessage = "default";
-        final FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser(); //me
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("chats");
 
         reference.addValueEventListener(new ValueEventListener() {
@@ -172,19 +172,17 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.Chat
                                 || chat.getReceiver().equals(userID) && chat.getSender().equals(fUser.getUid())) {
                             lastMessage = chat.getMessage();
                             lastTime = chat.getTime();
+                        }
+                        //indicate new message
+                        if ((chat.getReceiver().equals(fUser.getUid()) && chat.getSender().equals(userID))) {
 
-                            //indicate new message
-                            if ((chat.getReceiver().equals(fUser.getUid()) && chat.getSender().equals(userID))) {
-
-                                if (!chat.getIsSeen().equals("true")) {
-                                    iconIv.setVisibility(View.VISIBLE);
-                                    lastMessageTv.setTypeface(null, Typeface.BOLD);
-                                } else {
-                                    iconIv.setVisibility(View.GONE);
-                                    lastMessageTv.setTypeface(null, Typeface.NORMAL);
-                                }
+                            if (!chat.getIsSeen().equals("true")) {
+                                iconIv.setVisibility(View.VISIBLE);
+                                lastMessageTv.setTypeface(null, Typeface.BOLD);
+                            } else {
+                                iconIv.setVisibility(View.GONE);
+                                lastMessageTv.setTypeface(null, Typeface.NORMAL);
                             }
-
                         }
                     }
                 }

@@ -39,6 +39,7 @@ import com.example.dogapp.Fragments.FollowersFragment;
 import com.example.dogapp.Fragments.FollowingFragment;
 import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
+import com.example.dogapp.Fragments.WalkerBoardFragment;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -61,7 +62,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, ChatsFragment.OnChatClickListener, FollowersFragment.MyFollowersFragmentListener, FollowingFragment.MyFollowingFragmentListener {
+public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, ChatsFragment.OnChatClickListener, FollowersFragment.MyFollowersFragmentListener, FollowingFragment.MyFollowingFragmentListener, WalkerBoardFragment.MyWalkerBoardFragmentListener {
 
     //Fragments TAGs
     private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
@@ -102,6 +103,10 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
     //Change UI from notification
     BroadcastReceiver receiver;
+
+    //is walker
+    private boolean isWalker;
+    private boolean lastCall;
 
     //TODO check if there are problems
     /*@Override
@@ -261,6 +266,10 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     }
                     locationTv.setText(user.getLocation());
 
+                    //to give the settings activity
+                    isWalker = user.getType(); //walker vs user
+                    lastCall = user.getLastCall();
+
                 } else {
                     Toast.makeText(MainActivity.this, "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
                 }
@@ -388,14 +397,17 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         break;
 
                     case R.id.item_settings:
-                        startActivityForResult(new Intent(MainActivity.this,SettingsActivity.class),SETTINGS_REQUEST);
+                        Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+                        intent.putExtra("isWalker",isWalker); //true for walker
+                        intent.putExtra("lastCall",lastCall);
+                        startActivityForResult(intent,SETTINGS_REQUEST);
                         break;
 
                     case R.id.item_sign_out:
                         setUserStatus(false);
                         firebaseAuth.signOut();
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
+                        Intent signOutIntent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(signOutIntent);
                         finish();
                         break;
                 }
@@ -413,8 +425,12 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == SETTINGS_REQUEST) {
-            //save and update user fields in firebase
+
+            fullNameTv.setText(fUser.getDisplayName());
+
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+            lastCall = sp.getBoolean("last_call_cb_preference",false);
+
         }
     }
 
@@ -468,8 +484,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         toolbar.setTitle(getString(R.string.followers));
                     } else if (currFragment.getTag().equals(FOLLOWING_FRAGMENT_TAG)) {
                         toolbar.setTitle(getString(R.string.following));
-                    } else if (currFragment.getTag().equals(DISCOVER_FRIENDS_TAG)) {
-                        toolbar.setTitle(getString(R.string.settings));
+                    } else {
+
                     }
                     setSupportActionBar(toolbar);
                 }
@@ -486,10 +502,26 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
     //*****************FRAGMENTS DATA TRANSFER**************************//
 
+
+    @Override
+    public void onWalkerClicked(String userID, String imgURL) {
+        ProfileFragment fragment = ProfileFragment.newInstance(userID,imgURL);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,fragment,PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+    }
+
     //Profile fragment events
     @Override
     public void changeProfileToolBar(Toolbar toolbar) {
         setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public void onProfileSettingsClick() {
+        navigationView.setCheckedItem(R.id.item_settings);
+        Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+        intent.putExtra("isWalker",isWalker); //true for walker
+        intent.putExtra("lastCall",lastCall);
+        startActivityForResult(intent,SETTINGS_REQUEST);
     }
 
     @Override

@@ -15,6 +15,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.dogapp.Activities.InChatActivity;
+import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -96,49 +97,51 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String isComFriend = data.get("isComFriend");
 
 
-
             //when click notification, get to chat activity
             Intent chatIntent = new Intent(MyFirebaseMessagingService.this, InChatActivity.class);
             chatIntent.putExtra("userID", uid);
-            PendingIntent pendingIntent = PendingIntent.getActivity(MyFirebaseMessagingService.this, 0, chatIntent, PendingIntent.FLAG_ONE_SHOT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(MyFirebaseMessagingService.this, 0, chatIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            //for likes and comments
+            Intent mainIntent = new Intent(MyFirebaseMessagingService.this, MainActivity.class);
+            PendingIntent mainPendingIntent = PendingIntent.getActivity(MyFirebaseMessagingService.this,1,mainIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+
 
             // when the user is OUT OF THE APP!!!!
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ID");
             builder.setContentText(msg)
-                    .setSmallIcon(R.drawable.ic_explore_black_24dp)
-                    .setContentTitle(getString(R.string.new_msg_from) + "" + from)
+                    .setSmallIcon(R.drawable.ic_chat_black_24dp)
+                    .setContentTitle(getString(R.string.new_msg_from) + " " + from)
                     .setContentIntent(pendingIntent);
 
             NotificationCompat.Builder builder1 = new NotificationCompat.Builder(this, "ID");
             builder1.setContentText(msg)
                     .setSmallIcon(R.drawable.ic_explore_black_24dp)
-                    .setContentTitle(from + " Commented on your post");
+                    .setContentTitle(from + " " + getString(R.string.commented_on_your_post))
+                    .setContentIntent(mainPendingIntent);
 
             NotificationCompat.Builder builder2 = new NotificationCompat.Builder(this, "ID");
             builder2
-                    .setSmallIcon(R.drawable.ic_add_black_24dp)
-                    .setContentTitle(from + " Liked your post");
+                    .setSmallIcon(R.drawable.ic_baseline_thumb_up_black_24)
+                    .setContentTitle(from + " " + getString(R.string.liked_your_post))
+                    .setContentIntent(mainPendingIntent);
 
             NotificationCompat.Builder builder3 = new NotificationCompat.Builder(this, "ID");
             builder3.setContentText(msg)
                     .setSmallIcon(R.drawable.ic_add_black_24dp)
-                    .setContentTitle(from + "  also commented on " + nameComment + "" + " post" );
+                    .setContentTitle(from + " " + getString(R.string.also_commented_on) + " " + nameComment + " " + getString(R.string.post_notif))
+                    .setContentIntent(mainPendingIntent);
 
-            if(!checkApp()) {
+            if (!checkApp()) {
                 NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                if(isCom != null)
-                {
+                if (isCom != null) {
                     manager.notify(NOTIF_ID, builder1.build());
-                }
-                else if(isComFriend != null)
-                {
-                    manager.notify(NOTIF_ID,builder3.build());
-                }
-                else if(isMsg != null)
+                } else if (isComFriend != null) {
+                    manager.notify(NOTIF_ID, builder3.build());
+                } else if (isMsg != null)
                     manager.notify(NOTIF_ID, builder.build());
-                else if (isLike != null)
-                {
-                    manager.notify(NOTIF_ID,builder2.build());
+                else if (isLike != null) {
+                    manager.notify(NOTIF_ID, builder2.build());
                 }
 
             }
@@ -149,8 +152,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 //            }
 
             //When user is in the application (broadcast receiver)
-            if(isMsg != null)
-            {
+            if (isMsg != null && !uid.equals(FirebaseAuth.getInstance().getUid())) {
                 Intent intent = new Intent("action_msg_receive");
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
             }

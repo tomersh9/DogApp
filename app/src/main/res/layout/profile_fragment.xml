@@ -46,7 +46,78 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     app:layout_collapseMode="pin"
-                    app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+                    <RelativeLayout
+                        android:id="@+id/profile_toolbar_stars_hide"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:id="@+id/review_toolbar_stars_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:orientation="horizontal"
+                            android:padding="5dp"
+                            android:translationZ="1dp">
+
+                            <ImageView
+                                android:id="@+id/star_1_bar"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginHorizontal="2dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/star_empty_128"
+                                android:tint="@color/white" />
+
+                            <ImageView
+                                android:id="@+id/star_2_bar"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginHorizontal="2dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/star_empty_128"
+                                android:tint="@color/white" />
+
+                            <ImageView
+                                android:id="@+id/star_3_bar"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginHorizontal="2dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/star_empty_128"
+                                android:tint="@color/white" />
+
+                            <ImageView
+                                android:id="@+id/star_4_bar"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginHorizontal="2dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/star_empty_128"
+                                android:tint="@color/white" />
+
+                            <ImageView
+                                android:id="@+id/star_5_bar"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginHorizontal="2dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/star_empty_128"
+                                android:tint="@color/white" />
+
+                        </LinearLayout>
+                    </RelativeLayout>
+
+                </androidx.appcompat.widget.Toolbar>
 
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -566,10 +637,13 @@
                     <LinearLayout
                         android:id="@+id/row_3"
                         android:layout_width="match_parent"
+                        android:weightSum="1"
+                        android:layout_centerHorizontal="true"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/row_2"
                         android:layout_marginBottom="10dp"
                         android:orientation="horizontal"
+                        android:gravity="center"
                         android:visibility="gone">
 
                         <RelativeLayout
@@ -577,9 +651,7 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_marginVertical="5dp"
-                            android:layout_marginStart="1dp"
-                            android:layout_marginEnd="10dp"
-                            android:layout_weight="1"
+                            android:layout_weight="0.5"
                             android:background="@drawable/profile_item_btn_selector"
                             android:clickable="true"
                             android:focusable="true"
@@ -606,7 +678,7 @@
 
                         </RelativeLayout>
 
-                        <RelativeLayout
+                        <!--<RelativeLayout
                             android:id="@+id/profile_list_rating_layout_item"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
@@ -638,7 +710,7 @@
                                 android:textColor="@color/black"
                                 android:textSize="18sp" />
 
-                        </RelativeLayout>
+                        </RelativeLayout>-->
 
                     </LinearLayout>
 

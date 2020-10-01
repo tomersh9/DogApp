@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settings_layout_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/whitish">
@@ -23,6 +24,14 @@
         android:id="@+id/settings_frag_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/settings_app_bar"/>
+        android:layout_below="@id/settings_app_bar" />
+
+    <ProgressBar
+        android:id="@+id/settings_progress_bar"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_centerInParent="true"
+        android:indeterminateTint="@color/colorPrimary"
+        android:visibility="gone" />
 
 </RelativeLayout>

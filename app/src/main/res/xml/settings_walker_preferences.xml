@@ -40,6 +40,50 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/properties"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            android:entries="@array/exp_years_array"
+            android:entryValues="@array/exp_years_array_preference_value"
+            android:key="exp_list_preference"
+            android:summary="@string/how_many_years_dog_walking"
+            android:title="@string/years_of_experience"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:entries="@array/km_range"
+            android:entryValues="@array/km_range_preference_values"
+            android:key="range_list_preference"
+            android:summary="@string/how_long_travel"
+            android:title="@string/km_travel_range"
+            app:iconSpaceReserved="false" />
+
+        <MultiSelectListPreference
+            android:entries="@array/dog_sizes_array"
+            android:entryValues="@array/dog_sizes_array_values_pref"
+            android:key="sizes_multi_list_preference"
+            android:summary="@string/choose_dog_sizes_you_ok_with"
+            android:title="@string/dog_sizes_your_e_ok_with"
+            app:iconSpaceReserved="false" />
+
+        <CheckBoxPreference
+            android:key="last_call_cb_preference"
+            android:summary="@string/allow_last_min_call"
+            android:title="@string/are_you_ok_with_last_minute_call"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:dialogMessage="@string/pay_per_walk_usual_hour"
+            android:dialogTitle="@string/enter_pay_p_walk_ils"
+            android:key="payment_et_preference"
+            android:summary="@string/pay_per_walk_usual_hour"
+            android:title="@string/payment_per_walk_hour"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/account_settings"
         app:iconSpaceReserved="false">
 
