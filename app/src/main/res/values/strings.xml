@@ -305,4 +305,7 @@
     <string name="properties">Properties</string>
     <string name="km_travel_range">Km travel range</string>
     <string name="enter_pay_p_walk_ils">Enter payment per walk in ILS</string>
+    <string name="take_from_camera">Take from camera</string>
+    <string name="choose_from_gallery">Choose from gallery</string>
+    <string name="add_new_sliding_picture">Add new sliding picture</string>
 </resources>

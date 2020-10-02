@@ -123,6 +123,16 @@
             </com.google.android.material.appbar.CollapsingToolbarLayout>
         </com.google.android.material.appbar.AppBarLayout>
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/slider_fab"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="15dp"
+            android:src="@drawable/ic_map_black_24dp" />
+
         <ProgressBar
             android:id="@+id/app_bar_progress_bar"
             android:layout_width="70dp"
@@ -637,14 +647,14 @@
                     <LinearLayout
                         android:id="@+id/row_3"
                         android:layout_width="match_parent"
-                        android:weightSum="1"
-                        android:layout_centerHorizontal="true"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/row_2"
+                        android:layout_centerHorizontal="true"
                         android:layout_marginBottom="10dp"
-                        android:orientation="horizontal"
                         android:gravity="center"
-                        android:visibility="gone">
+                        android:orientation="horizontal"
+                        android:visibility="gone"
+                        android:weightSum="1">
 
                         <RelativeLayout
                             android:id="@+id/profile_list_experience_layout_item"

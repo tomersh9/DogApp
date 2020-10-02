@@ -211,4 +211,7 @@
     <string name="properties">מאפיינים</string>
     <string name="km_travel_range">טווח הגעה בקילומטרים</string>
     <string name="enter_pay_p_walk_ils">הכנס תעריף עבור טיול בודד בשקלים</string>
+    <string name="take_from_camera">צלם תמונה מהצלמה</string>
+    <string name="choose_from_gallery">בחר תמונה מהגלריה</string>
+    <string name="add_new_sliding_picture">הוסף תמונה נגללת חדשה</string>
 </resources>

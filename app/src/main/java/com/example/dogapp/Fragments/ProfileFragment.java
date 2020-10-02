@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -115,7 +116,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private TextView nameTv, followingTv, followersTv, criticsCountTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
     private LinearLayout followersLayoutBtn, followingLayoutBtn, criticsLayoutBtn;
     private RelativeLayout aboutMeLayout;
-    private FloatingActionButton chatFab, followFab, profileFab;
+    private FloatingActionButton chatFab, followFab, profileFab, sliderFab;
     private LinearLayout row1, row2, row3;
     private RelativeLayout dogSizeLayoutBtn, rangeLayoutBtn, lastCallLayoutBtn, paymentLayoutBtn, expLayoutBtn, locationLayoutBtn;
     private TextView sizesTv, rangeTv, lastCallTv, paymentTv, expTv, ratingTv;
@@ -222,6 +223,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         chatFab = rootView.findViewById(R.id.chat_fab);
         followFab = rootView.findViewById(R.id.follow_fab);
         profileFab = rootView.findViewById(R.id.profile_fab);
+        sliderFab = rootView.findViewById(R.id.slider_fab);
         profileProgressBar = rootView.findViewById(R.id.app_bar_progress_bar);
         coverProgressBar = rootView.findViewById(R.id.cover_progress_bar);
         locationLayoutBtn = rootView.findViewById(R.id.profile_list_location_layout_item);
@@ -253,9 +255,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         loadProfileViews();
 
         if (isMe) {
+            sliderFab.hide();
             chatFab.setVisibility(View.GONE);
             followFab.setVisibility(View.GONE);
             profileFab.setVisibility(View.VISIBLE);
+            sliderFab.setVisibility(View.VISIBLE);
 
             profileFab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -264,18 +268,20 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 }
             });
 
-            //change location in profile
-            locationLayoutBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
+            if(!isWalker) { //edit sliding photos
+                sliderFab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        buildSliderBottomDialog();
+                    }
+                });
+            }
 
         } else {
             chatFab.setVisibility(View.VISIBLE);
             followFab.setVisibility(View.VISIBLE);
             profileFab.setVisibility(View.GONE);
+            sliderFab.setVisibility(View.GONE);
             chatFab.hide();
 
             loadFollowingList(); //seeing other user's profile
@@ -416,6 +422,64 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         loadAllReviews();
 
         return rootView;
+    }
+
+    private void buildSliderBottomDialog() {
+        final BottomSheetDialog bottomDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+        View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_profile_slider, null);
+
+        LinearLayout takePic, selectPic;
+        takePic = bottomSheetView.findViewById(R.id.slider_take_pic);
+        selectPic = bottomSheetView.findViewById(R.id.slider_select_pic);
+
+        takePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "Picture");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "from");
+                fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                startActivityForResult(intent, CAMERA_REQUEST);
+                bottomDialog.dismiss();
+            }
+        });
+
+        selectPic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //TODO ask permissions here!!!
+
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                startActivityForResult(intent, SELECT_IMAGE);
+                bottomDialog.dismiss();
+            }
+        });
+
+        //DELETE PICTURE DIALOG
+        /*AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Are you sure you want to delete picture?")
+                .setIcon(R.drawable.ic_delete_black_24dp)
+                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //delete picture
+                    }
+                })
+                .setNegativeButton("no", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //return to normal
+                    }
+                }).setCancelable(false)
+                .show();*/
+
+        bottomDialog.setContentView(bottomSheetView);
+        bottomDialog.show();
     }
 
     private void assignWalkerListeners(final String sizes, final Integer range, final boolean lastCall, final int paymentPerWalk, final String exp) {
@@ -1047,6 +1111,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     }
 
+    //TODO make this 1 time
     private void buildProfileSheetDialog(boolean isProfile) {
 
         //MOVE THIS
@@ -1230,13 +1295,14 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             profileIv.animate().scaleX(scaleXProfile / 1.5f).scaleY(scaleYProfile / 1.5f).setDuration(300).start();
             if (isMe) {
                 profileFab.hide();
+                if(!isWalker) {
+                    sliderFab.show();
+                }
             } else {
 
-                /*if (followersList.contains(fUser.getUid())) {
-
-                }*/
-                chatFab.hide();
-
+                if (followingList.contains(userID)) {
+                    chatFab.hide();
+                }
                 followFab.hide();
             }
 
@@ -1246,8 +1312,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             profileIv.animate().scaleX(1f).scaleY(1f).setDuration(300).start();
             if (isMe) {
                 profileFab.show();
+
+                if(!isWalker) {
+                    sliderFab.hide();
+                }
+
             } else {
-                if (followersList.contains(fUser.getUid())) {
+                if (followingList.contains(userID)) {
                     chatFab.show();
                 }
                 followFab.show();
