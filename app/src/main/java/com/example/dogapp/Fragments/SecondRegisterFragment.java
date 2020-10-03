@@ -141,20 +141,20 @@ public class SecondRegisterFragment extends Fragment {
 
         if (requestCode == WRITE_PERMISSION_REQUEST) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getActivity(), "No permissions", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.no_permissions, Toast.LENGTH_SHORT).show();
                 if (alertDialog != null) {
                     alertDialog.dismiss();
                 }
                 permission = false;
             } else {
-                Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.permissions_granted, Toast.LENGTH_SHORT).show();
                 permission = true;
             }
         }
 
         if (requestCode == LOCATION_PERMISSION_REQUEST) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getActivity(), "No permissions", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.no_permissions, Toast.LENGTH_SHORT).show();
                 if (alertDialog != null) {
                     alertDialog.dismiss();
                 }
@@ -162,7 +162,7 @@ public class SecondRegisterFragment extends Fragment {
                 if (isLocation) {
                     startLocation();
                 }
-                Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.permissions_granted, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -186,7 +186,7 @@ public class SecondRegisterFragment extends Fragment {
                 isFromCamera = true;
                 alertDialog.dismiss();
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_SHORT).show();
                 fileUri = null;
             }
 
@@ -300,24 +300,35 @@ public class SecondRegisterFragment extends Fragment {
         dateEt.getEditText().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Calendar calendar = Calendar.getInstance();
                 final int globalYear = calendar.get(Calendar.YEAR);
                 final int globalMonth = calendar.get(Calendar.MONTH);
                 final int globalDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-                if (Build.VERSION.SDK_INT >= 26) {
-                    DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), android.R.style.Theme_Holo_Light_Dialog_MinWidth, new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                DatePickerDialog dpd = new DatePickerDialog(getActivity(), android.R.style.Theme_Holo_Light_Dialog_MinWidth, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        if (Build.VERSION.SDK_INT >= 26) {
+                            if (year > 2007) {
+                                Toast.makeText(getActivity(), R.string.must_be_13, Toast.LENGTH_LONG).show();
+                                return;
+                            }
                             LocalDate myDate = LocalDate.of(year, month, dayOfMonth);
                             age = calculateAge(myDate, LocalDate.of(globalYear, globalMonth, globalDay)); //saving user's age
-                            dateOfBirth = dayOfMonth + "/" + (month + 1) + "/" + year;
-                            dateEt.getEditText().setText(dateOfBirth);
+                        } else {
+                            if (year > 2007) {
+                                Toast.makeText(getActivity(), R.string.must_be_13, Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            age = getAge(year, month, dayOfMonth);
                         }
-                    }, globalYear, globalMonth, globalDay);
-                    datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    datePickerDialog.show();
-                }
+                        dateOfBirth = dayOfMonth + "/" + (month + 1) + "/" + year;
+                        dateEt.getEditText().setText(dateOfBirth);
+                    }
+                }, globalYear, globalMonth, globalDay);
+                dpd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dpd.show(); //shows dialog
             }
         });
 
@@ -343,7 +354,7 @@ public class SecondRegisterFragment extends Fragment {
                             locationEt.clearFocus();
                             startLocation();
                         } else {
-                            Toast.makeText(getActivity(), R.string.check_location_permissions, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), R.string.turn_on_location_first, Toast.LENGTH_SHORT).show();
                             locationEt.setHint(getString(R.string.enter_loc_manual));
                         }
 
@@ -354,7 +365,7 @@ public class SecondRegisterFragment extends Fragment {
                         startLocation();
                     } else {
                         locationEt.setHint(getString(R.string.enter_loc_manual));
-                        Toast.makeText(getActivity(), R.string.check_location_permissions, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.turn_on_location_first, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -671,6 +682,7 @@ public class SecondRegisterFragment extends Fragment {
         }
     }
 
+    //API 26 and above
     public static int calculateAge(LocalDate birthDate, LocalDate currentDate) {
         if (Build.VERSION.SDK_INT >= 26) {
             if ((birthDate != null) && (currentDate != null)) {
@@ -680,5 +692,24 @@ public class SecondRegisterFragment extends Fragment {
             }
         }
         return 0;
+    }
+
+    //Below API 26
+    private Integer getAge(int year, int month, int day) {
+
+        Calendar dob = Calendar.getInstance();
+        Calendar today = Calendar.getInstance();
+
+        dob.set(year, month, day);
+
+        int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
+
+        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
+            age--;
+        }
+
+        Integer ageInt = Integer.valueOf(age);
+
+        return ageInt;
     }
 }

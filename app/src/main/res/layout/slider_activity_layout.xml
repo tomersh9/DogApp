@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/white_bg_shape">
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/slider_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/finish_btn" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/finish_btn"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/indicators_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="10dp"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="12dp"
+        android:scaleX="0"
+        android:scaleY="0"
+        android:text="@string/get_started"
+        android:textAllCaps="false"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        app:cornerRadius="40dp" />
+
+    <!--<Button
+        android:id="@+id/finish_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/indicators_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:text="Get started"
+        android:textSize="22sp"
+        android:textAllCaps="false"
+        android:paddingVertical="7dp"
+        android:scaleX="0"
+        android:scaleY="0"
+        android:visibility="invisible" />-->
+
+    <RelativeLayout
+        android:id="@+id/indicators_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="7dp">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/dots_tab_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@null"
+            app:tabBackground="@drawable/dots_selector"
+            app:tabIndicatorColor="@null">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.tabs.TabLayout>
+
+        <TextView
+            android:id="@+id/slider_next_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="5dp"
+            android:text="@string/next"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/slider_back_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="5dp"
+            android:text="@string/back"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

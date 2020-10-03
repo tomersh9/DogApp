@@ -51,26 +51,25 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
 
-        readCounter();
+        //fixed portrait mode
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        readCounter();
 
         if (counter == 0) {
 
             if (firebaseAuth.getUid() != null) {
-                DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(firebaseAuth.getUid());
 
-                usersRef.addValueEventListener(new ValueEventListener() {
+                DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(firebaseAuth.getUid());
+                usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-
 
                         if (snapshot.exists()) {
                             User user = snapshot.getValue(User.class);
                             userId = user.getId();
                             authStateListener.onAuthStateChanged(firebaseAuth);
-
                         }
-
                     }
 
                     @Override
@@ -79,9 +78,6 @@ public class SplashScreen extends AppCompatActivity {
                 });
             }
         }
-
-        //fixed portrait mode
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         ImageView imageView = findViewById(R.id.splash_bg);
         imageView.animate().scaleX(4f).scaleY(2).setDuration(1500).withEndAction(new Runnable() {
@@ -92,26 +88,24 @@ public class SplashScreen extends AppCompatActivity {
             }
         }).start();
 
-        //fixed second at start
+
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 
                 if (bool) {
-                    final FirebaseUser user = firebaseAuth.getCurrentUser(); //get current user
-                    if (counter == 0) {
+                    if (counter == 0) { //first time loading the app
                         if (userId != null) {
                             Intent intent = new Intent(SplashScreen.this, MainActivity.class);
                             startActivity(intent);
                             finish();
                         } else {
-                            Intent intent = new Intent(SplashScreen.this, LoginActivity.class);
+                            Intent intent = new Intent(SplashScreen.this, SliderActivity.class);
                             startActivity(intent);
                             finish();
                         }
                         counter++;
-                        saveCounter();
-                    } else {
+                    } else { //not the first time loading app
                         if (firebaseAuth.getUid() != null) {
                             Intent intent = new Intent(SplashScreen.this, MainActivity.class);
                             startActivity(intent);
@@ -127,6 +121,11 @@ public class SplashScreen extends AppCompatActivity {
         };
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveCounter();
+    }
 
     private void saveCounter() {
         try {

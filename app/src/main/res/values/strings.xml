@@ -308,4 +308,8 @@
     <string name="take_from_camera">Take from camera</string>
     <string name="choose_from_gallery">Choose from gallery</string>
     <string name="add_new_sliding_picture">Add new sliding picture</string>
+    <string name="turn_on_location_first">Turn on location first</string>
+    <string name="must_be_13">Must be at least 13 years old to register</string>
+    <string name="back">Back</string>
+    <string name="get_started">Get started</string>
 </resources>

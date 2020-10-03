@@ -26,6 +26,7 @@ import com.example.dogapp.Fragments.ForgotPasswordFragment;
 import com.example.dogapp.Fragments.RegisterFragment;
 import com.example.dogapp.Fragments.SecondRegisterFragment;
 import com.example.dogapp.Fragments.WalkerFinalRegisterFragment;
+import com.example.dogapp.Models.SliderItem;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -38,6 +39,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity implements RegisterFragment.OnRegisterFragmentListener, SecondRegisterFragment.OnSecondRegisterFragmentListener, ForgotPasswordFragment.OnForgotPasswordListener, WalkerFinalRegisterFragment.MyFinalWalkerFragmentListener {
@@ -220,7 +222,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "aboutMe",null, 0, null, false, 0,0);
+                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "aboutMe",null, 0, null, false, 0,0,new ArrayList<SliderItem>());
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {
@@ -398,7 +400,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", aboutMe,exp, kmRange, dogSizeList, lastCall, payPerWalk,0);
+                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", aboutMe,exp, kmRange, dogSizeList, lastCall, payPerWalk,0,new ArrayList<SliderItem>());
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {

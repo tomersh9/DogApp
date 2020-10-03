@@ -125,13 +125,13 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/slider_fab"
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|start"
             android:layout_marginStart="10dp"
             android:layout_marginBottom="15dp"
-            android:src="@drawable/ic_map_black_24dp" />
+            android:src="@drawable/ic_map_black_24dp"
+            android:visibility="gone" />
 
         <ProgressBar
             android:id="@+id/app_bar_progress_bar"
@@ -688,39 +688,26 @@
 
                         </RelativeLayout>
 
-                        <!--<RelativeLayout
-                            android:id="@+id/profile_list_rating_layout_item"
-                            android:layout_width="0dp"
+                    </LinearLayout>
+
+                    <!--View Pager 2-->
+                    <LinearLayout
+                        android:id="@+id/row_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/row_2"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="10dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:weightSum="1">
+
+                        <androidx.viewpager2.widget.ViewPager2
+                            android:id="@+id/photo_view_pager"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_marginVertical="5dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginEnd="1dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/profile_item_btn_selector"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="10dp"
-                            android:translationZ="3dp">
-
-                            <ImageView
-                                android:id="@+id/rating_icon"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_centerHorizontal="true"
-                                android:src="@drawable/star_icon_64" />
-
-                            <TextView
-                                android:id="@+id/profile_item_rating_tv"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@id/rating_icon"
-                                android:layout_centerHorizontal="true"
-                                android:layout_marginTop="5dp"
-                                android:gravity="center"
-                                android:textColor="@color/black"
-                                android:textSize="18sp" />
-
-                        </RelativeLayout>-->
+                            android:paddingStart="80dp"
+                            android:paddingEnd="80dp" />
 
                     </LinearLayout>
 

@@ -214,4 +214,8 @@
     <string name="take_from_camera">צלם תמונה מהצלמה</string>
     <string name="choose_from_gallery">בחר תמונה מהגלריה</string>
     <string name="add_new_sliding_picture">הוסף תמונה נגללת חדשה</string>
+    <string name="turn_on_location_first">אנא הדלק את המיקום</string>
+    <string name="must_be_13">עליך להיות לפחות בגיל 13 כדי להירשם</string>
+    <string name="back">חזור</string>
+    <string name="get_started">התחל</string>
 </resources>

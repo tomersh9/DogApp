@@ -1,5 +1,7 @@
 package com.example.dogapp.Enteties;
 
+import com.example.dogapp.Models.SliderItem;
+
 import java.util.Comparator;
 import java.util.List;
 
@@ -24,11 +26,12 @@ public class User implements Comparable<User> {
     private Boolean lastCall;
     private Integer paymentPerWalk;
     private Integer rating;
+    private List<SliderItem> dogPicList;
 
     public User() {
     }
 
-    public User(String fullName, String dateOfBirth, Integer age, String email, Integer gender, Boolean type, String location, String photoUrl, String coverUrl, String id, Boolean status, String timeStamp, String aboutMe, Integer experience, Integer kmRange, List<Integer> dogSizesList, Boolean lastCall, Integer paymentPerWalk, Integer rating) {
+    public User(String fullName, String dateOfBirth, Integer age, String email, Integer gender, Boolean type, String location, String photoUrl, String coverUrl, String id, Boolean status, String timeStamp, String aboutMe, Integer experience, Integer kmRange, List<Integer> dogSizesList, Boolean lastCall, Integer paymentPerWalk, Integer rating, List<SliderItem> dogPicList) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
         this.age = age;
@@ -48,6 +51,7 @@ public class User implements Comparable<User> {
         this.lastCall = lastCall;
         this.paymentPerWalk = paymentPerWalk;
         this.rating = rating;
+        this.dogPicList = dogPicList;
     }
 
     public String getFullName() {
@@ -200,6 +204,14 @@ public class User implements Comparable<User> {
 
     public void setRating(Integer rating) {
         this.rating = rating;
+    }
+
+    public List<SliderItem> getDogPicList() {
+        return dogPicList;
+    }
+
+    public void setDogPicList(List<SliderItem> dogPicList) {
+        this.dogPicList = dogPicList;
     }
 
     @Override

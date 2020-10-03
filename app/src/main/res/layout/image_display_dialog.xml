@@ -4,6 +4,18 @@
     android:layout_height="wrap_content"
     android:background="@drawable/round_bg__dialog_shape">
 
+    <ImageButton
+        android:id="@+id/img_dialog_back_btn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="12dp"
+        android:background="@null"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_close_black_24dp"
+        android:tint="@color/colorPrimary"/>
+
     <ProgressBar
         android:id="@+id/img_loader_bar"
         android:layout_width="100dp"
@@ -17,6 +29,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/star_icon"
-        android:visibility="invisible"/>
+        android:visibility="invisible" />
 
 </RelativeLayout>
