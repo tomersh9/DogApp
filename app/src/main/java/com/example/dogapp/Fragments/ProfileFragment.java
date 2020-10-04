@@ -39,6 +39,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -102,6 +103,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
     private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
     private DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers");
+    private boolean isAnonymous;
     private String userID, imgURL, coverURL; //for any user of the app
     private boolean isMe;
     private boolean isWalker;
@@ -120,12 +122,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private ImageView profileIv, genderIv, typeIv, coverIv;
     private TextView nameTv, followingTv, followersTv, criticsCountTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
     private LinearLayout followersLayoutBtn, followingLayoutBtn, criticsLayoutBtn;
-    private RelativeLayout aboutMeLayout;
+    private RelativeLayout uploadPicsHintLayout;
     private FloatingActionButton chatFab, followFab, profileFab, sliderFab;
-    private LinearLayout row1, row2, row3;
+    private LinearLayout row1, row2, row3, row4;
     private RelativeLayout dogSizeLayoutBtn, rangeLayoutBtn, lastCallLayoutBtn, paymentLayoutBtn, expLayoutBtn, locationLayoutBtn;
     private TextView sizesTv, rangeTv, lastCallTv, paymentTv, expTv, ratingTv;
-    private TextView displayNameTv;
+    //private TextView displayNameTv;
+    private CoordinatorLayout coordinatorLayout;
 
     //rating stars
     private RelativeLayout toolbarStarsLayout;
@@ -137,10 +140,15 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private ProgressBar profileProgressBar;
     private ProgressBar coverProgressBar;
+    private ProgressBar deleteSliderDialogProgressBar;
     private boolean isProfilePicture; //to define clicks form profile and cover
+    private boolean isSliderGallery = false;
+    private boolean isProfileGallery = false;
+    private boolean isCoverGallery = false;
 
     //Dialogs
     private AlertDialog alertDialog;
+    private AlertDialog deleteSliderDialog;
 
     //camera and gallery
     Uri fileUri;
@@ -204,6 +212,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         //get user who activated the fragment
         userID = getArguments().getString("userID");
         imgURL = getArguments().getString("imgURL");
+        isAnonymous = fUser.isAnonymous();
 
         if (userID.equals(fUser.getUid())) {
             isMe = true;
@@ -212,11 +221,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
 
         //assign views
+        uploadPicsHintLayout = rootView.findViewById(R.id.upload_pics_layout_to_hide);
+        coordinatorLayout = rootView.findViewById(R.id.profile_coordinator);
         viewPager2 = rootView.findViewById(R.id.photo_view_pager);
         row1 = rootView.findViewById(R.id.row_1);
         row2 = rootView.findViewById(R.id.row_2);
         row3 = rootView.findViewById(R.id.row_3);
-        displayNameTv = rootView.findViewById(R.id.profile_frag_name_tv);
+        row4 = rootView.findViewById(R.id.row_4);
         profileIv = rootView.findViewById(R.id.profile_frag_iv);
         coverIv = rootView.findViewById(R.id.profile_cover_iv);
         scaleXProfile = profileIv.getScaleX();
@@ -232,11 +243,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         genderIv = rootView.findViewById(R.id.profile_gender_iv);
         followersLayoutBtn = rootView.findViewById(R.id.followers_layout);
         followingLayoutBtn = rootView.findViewById(R.id.following_layout);
-        aboutMeLayout = rootView.findViewById(R.id.profile_list_about_me_layout_item);
         chatFab = rootView.findViewById(R.id.chat_fab);
         followFab = rootView.findViewById(R.id.follow_fab);
         profileFab = rootView.findViewById(R.id.profile_fab);
         sliderFab = rootView.findViewById(R.id.slider_fab);
+        sliderFab.hide();
         profileProgressBar = rootView.findViewById(R.id.app_bar_progress_bar);
         coverProgressBar = rootView.findViewById(R.id.cover_progress_bar);
         locationLayoutBtn = rootView.findViewById(R.id.profile_list_location_layout_item);
@@ -266,7 +277,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         loadProfileViews();
 
         if (isMe) {
-            sliderFab.hide();
             chatFab.setVisibility(View.GONE);
             followFab.setVisibility(View.GONE);
             profileFab.setVisibility(View.VISIBLE);
@@ -314,7 +324,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             });
         }
 
-
         //toolbar
         collapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar_layout);
         toolbar = rootView.findViewById(R.id.toolbar_profile);
@@ -322,7 +331,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         appBarLayout = rootView.findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(this);
         toolbar.setTitle("");
-
 
         //profile pic click event
         profileIv.setOnClickListener(new View.OnClickListener() {
@@ -367,13 +375,21 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         followingLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onProfileFollowingsClick(userID);
+                if (!isAnonymous) {
+                    listener.onProfileFollowingsClick(userID);
+                } else {
+                    Snackbar.make(coordinatorLayout, R.string.only_reg_user, Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
         followersLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onProfileFollowersClick(userID);
+                if (!isAnonymous) {
+                    listener.onProfileFollowersClick(userID);
+                } else {
+                    Snackbar.make(coordinatorLayout, R.string.only_reg_user, Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -399,42 +415,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         viewPager2.setPageTransformer(compositePageTransformer);
 
-        Toast.makeText(getActivity(), sliderItems.size() + "", Toast.LENGTH_SHORT).show();
-
-        //viewPager2.setAdapter(sliderAdapter);
-
         return rootView;
-    }
-
-    private void deleteSliderPic(final int position) {
-
-
-
-        /*final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Slider_pics").child(fUser.getUid()).child(position + ".jpeg");
-        storage.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });*/
     }
 
     private void buildSliderBottomDialog() {
 
         final BottomSheetDialog bottomDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
         View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_profile_slider, null);
-
-        if (Build.VERSION.SDK_INT >= 23) {
-            int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
-            if (hasWritePermission != PackageManager.PERMISSION_GRANTED && hasReadPermission != PackageManager.PERMISSION_GRANTED)
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
-        }
 
         LinearLayout takePic, selectPic;
         takePic = bottomSheetView.findViewById(R.id.slider_take_pic);
@@ -443,15 +430,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         takePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Images.Media.TITLE, "Picture");
-                values.put(MediaStore.Images.Media.DESCRIPTION, "from");
-                fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent, CAMERA_REQUEST_SLIDER);
+                takePicture(CAMERA_REQUEST_SLIDER);
                 bottomDialog.dismiss();
             }
         });
@@ -459,17 +438,46 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         selectPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //TODO ask permissions here!!!
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setType("image/*");
-                startActivityForResult(intent, SELECT_IMAGE_SLIDER);
+                isProfileGallery = false;
+                isCoverGallery = false;
+                isSliderGallery = true;
+                askStoragePermissions(SELECT_IMAGE_SLIDER);
                 bottomDialog.dismiss();
             }
         });
 
         bottomDialog.setContentView(bottomSheetView);
         bottomDialog.show();
+    }
+
+    private void openGallery(int requestCode) {
+        //TODO ask permissions here!!!
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, requestCode);
+    }
+
+    private void takePicture(int requestCode) {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "from");
+        fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        startActivityForResult(intent, requestCode);
+    }
+
+    private void askStoragePermissions(int requestCode) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+            if (hasWritePermission != PackageManager.PERMISSION_GRANTED && hasReadPermission != PackageManager.PERMISSION_GRANTED) { //no permissions
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
+            } else { //have permissions
+                openGallery(requestCode);
+            }
+        }
     }
 
     private void assignWalkerListeners(final String sizes, final Integer range, final boolean lastCall, final int paymentPerWalk, final String exp) {
@@ -518,8 +526,12 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         criticsLayoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buildAllReviewsSheetDialog();
-                //loadAllReviews(); //load reviews list after
+                if (!isAnonymous) {
+                    buildAllReviewsSheetDialog();
+                } else {
+                    Snackbar.make(coordinatorLayout, R.string.only_reg_user, Snackbar.LENGTH_SHORT).show();
+                }
+
             }
         });
     }
@@ -615,6 +627,53 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         });
     }
 
+    private void createCustomDeleteDialog(final int position) {
+
+        View dialogView = getLayoutInflater().inflate(R.layout.profile_location_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        deleteSliderDialog = builder.setView(dialogView).show();
+        deleteSliderDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        final RelativeLayout hideOnLoadLayout = dialogView.findViewById(R.id.delete_dialog_hide_layout);
+        deleteSliderDialogProgressBar = dialogView.findViewById(R.id.delete_dialog_progress_bar);
+        final Button yesBtn = dialogView.findViewById(R.id.profile_dialog_yes_btn);
+        final Button noBtn = dialogView.findViewById(R.id.profile_dialog_no_btn);
+        ImageView iconIv = dialogView.findViewById(R.id.profile_dialog_icon);
+
+        iconIv.animate().scaleX(1f).scaleY(1f).setDuration(250).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                yesBtn.animate().scaleX(1f).scaleY(1f).setDuration(200).start();
+                noBtn.animate().scaleX(1f).scaleY(1f).setDuration(200).start();
+            }
+        }).start();
+
+        yesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                hideOnLoadLayout.setVisibility(View.GONE);
+                deleteSliderDialogProgressBar.setVisibility(View.VISIBLE);
+
+                //remove local list
+                SliderItem item = sliderItems.get(position);
+                sliderItems.remove(item);
+                sliderAdapter.notifyItemRemoved(position); // doesn't work well
+
+                //delete from storage and DB
+                deleteSlidePic(item.getPhotoUrl());
+            }
+        });
+
+        noBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteSliderDialog.dismiss();
+            }
+        });
+    }
+
     private void createCustomDialog(int icon, String title, String body) {
 
         final AlertDialog alertDialog;
@@ -666,9 +725,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     coverURL = user.getCoverUrl();
                     int age = user.getAge();
 
-                    //view pager
-                    getPictureList(user.getDogPicList());
-
                     //cover picture load
                     try {
                         Glide.with(getActivity()).asBitmap().load(coverURL).into(coverIv);
@@ -698,6 +754,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     //USER TYPE
                     if (!user.getType()) { // NOT WALKER
 
+                        //view pager
+                        row4.setVisibility(View.VISIBLE);
+                        getPictureList(user.getDogPicList());
                         typeTv.setText(R.string.dog_owner);
                         typeIv.setImageResource(R.drawable.dog_owner_icon);
                         isWalker = false;
@@ -709,6 +768,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                     } else { //WALKER
 
+                        row4.setVisibility(View.GONE);
                         typeTv.setText(R.string.dog_walker);
                         typeIv.setImageResource(R.drawable.dog_walker_icon);
                         isWalker = true;
@@ -773,6 +833,15 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         if (dogPicList != null) {
             sliderItems = dogPicList;
         }
+
+        if (isMe) {
+            if (sliderItems.isEmpty()) {
+                uploadPicsHintLayout.setVisibility(View.VISIBLE);
+            } else {
+                uploadPicsHintLayout.setVisibility(View.GONE);
+            }
+        }
+
         sliderAdapter = new SliderAdapter(sliderItems);
         viewPager2.setAdapter(sliderAdapter);
         sliderAdapter.setListener(ProfileFragment.this);
@@ -780,47 +849,55 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     }
 
     @Override
+    public void onPictureClicked(int position) {
+        loadImageDialog(sliderItems.get(position).getPhotoUrl());
+    }
+
+    @Override
     public void onPictureLongClicked(final int position, View view) {
 
-        Toast.makeText(getActivity(), position + "", Toast.LENGTH_SHORT).show();
+        if (isMe) {
+            createCustomDeleteDialog(position);
+        }
+    }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Are you sure you want to delete picture?")
-                .setIcon(R.drawable.ic_delete_black_24dp)
-                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+    private void deleteSlidePic(String path) {
+
+        StorageReference storage = FirebaseStorage.getInstance().getReferenceFromUrl(path);
+        storage.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+
+                if (sliderItems.isEmpty()) {
+                    uploadPicsHintLayout.setVisibility(View.VISIBLE);
+                }
+                //update DB
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
+                Map<String, Object> hashMap = new HashMap<>();
+                hashMap.put("dogPicList", sliderItems);
+                reference.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        //delete picture
-                        SliderItem item = sliderItems.get(position);
-                        sliderItems.remove(item);
-                        sliderAdapter.notifyItemRemoved(position); // doesnt work well
-
-                        //update DB
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
-                        Map<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("dogPicList", sliderItems);
-                        reference.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Delete succeed", Snackbar.LENGTH_SHORT).show();
-                                } else {
-                                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Delete failed", Snackbar.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-
-                        //deleteSliderPic(position);
-                        //viewPager2.refreshDrawableState();
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Snackbar.make(coordinatorLayout, "Delete succeed", Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            Snackbar.make(coordinatorLayout, "Delete failed", Snackbar.LENGTH_SHORT).show();
+                        }
+                        deleteSliderDialogProgressBar.setVisibility(View.GONE);
+                        deleteSliderDialog.dismiss();
                     }
-                })
-                .setNegativeButton("no", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                }).setCancelable(false)
-                .show();
+                });
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                deleteSliderDialogProgressBar.setVisibility(View.GONE);
+                deleteSliderDialog.dismiss();
+                Snackbar.make(coordinatorLayout, "Delete failed", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
 
     }
 
@@ -866,6 +943,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     private void onProfileFollowClick() {
 
+        if (isAnonymous) {
+            Snackbar.make(coordinatorLayout, R.string.only_reg_user, Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
         if (!followingList.contains(userID)) { //follow user
 
             //add the user to my following list
@@ -895,13 +977,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                 }
             });
-            //change fab apperance
+            //change fab appearance
             chatFab.show();
             followFab.setImageResource(R.drawable.unfollow_user_icon_64);
             followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.red)));
             Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + nameTv.getText().toString(), Snackbar.LENGTH_SHORT).show();
 
-        } else { //unfollow user
+        } else { //unFollow user
 
             followingList.remove(userID);
             followingRef.child(fUser.getUid()).setValue(followingList);
@@ -929,15 +1011,12 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                 }
             });
-            //change fab apperance
+            //change fab appearance
             chatFab.hide();
             followFab.setImageResource(R.drawable.follow_user_icon_64);
             followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.green)));
             Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.unfollow_from) + " " + nameTv.getText().toString(), Snackbar.LENGTH_SHORT).show();
         }
-
-        //loadDetailsViews();
-
     }
 
     private void loadDetailsViews() {
@@ -1119,9 +1198,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(getActivity(), walkerRating + " success", Toast.LENGTH_SHORT).show();
+                                        // Toast.makeText(getActivity(), walkerRating + " success", Toast.LENGTH_SHORT).show();
                                     } else {
-                                        Toast.makeText(getActivity(), walkerRating + " fail", Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(getActivity(), walkerRating + " fail", Toast.LENGTH_SHORT).show();
                                     }
                                     assignStarts(walkerRating);
                                 }
@@ -1161,16 +1240,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     }
 
     //TODO make this 1 time
-    private void buildProfileSheetDialog(boolean isProfile) {
-
-        //MOVE THIS
-        if (Build.VERSION.SDK_INT >= 23) {
-            int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
-            if (hasWritePermission != PackageManager.PERMISSION_GRANTED && hasReadPermission != PackageManager.PERMISSION_GRANTED)
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
-        }
-
+    private void buildProfileSheetDialog(final boolean isProfile) {
 
         if (isProfile) {
             final BottomSheetDialog bottomDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
@@ -1192,14 +1262,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             takePic.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ContentValues values = new ContentValues();
-                    values.put(MediaStore.Images.Media.TITLE, "Picture");
-                    values.put(MediaStore.Images.Media.DESCRIPTION, "from");
-                    fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                    startActivityForResult(intent, CAMERA_REQUEST);
+                    takePicture(CAMERA_REQUEST);
                     bottomDialog.dismiss();
                 }
             });
@@ -1207,12 +1270,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             selectPic.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    //TODO ask permissions here!!!
-
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(intent, SELECT_IMAGE);
+                    isProfileGallery = true;
+                    isCoverGallery = false;
+                    isProfileGallery = false;
+                    askStoragePermissions(SELECT_IMAGE);
                     bottomDialog.dismiss();
                 }
             });
@@ -1248,14 +1309,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             takePic.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ContentValues values = new ContentValues();
-                    values.put(MediaStore.Images.Media.TITLE, "Picture");
-                    values.put(MediaStore.Images.Media.DESCRIPTION, "from");
-                    fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                    startActivityForResult(intent, CAMERA_REQUEST);
+                    takePicture(CAMERA_REQUEST);
                     bottomDialog.dismiss();
                 }
             });
@@ -1263,20 +1317,17 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             selectPic.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    //TODO ask permissions here!!!
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(intent, SELECT_IMAGE);
+                    isCoverGallery = true;
+                    isProfileGallery = false;
+                    isSliderGallery = false;
+                    askStoragePermissions(SELECT_IMAGE);
                     bottomDialog.dismiss();
                 }
             });
 
             bottomDialog.setContentView(bottomSheetView);
             bottomDialog.show();
-
         }
-
     }
 
     //opens picture full res with Glide
@@ -1347,7 +1398,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         } else if (verticalOffset == 0) {
             // Expanded
             profileIv.animate().scaleX(1f).scaleY(1f).setDuration(300).start();
+
             if (isMe) {
+
                 profileFab.show();
 
                 if (!isWalker) {
@@ -1405,20 +1458,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                //profileIv.setImageBitmap(bitmap1);
-                //getActivity().getContentResolver().delete(fileUri,null, null); // have to transfer to register button
-                //pressTv.setVisibility(View.GONE);
                 isFromCamera = true;
                 if (bitmap1 != null) {
-                    //profileIv.setImageBitmap(bitmap1);
                     handleUpload(bitmap1, isProfilePicture);
-
                 }
-                //alertDialog.dismiss();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 fileUri = null;
             }
-
         }
 
         if (requestCode == SELECT_IMAGE) {
@@ -1433,18 +1479,14 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     e.printStackTrace();
                 }
                 if (bitmap2 != null) {
-                    //profileIv.setImageBitmap(bitmap2);
                     handleUpload(bitmap2, isProfilePicture);
 
                 }
 
-                //pressTv.setVisibility(View.GONE);
                 isFromCamera = false;
-                if (isFromCamera)
+                if (isFromCamera) {
                     getActivity().getContentResolver().delete(fileUri, null, null);
-                //alertDialog.dismiss();
-            } else {
-                //profileIv.setVisibility(View.VISIBLE);
+                }
             }
         }
 
@@ -1458,21 +1500,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                //profileIv.setImageBitmap(bitmap1);
-                //getActivity().getContentResolver().delete(fileUri,null, null); // have to transfer to register button
-                //pressTv.setVisibility(View.GONE);
                 isFromCamera = true;
                 if (bitmap1 != null) {
-                    //profileIv.setImageBitmap(bitmap1);
-                    //handleUpload(bitmap1, isProfilePicture);
-
-                    //sliderItems.add(new SliderItem(fileUri.toString()));
-                    //sliderAdapter.notifyItemInserted(sliderItems.size()+1);
                     uploadSliderPic(bitmap1);
-
-
                 }
-                //alertDialog.dismiss();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 fileUri = null;
             }
@@ -1491,22 +1522,12 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     e.printStackTrace();
                 }
                 if (bitmap2 != null) {
-                    //profileIv.setImageBitmap(bitmap2);
-                    //handleUpload(bitmap2, isProfilePicture);
-                    //sliderItems.add(new SliderItem(fileUri.toString()));
-                    //sliderAdapter.notifyItemInserted(sliderItems.size()+1);
                     uploadSliderPic(bitmap2);
-
-
                 }
-
-                //pressTv.setVisibility(View.GONE);
                 isFromCamera = false;
-                if (isFromCamera)
+                if (isFromCamera) {
                     getActivity().getContentResolver().delete(fileUri, null, null);
-                //alertDialog.dismiss();
-            } else {
-                //profileIv.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
@@ -1519,8 +1540,20 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 Toast.makeText(getActivity(), "No permissions!!!", Toast.LENGTH_SHORT).show();
                 permission = false;
             } else {
+
                 Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
                 permission = true;
+
+                if (isSliderGallery) {
+                    openGallery(SELECT_IMAGE_SLIDER);
+                    isSliderGallery = false;
+                } else if (isProfileGallery) {
+                    openGallery(SELECT_IMAGE);
+                    isProfileGallery = false;
+                } else {
+                    openGallery(SELECT_IMAGE);
+                    isCoverGallery = false;
+                }
             }
         }
 
@@ -1530,7 +1563,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         //update DB
         //update database field
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Slider_pics").child(fUser.getUid()).child(sliderItems.size() + ".jpeg");
@@ -1542,6 +1574,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                 .addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
                                     public void onSuccess(Uri uri) {
+                                        uploadPicsHintLayout.setVisibility(View.GONE);
                                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
                                         SliderItem item = new SliderItem(uri.toString());
                                         sliderItems.add(item);
@@ -1552,9 +1585,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Upload succeed", Snackbar.LENGTH_SHORT).show();
+                                                    Snackbar.make(coordinatorLayout, "Upload succeed", Snackbar.LENGTH_SHORT).show();
                                                 } else {
-                                                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Upload failed", Snackbar.LENGTH_SHORT).show();
+                                                    Snackbar.make(coordinatorLayout, "Upload failed", Snackbar.LENGTH_SHORT).show();
                                                 }
                                             }
                                         });

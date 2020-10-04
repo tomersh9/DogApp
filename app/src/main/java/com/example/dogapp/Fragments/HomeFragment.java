@@ -2,6 +2,7 @@ package com.example.dogapp.Fragments;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -14,12 +15,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,8 +39,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
-import com.example.dogapp.Activities.InChatActivity;
-import com.example.dogapp.Activities.LoginActivity;
 import com.example.dogapp.Adapters.CommentAdapter;
 import com.example.dogapp.Adapters.PostAdapter;
 import com.example.dogapp.Enteties.User;
@@ -50,11 +47,8 @@ import com.example.dogapp.Models.ModelPost;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -77,6 +71,9 @@ import java.util.Map;
 
 public class HomeFragment extends Fragment implements PostAdapter.OnPostListener, SwipeRefreshLayout.OnRefreshListener {
 
+    private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
+
+
     //list of posts
     private RecyclerView recyclerView;
     private List<ModelPost> postList;
@@ -97,7 +94,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     private EditText homeEt;
     private ImageView homeIv;
     private CoordinatorLayout coordinatorLayout;
-    private FloatingActionButton fab;
     private ProgressBar progressBar;
     private AlertDialog progressDialog;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -119,6 +115,21 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     private final String BASE_URL = "https://fcm.googleapis.com/fcm/send";
     boolean s;
 
+    public interface MyHomeFragmentListener {
+        void onMyPostClicked();
+    }
+
+    private MyHomeFragmentListener listener;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            listener = (MyHomeFragmentListener) context;
+        } catch (ClassCastException ex) {
+            throw new ClassCastException("MainActivity must implement MyHomeFragmentListener interface");
+        }
+    }
 
     @Nullable
     @Override
@@ -142,7 +153,11 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         homeEt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buildPostSheetDialog();
+                if(!fUser.isAnonymous()) {
+                    buildPostSheetDialog();
+                } else {
+                    Snackbar.make(coordinatorLayout, R.string.only_reg_user,Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -155,46 +170,67 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
         //init post list
         postList = new ArrayList<>();
-        //loadPosts();
-        loadFollowing();
 
-        //get my own details to put on the post
-        uid = fUser.getUid();
-        userDbRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    //update things from user data
-                    User user = dataSnapshot.getValue(User.class);
-                    name = user.getFullName();
-                    location = user.getLocation();
-                    try {
-                        Glide.with(rootView).load(user.getPhotoUrl()).placeholder(R.drawable.user_icon_png_64).into(homeIv);
-                    } catch (Exception ex) {
+        if (fUser.isAnonymous()) {
+            loadAnonymousPosts();
+        } else {
 
+            loadFollowing();
+
+            //get my own details to put on the post
+            uid = fUser.getUid();
+            userDbRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        //update things from user data
+                        User user = dataSnapshot.getValue(User.class);
+                        name = user.getFullName();
+                        location = user.getLocation();
+                        try {
+                            Glide.with(rootView).load(user.getPhotoUrl()).placeholder(R.drawable.user_icon_png_64).into(homeIv);
+                        } catch (Exception ex) {
+
+                        }
+
+                    } else {
+                        Toast.makeText(getActivity(), "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
                     }
-
-                } else {
-                    Toast.makeText(getActivity(), "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
-
-        //*******ADD NEW POST BUTTONS*********//
-        /*fab = rootView.findViewById(R.id.home_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                buildPostSheetDialog();
-            }
-        });*/
+                }
+            });
+        }
 
         return rootView;
+    }
+
+    private void loadAnonymousPosts() {
+        postsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                postList.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    ModelPost modelPost = ds.getValue(ModelPost.class);
+                    postList.add(modelPost);
+                }
+                postAdapter = new PostAdapter(getActivity(), postList);
+                postAdapter.setOnPostListener(HomeFragment.this);
+                recyclerView.setAdapter(postAdapter);
+
+                progressBar.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                progressBar.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     private void buildPostSheetDialog() {
@@ -219,7 +255,27 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
     @Override
     public void onCommentClicked(String pId) {
-        buildCommentSheetDialog(pId);
+        if(!fUser.isAnonymous()) {
+            buildCommentSheetDialog(pId);
+        } else {
+            Snackbar.make(coordinatorLayout, R.string.only_reg_user,Snackbar.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    public void onAnonymousLikeClicked() {
+        Snackbar.make(coordinatorLayout, R.string.only_reg_user,Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPostImageClicked(String userID, String imgURL) {
+        if(fUser.getUid().equals(userID)) {
+            listener.onMyPostClicked(); //only change bottom nav bar item
+        } else {
+            ProfileFragment profileFragment = ProfileFragment.newInstance(userID, imgURL);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+        }
     }
 
     private void buildCommentSheetDialog(final String pId) {
@@ -378,11 +434,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         });
     }
 
-    @Override
-    public void onLikeClicked() {
-        //Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "LIKE", Snackbar.LENGTH_LONG).show();
-    }
-
     //get all of your followers
     private void loadFollowing() {
         progressBar.setVisibility(View.VISIBLE);
@@ -394,6 +445,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     for (DataSnapshot ds : snapshot.getChildren()) {
                         followingList.add(ds.getValue(String.class));
                     }
+                    loadPosts();
                 }
             }
 
@@ -402,7 +454,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
             }
         });
-        loadPosts();
     }
 
     //load posts of your followers
@@ -416,10 +467,12 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     if (followingList.contains(modelPost.getuId()) || modelPost.getuId().equals(fUser.getUid())) {
                         postList.add(modelPost);
                     }
-                    postAdapter = new PostAdapter(getActivity(), postList);
-                    postAdapter.setOnPostListener(HomeFragment.this);
-                    recyclerView.setAdapter(postAdapter);
                 }
+
+                postAdapter = new PostAdapter(getActivity(), postList);
+                postAdapter.setOnPostListener(HomeFragment.this);
+                recyclerView.setAdapter(postAdapter);
+
                 progressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -434,7 +487,11 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
     @Override
     public void onRefresh() {
-        loadFollowing();
+        if(!fUser.isAnonymous()) {
+            loadFollowing();
+        } else {
+            loadAnonymousPosts();
+        }
     }
 
     private void searchPosts(final String searchQuery) {
@@ -534,7 +591,12 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     if (!TextUtils.isEmpty(query)) {
                         searchPosts(query);
                     } else {
-                        loadPosts();
+                        if(!fUser.isAnonymous()) {
+                            loadPosts();
+                        } else {
+                            loadAnonymousPosts();
+                        }
+
                     }
                     return false;
                 }
@@ -544,7 +606,11 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     if (!TextUtils.isEmpty(newText)) {
                         searchPosts(newText);
                     } else {
-                        loadPosts();
+                        if(!fUser.isAnonymous()) {
+                            loadPosts();
+                        } else {
+                            loadAnonymousPosts();
+                        }
                     }
                     return false;
                 }

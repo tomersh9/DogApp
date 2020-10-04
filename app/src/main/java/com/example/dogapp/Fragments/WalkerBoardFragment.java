@@ -154,6 +154,7 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
 
             case R.id.walker_menu_item_search:
                 SearchView searchView = (SearchView) item.getActionView();
+                searchView.setQueryHint(getString(R.string.search_by_name_location));
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {

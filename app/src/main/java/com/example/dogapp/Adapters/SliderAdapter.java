@@ -19,17 +19,14 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderView
     private List<SliderItem> sliderAdapterList;
     private MySliderAdapterListener listener;
 
-    public interface MySliderAdapterListener
-    {
+    public interface MySliderAdapterListener {
         void onPictureLongClicked(int position, View view);
+
+        void onPictureClicked(int position);
     }
 
     public void setListener(MySliderAdapterListener listener) {
         this.listener = listener;
-    }
-
-    public void setSliderAdapterList(List<SliderItem> sliderAdapterList) {
-        this.sliderAdapterList = sliderAdapterList;
     }
 
     public SliderAdapter(List<SliderItem> sliderAdapterList) {
@@ -41,18 +38,14 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderView
     public SliderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new SliderViewHolder(
                 LayoutInflater.from(parent.getContext()).inflate(
-                        R.layout.photo_slide_container,parent,
+                        R.layout.photo_slide_container, parent,
                         false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull SliderViewHolder holder, int position) {
-        //holder.setImage(sliderAdapterList.get(position));
-        //Glide.with(holder.itemView).load("https://firebasestorage.googleapis.com/v0/b/dogapp-4a37e.appspot.com/o/Profiles%2Fkk%40kk.kk.jpeg?alt=media&token=677494f0-1fc0-4f38-ba24-2bb208beeb40").into(holder.imageView);
-        Glide.with(holder.itemView).asBitmap().load(sliderAdapterList.get(position).getPhotoUrl()).override(1000,1000)
+        Glide.with(holder.itemView).asBitmap().load(sliderAdapterList.get(position).getPhotoUrl()).override(1000, 1000)
                 .into(holder.imageView);
-        //holder.imageButton.setVisibility(View.INVISIBLE);
-
     }
 
     @Override
@@ -63,27 +56,26 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderView
     class SliderViewHolder extends RecyclerView.ViewHolder {
 
         private RoundedImageView imageView;
-        //private ImageButton imageButton;
 
         public SliderViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.image_slide);
-            //imageButton = itemView.findViewById(R.id.close_btn);
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() { //open image
+                @Override
+                public void onClick(View v) {
+                    listener.onPictureClicked(getAdapterPosition());
+                }
+            });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() { //open to delete image
                 @Override
                 public boolean onLongClick(View v) {
-                    listener.onPictureLongClicked(getAdapterPosition(),v);
+                    listener.onPictureLongClicked(getAdapterPosition(), v);
                     return false;
                 }
             });
 
-        }
-
-        void setImage(SliderItem sliderItem)
-        {
-            //imageView.setImageResource(sliderItem.getPhotoUrl());
-            //Glide.with(itemView).load(Uri.parse(sliderItem.getPhotoUrl())).into(imageView);
         }
     }
 }

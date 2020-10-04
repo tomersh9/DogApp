@@ -173,42 +173,47 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
 
     @Override
     public void onFriendFollowClicked(int pos, View v) {
-        final User user = users.get(pos);
-        followingList.add(user.getId());
-        users.remove(user);
-        adapter.notifyItemRemoved(pos);
-        followingRef.child(fUser.getUid()).setValue(followingList);
-        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_LONG)
-                .setAction(R.string.visit_profile, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUrl());
-                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+        if(!fUser.isAnonymous()) {
+            final User user = users.get(pos);
+            followingList.add(user.getId());
+            users.remove(user);
+            adapter.notifyItemRemoved(pos);
+            followingRef.child(fUser.getUid()).setValue(followingList);
+            Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_LONG)
+                    .setAction(R.string.visit_profile, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUrl());
+                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+                        }
+                    }).show();
+
+            //get user's followers list
+            followersRef.child(user.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    followersList.clear();
+
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        followersList.add(ds.getValue(String.class));
                     }
-                }).show();
+                    //add myself as a user
+                    if (!followersList.contains(fUser.getUid())) {
+                        followersList.add(fUser.getUid());
+                        followersRef.child(user.getId()).setValue(followersList);
+                    }
 
-        //get user's followers list
-        followersRef.child(user.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                followersList.clear();
-
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    followersList.add(ds.getValue(String.class));
-                }
-                //add myself as a user
-                if (!followersList.contains(fUser.getUid())) {
-                    followersList.add(fUser.getUid());
-                    followersRef.child(user.getId()).setValue(followersList);
                 }
 
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+        } else {
+            Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.only_reg_user, Snackbar.LENGTH_SHORT).show();
+        }
 
-            }
-        });
     }
 
     @Override

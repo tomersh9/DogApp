@@ -15,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -95,6 +96,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
         forgotPassTv = findViewById(R.id.forgot_pass_tv);
         progressBar = findViewById(R.id.reg_2_progress_bar);
         hideLayout = findViewById(R.id.reg_2_hide_layout);
+        guestTv = findViewById(R.id.continue_guest_tv);
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -124,6 +126,24 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                 }
             }
         };
+
+        guestTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firebaseAuth.signInAnonymously().addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()) {
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "fail", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
 
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override

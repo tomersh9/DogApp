@@ -149,6 +149,7 @@ public class SecondRegisterFragment extends Fragment {
             } else {
                 Toast.makeText(getActivity(), R.string.permissions_granted, Toast.LENGTH_SHORT).show();
                 permission = true;
+                openGallery();
             }
         }
 
@@ -449,19 +450,20 @@ public class SecondRegisterFragment extends Fragment {
                 galleryBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        intent.setType("image/*");
-                        startActivityForResult(intent, SELECT_IMAGE);
+
+                        //check permissions
+                        if (Build.VERSION.SDK_INT >= 23) {
+                            int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                            int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+                            if (hasWritePermission != PackageManager.PERMISSION_GRANTED && hasReadPermission != PackageManager.PERMISSION_GRANTED) {
+                                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
+                            } else {
+                                openGallery();
+                            }
+                        }
                     }
                 });
 
-                //check permissions
-                if (Build.VERSION.SDK_INT >= 23) {
-                    int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                    int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
-                    if (hasWritePermission != PackageManager.PERMISSION_GRANTED && hasReadPermission != PackageManager.PERMISSION_GRANTED)
-                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
-                }
             }
         });
 
@@ -494,6 +496,12 @@ public class SecondRegisterFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, SELECT_IMAGE);
     }
 
     private void startLocation() {

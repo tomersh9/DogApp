@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,8 +30,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Models.ModelPost;
 import com.example.dogapp.R;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -69,7 +72,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     public interface OnPostListener {
         void onCommentClicked(String pId);
 
-        void onLikeClicked();
+        void onAnonymousLikeClicked();
+
+        void onPostImageClicked(String userID, String imgURL);
     }
 
     private OnPostListener listener;
@@ -124,7 +129,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         holder.moreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showMoreOptions(holder.moreBtn, uId, myUid, pId,holder.getAdapterPosition());
+                showMoreOptions(holder.moreBtn, uId, myUid, pId, holder.getAdapterPosition());
             }
         });
 
@@ -140,32 +145,47 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             public void onClick(View v) {
                 //listener.onLikeClicked();
 
-                final int pLikes = Integer.parseInt(postList.get(position).getpLikes());
-                mProcessLike = true;
-                final String postId = postList.get(position).getpId();
-                likesRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (mProcessLike) {
-                            if (snapshot.child(postId).hasChild(myUid)) {
-                                postsRef.child(postId).child("pLikes").setValue("" + (pLikes - 1));
-                                likesRef.child(postId).child(myUid).removeValue();
-                                mProcessLike = false;
-                            } else {
-                                postsRef.child(postId).child("pLikes").setValue("" + (pLikes + 1));
-                                likesRef.child(postId).child(myUid).setValue("Liked");
-                                mProcessLike = false;
-                                sendToToken(postId,FirebaseAuth.getInstance().getCurrentUser().getDisplayName() );
+                if (!FirebaseAuth.getInstance().getCurrentUser().isAnonymous()) {
+
+                    final int pLikes = Integer.parseInt(postList.get(position).getpLikes());
+                    mProcessLike = true;
+                    final String postId = postList.get(position).getpId();
+                    likesRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (mProcessLike) {
+                                if (snapshot.child(postId).hasChild(myUid)) {
+                                    postsRef.child(postId).child("pLikes").setValue("" + (pLikes - 1));
+                                    likesRef.child(postId).child(myUid).removeValue();
+                                    mProcessLike = false;
+                                } else {
+                                    postsRef.child(postId).child("pLikes").setValue("" + (pLikes + 1));
+                                    likesRef.child(postId).child(myUid).setValue("Liked");
+                                    mProcessLike = false;
+                                    sendToToken(postId, FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                                }
+
                             }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
 
                         }
-                    }
+                    });
+                } else {
+                    listener.onAnonymousLikeClicked();
+                }
+            }
+        });
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
+        holder.postClickLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ModelPost post = postList.get(position);
+                String userID = post.getuId();
+                String imgURL = post.getuPic();
+                listener.onPostImageClicked(userID,imgURL);
             }
         });
 
@@ -193,7 +213,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         });
     }
 
-    private void showMoreOptions(ImageButton moreBtn, String uId, String myUid, final String pId,final int pos) {
+    private void showMoreOptions(ImageButton moreBtn, String uId, String myUid, final String pId, final int pos) {
         PopupMenu popupMenu = new PopupMenu(context, moreBtn, Gravity.END);
 
         //show delete option only in the posts of the current user
@@ -209,7 +229,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                 int id = item.getItemId();
                 if (id == 0) {
                     //delete is clicked
-                    beginDelete(pId,pos);
+                    beginDelete(pId, pos);
                 }
                 return false;
             }
@@ -261,6 +281,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         TextView nameTv, timeTv, descTv, likesTv, comTv, likeBtnTv;
         ImageButton moreBtn;
         LinearLayout commentsLayout, likesLayout;
+        RelativeLayout postClickLayout;
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
@@ -274,6 +295,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             moreBtn = itemView.findViewById(R.id.more_btn);
             commentsLayout = itemView.findViewById(R.id.comment_btn_layout);
             likesLayout = itemView.findViewById(R.id.like_btn_layout);
+            postClickLayout = itemView.findViewById(R.id.post_click_layout);
             likeBtn = itemView.findViewById(R.id.like_btn);
             likeBtnTv = itemView.findViewById(R.id.like_btn_tv);
         }

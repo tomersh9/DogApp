@@ -127,11 +127,14 @@
             android:id="@+id/slider_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|start"
+            android:layout_gravity="bottom|center"
             android:layout_marginStart="10dp"
             android:layout_marginBottom="15dp"
-            android:src="@drawable/ic_map_black_24dp"
-            android:visibility="gone" />
+            android:src="@drawable/ic_add_black_24dp"
+            android:tint="@color/white"
+            android:visibility="gone"
+            app:backgroundTint="@color/green"
+            app:tint="@color/white" />
 
         <ProgressBar
             android:id="@+id/app_bar_progress_bar"
@@ -699,15 +702,47 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginBottom="10dp"
                         android:gravity="center"
-                        android:orientation="horizontal"
-                        android:weightSum="1">
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <RelativeLayout
+                            android:id="@+id/upload_pics_layout_to_hide"
+                            android:layout_width="180dp"
+                            android:layout_height="220dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="35dp"
+                            android:background="@drawable/hint_item_shape"
+                            android:gravity="center"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:id="@+id/no_pics_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:gravity="center"
+                                android:lineHeight="25dp"
+                                android:padding="15dp"
+                                android:text="@string/upload_pictures_of_your_dogs"
+                                android:textSize="20sp" />
+
+                            <ImageView
+                                android:id="@+id/pic_icon"
+                                android:layout_width="70dp"
+                                android:layout_height="70dp"
+                                android:layout_below="@id/no_pics_tv"
+                                android:layout_centerHorizontal="true"
+                                android:src="@drawable/dog_icon_128" />
+
+                        </RelativeLayout>
 
                         <androidx.viewpager2.widget.ViewPager2
                             android:id="@+id/photo_view_pager"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:paddingStart="80dp"
-                            android:paddingEnd="80dp" />
+                            android:paddingEnd="80dp"
+                            android:visibility="visible" />
 
                     </LinearLayout>
 

@@ -164,7 +164,7 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
             } else {
                 String filterPattern = constraint.toString().toLowerCase().trim(); //the filter
                 for (User user : usersFull) { //adding matching items to the filtered list
-                    if (user.getFullName().toLowerCase().contains(filterPattern)) {
+                    if (user.getFullName().toLowerCase().contains(filterPattern) || user.getLocation().toLowerCase().contains(filterPattern)) {
                         filteredList.add(user);
                     }
                 }

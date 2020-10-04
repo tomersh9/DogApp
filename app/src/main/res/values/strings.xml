@@ -312,4 +312,8 @@
     <string name="must_be_13">Must be at least 13 years old to register</string>
     <string name="back">Back</string>
     <string name="get_started">Get started</string>
+    <string name="are_you_sure_del_pic">Are you sure you want to delete this picture?</string>
+    <string name="upload_pictures_of_your_dogs">Upload pictures of your dogs</string>
+    <string name="search_by_name_location">Search by name or location..</string>
+    <string name="only_reg_user">Only registered users can use this feature</string>
 </resources>

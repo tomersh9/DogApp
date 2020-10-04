@@ -75,8 +75,7 @@
         android:layout_gravity="start"
         android:background="@drawable/white_bg_shape"
         app:headerLayout="@layout/header_drawer_layout"
-        app:itemIconTint="@null"
-        app:menu="@menu/drawer_menu" />
+        app:itemIconTint="@null" />
 
 
 </androidx.drawerlayout.widget.DrawerLayout>

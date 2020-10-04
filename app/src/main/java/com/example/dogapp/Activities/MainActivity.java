@@ -9,6 +9,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
@@ -48,6 +49,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -62,7 +64,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, ChatsFragment.OnChatClickListener, FollowersFragment.MyFollowersFragmentListener, FollowingFragment.MyFollowingFragmentListener, WalkerBoardFragment.MyWalkerBoardFragmentListener {
+public class MainActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentListener, ChatsFragment.OnChatClickListener, FollowersFragment.MyFollowersFragmentListener, FollowingFragment.MyFollowingFragmentListener, WalkerBoardFragment.MyWalkerBoardFragmentListener, HomeFragment.MyHomeFragmentListener {
 
     //Fragments TAGs
     private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
@@ -100,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     DatabaseReference usersRef = database.getReference("users"); //create new table named "users" and we get a reference to it
     FirebaseUser fUser = firebaseAuth.getCurrentUser();
     File file;
+    private boolean isAnonymous;
 
     //Change UI from notification
     BroadcastReceiver receiver;
@@ -109,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     private boolean lastCall;
 
     //TODO check if there are problems
+
     /*@Override
     protected void onStart() {
         super.onStart();
@@ -182,53 +186,58 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         homeFragment = new HomeFragment();
         exploreFragment = new ExploreFragment();
         chatsFragment = new ChatsFragment();
-        //profileFragment = new ProfileFragment();
 
-        //set on click listeners
-        setOnClickListeners();
+        isAnonymous = fUser.isAnonymous();
 
         //set default home fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
         toolbar.setTitle(R.string.home);
 
-        //TODO check if there are problems
-        //listens to events of fire base instances
-        /*authStateListener = new FirebaseAuth.AuthStateListener() {
+        //set on click listeners
+        setOnClickListeners();
 
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (fUser != null) {
+        if (!isAnonymous) {
 
-                } else { //sign out
+            navigationView.inflateMenu(R.menu.drawer_menu);
 
-                }
-            }
-        };*/
+            /*//TODO check if there are problems
+            //listens to events of fire base instances
+            authStateListener = new FirebaseAuth.AuthStateListener() {
 
-        //************* UPDATE USER FIELDS RETROACTIVE TO CREATION IN DATABASE*******************//
-        //***************UPDATE DRAWER UI WITH USER FIELDS**************************//
-        //to prevent deleted users create real time things in the table
-        //update photo url field in User class
-
-        if (fUser != null) {
-
-            //update user fields
-            Map<String, Object> hashMap = new HashMap<>();
-            hashMap.put("photoUrl", fUser.getPhotoUrl().toString());
-            hashMap.put("id", fUser.getUid());
-            usersRef.child(fUser.getUid()).updateChildren(hashMap);
-
-            //token
-            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                 @Override
-                public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                    if (task.isSuccessful()) {
-                        sendRegistrationToServer(task.getResult().getToken());
-                    } else {
-                        Toast.makeText(MainActivity.this, "NO TOKEN", Toast.LENGTH_SHORT).show();
+                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                    if (fUser != null) {
+
+                    } else { //sign out
+
                     }
                 }
-            });
+            };*/
+
+            //************* UPDATE USER FIELDS RETROACTIVE TO CREATION IN DATABASE*******************//
+            //***************UPDATE DRAWER UI WITH USER FIELDS**************************//
+            //to prevent deleted users create real time things in the table
+            //update photo url field in User class
+
+            if (fUser != null) {
+
+                //update user fields
+                Map<String, Object> hashMap = new HashMap<>();
+                hashMap.put("photoUrl", fUser.getPhotoUrl().toString());
+                hashMap.put("id", fUser.getUid());
+                usersRef.child(fUser.getUid()).updateChildren(hashMap);
+
+                //token
+                FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (task.isSuccessful()) {
+                            sendRegistrationToServer(task.getResult().getToken());
+                        } else {
+                            Toast.makeText(MainActivity.this, "NO TOKEN", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             /*Map<String,Object> hashMap = new HashMap<>();
             hashMap.put("photoUri",fUser.getPhotoUrl().toString());
             hashMap.put("id",fUser.getUid());
@@ -245,63 +254,86 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     }
                 }
             });*/
-        }
+            }
 
        /* usersRef.child(fUser.getUid()).child("photoUri").setValue(fUser.getPhotoUrl().toString());
         //update Unique ID field
         usersRef.child(fUser.getUid()).child("id").setValue(fUser.getUid());*/
 
-        //get data of current user from firebase and update views
-        usersRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    //update things from user data
-                    User user = dataSnapshot.getValue(User.class);
-                    fullNameTv.setText(user.getFullName());
-                    if (user.getType()) { //true walker
-                        titleTv.setText(R.string.dog_walker);
-                    } else { //false owner
-                        titleTv.setText(R.string.dog_owner);
-                    }
-                    locationTv.setText(user.getLocation());
-
-                    //to give the settings activity
-                    isWalker = user.getType(); //walker vs user
-                    lastCall = user.getLastCall();
-
-                } else {
-                    Toast.makeText(MainActivity.this, "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        if (fUser.getPhotoUrl() != null) {
-            Glide.with(this).asBitmap().load(fUser.getPhotoUrl()).into(drawerProfilePic);
-        }
-
-        //Broadcast Receiver - update UI when user is in the app
-        if (receiver == null) {
-            receiver = new BroadcastReceiver() {
+            //get data of current user from firebase and update views
+            usersRef.child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onReceive(Context context, Intent intent) {
-                    //add badge to the chats bottom nav item
-                    Menu menu = bottomNavBar.getMenu();
-                    MenuItem menuItem = menu.findItem(R.id.bottom_chat); //chats item
-                    BadgeDrawable badgeDrawable = bottomNavBar.getOrCreateBadge(menuItem.getItemId());
-                    badgeDrawable.setVisible(true);
-                    badgeDrawable.setBackgroundColor(getResources().getColor(R.color.red));
-                }
-            };
-        }
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        //update things from user data
+                        User user = dataSnapshot.getValue(User.class);
+                        fullNameTv.setText(user.getFullName());
+                        if (user.getType()) { //true walker
+                            titleTv.setText(R.string.dog_walker);
+                        } else { //false owner
+                            titleTv.setText(R.string.dog_owner);
+                        }
+                        locationTv.setText(user.getLocation());
 
-        IntentFilter filter = new IntentFilter("action_msg_receive");
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+                        //to give the settings activity
+                        isWalker = user.getType(); //walker vs user
+                        lastCall = user.getLastCall();
+
+                    } else {
+                        Toast.makeText(MainActivity.this, "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            if (fUser.getPhotoUrl() != null) {
+                Glide.with(this).asBitmap().load(fUser.getPhotoUrl()).into(drawerProfilePic);
+            }
+
+            //Broadcast Receiver - update UI when user is in the app
+            if (receiver == null) {
+                receiver = new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        //add badge to the chats bottom nav item
+                        Menu menu = bottomNavBar.getMenu();
+                        MenuItem menuItem = menu.findItem(R.id.bottom_chat); //chats item
+                        BadgeDrawable badgeDrawable = bottomNavBar.getOrCreateBadge(menuItem.getItemId());
+                        badgeDrawable.setVisible(true);
+                        badgeDrawable.setBackgroundColor(getResources().getColor(R.color.red));
+                    }
+                };
+            }
+
+            IntentFilter filter = new IntentFilter("action_msg_receive");
+            LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+
+        } else {
+
+            navigationView.inflateMenu(R.menu.drawer_anonymus_menu);
+            drawerProfilePic.setImageResource(R.drawable.user_drawer_icon_256);
+            fullNameTv.setText("Guest");
+            locationTv.setText("");
+            titleTv.setText("");
+
+            navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    if (item.getItemId() == R.id.item_sign_out_anonymus) {
+                        firebaseAuth.signOut();
+                        Intent signOutIntent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(signOutIntent);
+                        finish();
+                    }
+                    drawerLayout.closeDrawers();
+                    return true;
+                }
+            });
+        }
     }
 
     private void sendRegistrationToServer(String token) {
@@ -339,6 +371,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
             public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
 
                 Fragment currFragment;
+                FragmentManager manager = getSupportFragmentManager();
 
                 switch (item.getItemId()) {
 
@@ -364,12 +397,17 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         if (badgeDrawable != null) {
                             badgeDrawable.setVisible(false);
                         }
-
                         break;
 
                     case R.id.bottom_profile:
-                        profileFragment = ProfileFragment.newInstance(fUser.getUid(), fUser.getPhotoUrl().toString());
-                        currFragment = profileFragment;
+                        if (!isAnonymous) {
+                            profileFragment = ProfileFragment.newInstance(fUser.getUid(), fUser.getPhotoUrl().toString());
+                            currFragment = profileFragment;
+                        } else {
+                            currFragment = null;
+                            item.setCheckable(false);
+                            Snackbar.make(coordinatorLayout, R.string.only_reg_user, Snackbar.LENGTH_SHORT).show();
+                        }
                         break;
 
                     default:
@@ -380,7 +418,11 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 if (navigationView.getCheckedItem() != null) {
                     navigationView.getCheckedItem().setChecked(false);
                 }
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, currFragment).commit();
+
+                if (currFragment != null) {
+                    clearBackStack();
+                    manager.beginTransaction().replace(R.id.fragment_container, currFragment).commit();
+                }
                 return true;
             }
         });
@@ -397,10 +439,10 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         break;
 
                     case R.id.item_settings:
-                        Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
-                        intent.putExtra("isWalker",isWalker); //true for walker
-                        intent.putExtra("lastCall",lastCall);
-                        startActivityForResult(intent,SETTINGS_REQUEST);
+                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                        intent.putExtra("isWalker", isWalker); //true for walker
+                        intent.putExtra("lastCall", lastCall);
+                        startActivityForResult(intent, SETTINGS_REQUEST);
                         break;
 
                     case R.id.item_sign_out:
@@ -419,17 +461,23 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         });
     }
 
+    private void clearBackStack() {
+        for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
+            getSupportFragmentManager().popBackStack();
+        }
+    }
+
     //change from settings activity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == SETTINGS_REQUEST) {
+        if (requestCode == SETTINGS_REQUEST) {
 
             fullNameTv.setText(fUser.getDisplayName());
 
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-            lastCall = sp.getBoolean("last_call_cb_preference",false);
+            lastCall = sp.getBoolean("last_call_cb_preference", false);
 
         }
     }
@@ -439,13 +487,14 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else  {
+        } else if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
             //get current fragment after
             Fragment currFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (currFragment != null) {
                 closeFragment(currFragment.getTag());
             }
-
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -468,6 +517,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     private void closeFragment(String tag) {
 
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             getSupportFragmentManager().popBackStack(); //remove from back stack
@@ -505,8 +555,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
     @Override
     public void onWalkerClicked(String userID, String imgURL) {
-        ProfileFragment fragment = ProfileFragment.newInstance(userID,imgURL);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,fragment,PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+        ProfileFragment fragment = ProfileFragment.newInstance(userID, imgURL);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
     }
 
     //Profile fragment events
@@ -516,12 +566,17 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     }
 
     @Override
+    public void onMyPostClicked() {
+        bottomNavBar.setSelectedItemId(R.id.bottom_profile);
+    }
+
+    @Override
     public void onProfileSettingsClick() {
         navigationView.setCheckedItem(R.id.item_settings);
-        Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
-        intent.putExtra("isWalker",isWalker); //true for walker
-        intent.putExtra("lastCall",lastCall);
-        startActivityForResult(intent,SETTINGS_REQUEST);
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+        intent.putExtra("isWalker", isWalker); //true for walker
+        intent.putExtra("lastCall", lastCall);
+        startActivityForResult(intent, SETTINGS_REQUEST);
     }
 
     @Override
@@ -563,12 +618,16 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     @Override
     protected void onResume() {
         super.onResume();
-        setUserStatus(true);
+        if (!fUser.isAnonymous()) {
+            setUserStatus(true);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        setUserStatus(false);
+        if (!fUser.isAnonymous()) {
+            setUserStatus(false);
+        }
     }
 }

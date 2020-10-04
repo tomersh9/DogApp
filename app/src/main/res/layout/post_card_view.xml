@@ -19,40 +19,47 @@
         android:layout_marginTop="15dp"
         android:layout_marginRight="15dp">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/post_img"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/shutterstock_648907024" />
-
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/post_click_layout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/post_img"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tv_name"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/post_img"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/shutterstock_648907024" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/place_holder"
-                android:textColor="@color/black"
-                android:textSize="17sp" />
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@id/post_img"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="@string/_11_hr"
-                android:textColor="@color/black"
-                android:textSize="13sp" />
+                <TextView
+                    android:id="@+id/tv_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/place_holder"
+                    android:textColor="@color/black"
+                    android:textSize="17sp" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/_11_hr"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
 
         <ImageButton
             android:id="@+id/more_btn"

@@ -51,6 +51,12 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
 
+        if(firebaseAuth.getCurrentUser()!=null) {
+            if(firebaseAuth.getCurrentUser().isAnonymous()) {
+                firebaseAuth.signOut();
+            }
+        }
+
         //fixed portrait mode
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -80,7 +86,7 @@ public class SplashScreen extends AppCompatActivity {
         }
 
         ImageView imageView = findViewById(R.id.splash_bg);
-        imageView.animate().scaleX(4f).scaleY(2).setDuration(1500).withEndAction(new Runnable() {
+        imageView.animate().scaleX(4f).scaleY(2).setDuration(1700).withEndAction(new Runnable() {
             @Override
             public void run() {
                 bool = true;

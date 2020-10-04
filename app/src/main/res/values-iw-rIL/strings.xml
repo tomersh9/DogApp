@@ -218,4 +218,8 @@
     <string name="must_be_13">עליך להיות לפחות בגיל 13 כדי להירשם</string>
     <string name="back">חזור</string>
     <string name="get_started">התחל</string>
+    <string name="are_you_sure_del_pic">האם למחוק את התמונה?</string>
+    <string name="upload_pictures_of_your_dogs">העלו תמונות של הכלבים שלכם</string>
+    <string name="search_by_name_location">חיפוש לפי שם או מיקום..</string>
+    <string name="only_reg_user">רק משתמשים רשומים יכולים לבצע פעולה זו</string>
 </resources>
