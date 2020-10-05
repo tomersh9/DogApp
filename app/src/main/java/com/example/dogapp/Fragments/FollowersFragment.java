@@ -37,7 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FollowersFragment extends Fragment implements FriendsAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
+public class FollowersFragment extends Fragment implements FriendsAdapter.MyUserListener {
 
     private final String FOLLOWERS_FRAGMENT_TAG = "followers_tag";
     private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
@@ -59,7 +59,7 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
 
     //UI
     private ProgressBar progressBar;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    //private SwipeRefreshLayout swipeRefreshLayout;
     private boolean isRefreshing = false;
     private TextView noFollowersTv;
 
@@ -111,8 +111,8 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
         }
 
         progressBar = rootView.findViewById(R.id.friends_fragment_progress_bar);
-        swipeRefreshLayout = rootView.findViewById(R.id.friends_swiper);
-        swipeRefreshLayout.setOnRefreshListener(this);
+        //swipeRefreshLayout = rootView.findViewById(R.id.friends_swiper);
+        //swipeRefreshLayout.setOnRefreshListener(this);
 
         //init recyclerview
         recyclerView = rootView.findViewById(R.id.friends_recycler);
@@ -128,9 +128,9 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
 
     private void getAllFollowers() {
 
-        if (!isRefreshing) { //swiper already refreshing
+        /*if (!isRefreshing) { //swiper already refreshing
             progressBar.setVisibility(View.VISIBLE);
-        }
+        }*/
 
         followersRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -177,14 +177,14 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
                     }
                 }
                 progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
+                //swipeRefreshLayout.setRefreshing(false);
                 isRefreshing = false;
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
+                //swipeRefreshLayout.setRefreshing(false);
                 isRefreshing = false;
             }
         });
@@ -300,9 +300,9 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
-    @Override
+    /*@Override
     public void onRefresh() {
         isRefreshing = true;
         getAllFollowers();
-    }
+    }*/
 }

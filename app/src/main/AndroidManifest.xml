@@ -38,6 +38,8 @@
             </intent-filter>
         </service>
 
+        <receiver android:name=".Services.AlarmBroadcastReceiver"/>
+
         <activity android:name=".Activities.SettingsActivity"/>
 
     </application>

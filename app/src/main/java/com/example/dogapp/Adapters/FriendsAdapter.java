@@ -1,6 +1,8 @@
 package com.example.dogapp.Adapters;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +19,11 @@ import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserViewHolder> implements Filterable {
 
@@ -32,6 +37,11 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
     private boolean isMyFriend;
     private boolean isMe;
     private Context context;
+
+    //location
+    private Geocoder geocoder;
+    private Handler handler;
+    private String result;
 
     public interface MyUserListener {
         void onFriendClicked(int pos, View v);
@@ -53,6 +63,9 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         this.isMe = isMe;
         this.context = context;
         usersFull = new ArrayList<>(users); //for filtering (copy of list)
+        if(context!=null) {
+            geocoder = new Geocoder(context);
+        }
     }
 
     //inner class
@@ -65,6 +78,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         ImageButton followBtn;
         ImageButton chatBtn;
         ImageView deleteBtn;
+        //String result;
 
         //constructor
         public UserViewHolder(@NonNull View itemView) {
@@ -144,27 +158,37 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
 
-        User user = users.get(position);
+        final User user = users.get(position);
         holder.usernameTv.setText(user.getFullName());
-        if(user.getType()) { //walker
+        if (user.getType()) { //walker
             holder.typeTv.setText(R.string.dog_walker);
         } else {
             holder.typeTv.setText(R.string.dog_owner);
         }
 
         int age = user.getAge();
+        holder.locationTv.setText(user.getLocation());
 
         //gender rtl
-        if(user.getGender() == 0) {
+        if (user.getGender() == 0) {
             holder.ageGenderTv.setText(context.getString(R.string.male) + ", " + age);
-        } else if(user.getGender() == 1) {
+        } else if (user.getGender() == 1) {
             holder.ageGenderTv.setText(context.getString(R.string.female) + ", " + age);
         } else {
             holder.ageGenderTv.setText(context.getString(R.string.other) + ", " + age);
         }
 
+        /*try {
+            List<Address> addresses = geocoder.getFromLocationName(user.getLocation(), 1);
+            final Address bestAddress = addresses.get(0);
+            holder.locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+
+
         try {
-            Glide.with(holder.itemView).asBitmap().load(user.getPhotoUrl()).placeholder(R.drawable.user_icon_png_128).into(holder.profileIv);
+            Glide.with(holder.itemView).asBitmap().load(user.getPhotoUrl()).placeholder(R.drawable.user_drawer_icon_256).into(holder.profileIv);
         } catch (Exception ex) {
             ex.getMessage();
         }

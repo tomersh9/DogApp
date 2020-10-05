@@ -20,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import com.example.dogapp.Models.ModelComment;
+import com.example.dogapp.Models.ModelPost;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -27,8 +29,11 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,6 +77,12 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         sp.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
     }
 
     @Override
@@ -138,6 +149,7 @@ public class SettingsActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         updateDB("fullName",name);
+                                        updatePostAndComments();
                                     } else {
                                         Snackbar.make(findViewById(R.id.settings_layout_root), getString(R.string.unable_make_change), Snackbar.LENGTH_SHORT).show();
                                         progressBar.setVisibility(View.GONE);
@@ -193,7 +205,7 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                         break;
 
-                    //************WALKER SETTINGS****************//
+                    //*****WALKER SETTINGS*****//
                     case EXP_CHANGE_KEY:
                         progressBar.setVisibility(View.VISIBLE);
                         Integer exp = Integer.parseInt(sharedPreferences.getString(key, "0"));
@@ -266,6 +278,57 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
+    private void updatePostAndComments()
+    {
+        final DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("Posts");
+        postRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                //update my posts
+                if (snapshot.exists()) {
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        final ModelPost post = ds.getValue(ModelPost.class);
+                        if (post.getuId().equals(fUser.getUid())) {
+                            Map<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("uName", fUser.getDisplayName());
+                            postRef.child(ds.getKey()).updateChildren(hashMap);
+                        }
+
+                        //update my comments
+                        postRef.child(post.getpId()).child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                if (snapshot.exists()) {
+                                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                        ModelComment comment = dataSnapshot.getValue(ModelComment.class);
+                                        if (comment.getuId().equals(fUser.getUid())) {
+
+                                            Map<String, Object> picMap = new HashMap<>();
+                                            picMap.put("uName", fUser.getDisplayName());
+                                            postRef.child(post.getpId()).child("Comments").child(comment.getcId()).updateChildren(picMap);
+                                        }
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void setUserStatus(Boolean status) {
         if (fUser != null) {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -286,59 +349,6 @@ public class SettingsActivity extends AppCompatActivity {
         super.onPause();
         setUserStatus(false);
     }
-
-   /* private void buildLoaderDialog(String body) {
-        final View dialogView;
-        final AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-        dialogView = getLayoutInflater().inflate(R.layout.loader_dialog, null);
-        TextView bodyTv = dialogView.findViewById(R.id.loader_tv);
-        bodyTv.setText(body);
-        progressDialog = builder1.setView(dialogView).setCancelable(false).show();
-        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-    }
-
-    private void buildConfirmDialog(String title, String body) {
-
-        final AlertDialog confirmDialog;
-        View dialogView = getLayoutInflater().inflate(R.layout.success_dialog, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        confirmDialog = builder.setView(dialogView).setCancelable(false).show();
-        confirmDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-        //dialog views
-        TextView titleTv = dialogView.findViewById(R.id.success_title_tv);
-        titleTv.setText(title);
-        TextView bodyTv = dialogView.findViewById(R.id.success_body_tv);
-        bodyTv.setText(body);
-        Button closeBtn = dialogView.findViewById(R.id.success_dialog_close_btn);
-        closeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                confirmDialog.dismiss();
-            }
-        });
-    }
-
-    private void buildFailDialog(String title, String body) {
-        final AlertDialog failDialog;
-        View dialogView = getLayoutInflater().inflate(R.layout.failed_dialog, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        failDialog = builder.setView(dialogView).show();
-        failDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-        //dialog views
-        TextView titleTv = dialogView.findViewById(R.id.failed_title_tv);
-        titleTv.setText(title);
-        TextView bodyTv = dialogView.findViewById(R.id.fail_body_tv);
-        bodyTv.setText(body);
-        Button closeBtn = dialogView.findViewById(R.id.fail_dialog_close_btn);
-        closeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                failDialog.dismiss();
-            }
-        });
-    }*/
 
     public static class PreferenceSettingsFragment extends PreferenceFragmentCompat {
         @Override

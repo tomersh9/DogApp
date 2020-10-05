@@ -45,11 +45,12 @@ public class SliderActivity extends AppCompatActivity {
         backTv = findViewById(R.id.slider_back_btn);
         finishBtn = findViewById(R.id.finish_btn);
 
-        items.add(new StarterSliderPagerItem(R.drawable.compass_icon_512,"Explore","You can search friends and dog walkers to follow their updates"));
-        items.add(new StarterSliderPagerItem(R.drawable.write_icon_512,"Post updates","You can post anything that's on your mind for your followers to know. You can also write reviews for dog walkers you had experience with"));
-        items.add(new StarterSliderPagerItem(R.drawable.work_icon_512,"Business account","You can sign up as a dog walker to offer your service to all the accounts of the app"));
+        items.add(new StarterSliderPagerItem(R.drawable.door_icon_512, "Welcome to Dog App", getString(R.string.app_headline)));
+        items.add(new StarterSliderPagerItem(R.drawable.compass_icon_512, getString(R.string.explore), getString(R.string.explore_headline)));
+        items.add(new StarterSliderPagerItem(R.drawable.chat_icon_512, getString(R.string.communicate), getString(R.string.communicate_headline)));
+        items.add(new StarterSliderPagerItem(R.drawable.work_icon_512, getString(R.string.multiple_accounts), getString(R.string.multiple_headline)));
 
-        adapter = new StarterSliderPagerAdapter(items,this);
+        adapter = new StarterSliderPagerAdapter(items, this);
         sliderPager.setAdapter(adapter);
         dotsTabLayout.setupWithViewPager(sliderPager);
 
@@ -57,7 +58,7 @@ public class SliderActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
 
-                if(tab.getPosition() == items.size() - 1) {
+                if (tab.getPosition() == items.size() - 1) {
                     nextTv.setVisibility(View.GONE);
                     startAnimation();
                 } else {
@@ -65,11 +66,11 @@ public class SliderActivity extends AppCompatActivity {
                     endAnimation();
                 }
 
-                if(tab.getPosition() > 0) {
+                if (tab.getPosition() > 0) {
                     backTv.setVisibility(View.VISIBLE);
                 }
 
-                if(tab.getPosition() == 0) {
+                if (tab.getPosition() == 0) {
                     backTv.setVisibility(View.GONE);
                 }
             }
@@ -91,17 +92,17 @@ public class SliderActivity extends AppCompatActivity {
 
                 position = sliderPager.getCurrentItem();
 
-                if(position < items.size()) {
+                if (position < items.size()) {
                     position++;
                     sliderPager.setCurrentItem(position); //move pages by button
                 }
 
-                if(position > 0) {
+                if (position > 0) {
                     backTv.setVisibility(View.VISIBLE);
-                } else if(position == 0) {
+                } else if (position == 0) {
                     backTv.setVisibility(View.GONE);
                 }
-             }
+            }
         });
 
         backTv.setOnClickListener(new View.OnClickListener() {
@@ -110,12 +111,12 @@ public class SliderActivity extends AppCompatActivity {
 
                 position = sliderPager.getCurrentItem();
 
-                if(position > 0) {
+                if (position > 0) {
                     position--;
                     sliderPager.setCurrentItem(position);
                 }
 
-                if(position == 0) {
+                if (position == 0) {
                     backTv.setVisibility(View.GONE);
                 }
             }

@@ -37,7 +37,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="5dp"
             android:gravity="center"
-            android:text="השאר ביקורת"
+            android:text="@string/leave_a_review"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -52,7 +52,7 @@
             android:layout_marginBottom="5dp"
             android:gravity="center"
             android:padding="7dp"
-            android:text="כתוב ביקורת מכבדת על שירותיו של NAME כדי לתת פידבק לנותן השירות שגם משתמשים אחרים יוכלו לראות" />
+            android:text="@string/please_write_a_respectful_review_about_this_dog_walker_s_service_to_give_him_and_the_other_users_feedback" />
 
         <ProgressBar
             android:id="@+id/review_sheet_progress_bar"
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/bottom_sheet_star_layout"
                 android:layout_centerHorizontal="true"
-                android:text="(אל תשכח להשאיר דירוג התואם את השירות)"
+                android:text="@string/do_not_forget_to_leave_a_rating_that_matches_the_service_in_your_opinion"
                 android:textSize="11sp" />
 
 
@@ -153,7 +153,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_toStartOf="@id/review_btn"
                 android:background="@android:color/transparent"
-                android:hint="כתוב ביקורת"
+                android:hint="@string/write_a_review"
                 android:padding="10dp" />
 
             <ImageButton

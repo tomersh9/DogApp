@@ -14,9 +14,12 @@ import android.graphics.Color;
 import android.graphics.ImageDecoder;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -48,6 +51,12 @@ import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -82,6 +91,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -166,8 +178,16 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     //View Pager 2
     private ViewPager2 viewPager2;
-    List<SliderItem> sliderItems = new ArrayList<>();
-    SliderAdapter sliderAdapter;
+    private List<SliderItem> sliderItems = new ArrayList<>();
+    private SliderAdapter sliderAdapter;
+
+    //location
+    private Geocoder geocoder;
+    private Handler handler = new Handler();
+
+    ///Following notifications
+    private final String SERVER_KEY = "AAAAsSPUwiM:APA91bF5T2kokP05wtjBjEwMiUXAuB9OXF4cCSgqf4HV9ST1kzKuD9w3ncboYoGTZxMQbBSv0EocqTcycHE4gGzFDDeGIYkyLolsd3W1gY1ZPu5qCHjpNAh-H3g0Y-JvNUIZ1iOm8uOW";
+    private final String BASE_URL = "https://fcm.googleapis.com/fcm/send";
 
     public interface OnProfileFragmentListener {
 
@@ -220,6 +240,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             isMe = false;
         }
 
+        //location geoCoder
+        geocoder = new Geocoder(getActivity());
+
         //assign views
         uploadPicsHintLayout = rootView.findViewById(R.id.upload_pics_layout_to_hide);
         coordinatorLayout = rootView.findViewById(R.id.profile_coordinator);
@@ -247,7 +270,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         followFab = rootView.findViewById(R.id.follow_fab);
         profileFab = rootView.findViewById(R.id.profile_fab);
         sliderFab = rootView.findViewById(R.id.slider_fab);
-        sliderFab.hide();
         profileProgressBar = rootView.findViewById(R.id.app_bar_progress_bar);
         coverProgressBar = rootView.findViewById(R.id.cover_progress_bar);
         locationLayoutBtn = rootView.findViewById(R.id.profile_list_location_layout_item);
@@ -280,7 +302,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             chatFab.setVisibility(View.GONE);
             followFab.setVisibility(View.GONE);
             profileFab.setVisibility(View.VISIBLE);
-            sliderFab.setVisibility(View.VISIBLE);
+            //sliderFab.setVisibility(View.VISIBLE);
 
             profileFab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -290,6 +312,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             });
 
             if (!isWalker) { //edit sliding photos
+                sliderFab.setVisibility(View.VISIBLE);
+                sliderFab.hide();
                 sliderFab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -327,7 +351,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         //toolbar
         collapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar_layout);
         toolbar = rootView.findViewById(R.id.toolbar_profile);
-        listener.changeProfileToolBar(toolbar);
+        if (getActivity().getSupportFragmentManager().getBackStackEntryCount() != 0) {
+            listener.changeProfileToolBar(toolbar);
+        }
         appBarLayout = rootView.findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(this);
         toolbar.setTitle("");
@@ -715,7 +741,27 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
 
-                    User user = snapshot.getValue(User.class);
+                    final User user = snapshot.getValue(User.class);
+
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            super.run();
+                            try {
+                                List<Address> addresses = geocoder.getFromLocationName(user.getLocation(), 1);
+                                final Address bestAddress = addresses.get(0);
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+                                    }
+                                });
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }.start();
 
                     //for dialogs including name
                     otherUserName = user.getFullName();
@@ -732,10 +778,15 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         ex.getMessage();
                     }
 
-                    //set views and text
                     nameTv.setText(user.getFullName());
-                    locationTv.setText(user.getLocation());
-                    aboutMeTv.setText(user.getAboutMe());
+
+
+                    String aboutString = user.getAboutMe();
+                    if (aboutString.isEmpty() && isMe) {
+                        aboutMeTv.setText(R.string.tell_about_yourself);
+                    } else {
+                        aboutMeTv.setText(aboutString);
+                    }
 
                     if (getActivity() != null) {
 
@@ -879,9 +930,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Snackbar.make(coordinatorLayout, "Delete succeed", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(coordinatorLayout, R.string.delete_succeed, Snackbar.LENGTH_SHORT).show();
                         } else {
-                            Snackbar.make(coordinatorLayout, "Delete failed", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(coordinatorLayout, R.string.delete_failed, Snackbar.LENGTH_SHORT).show();
                         }
                         deleteSliderDialogProgressBar.setVisibility(View.GONE);
                         deleteSliderDialog.dismiss();
@@ -894,7 +945,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             public void onFailure(@NonNull Exception e) {
                 deleteSliderDialogProgressBar.setVisibility(View.GONE);
                 deleteSliderDialog.dismiss();
-                Snackbar.make(coordinatorLayout, "Delete failed", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(coordinatorLayout, R.string.delete_failed, Snackbar.LENGTH_SHORT).show();
             }
         });
 
@@ -953,6 +1004,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             //add the user to my following list
             followingList.add(userID);
             followingRef.child(fUser.getUid()).setValue(followingList);
+            sendToToken(userID);
 
             //get user's followers list to add myself
             followersRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1017,6 +1069,56 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             followFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.green)));
             Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.unfollow_from) + " " + nameTv.getText().toString(), Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    private void sendToToken(String userID) {
+        //setting data with JSON objects to get the children
+        final JSONObject rootJson = new JSONObject(); //we put here "data" and "to"
+        final JSONObject dataJson = new JSONObject();
+
+        try {
+            dataJson.put("message", "follow");
+            dataJson.put("isFollow", "check");
+            dataJson.put("fullName", fUser.getDisplayName());
+            dataJson.put("imgURL", fUser.getPhotoUrl().toString());
+            dataJson.put("uID", fUser.getUid());
+            rootJson.put("to", "/topics/" + userID);
+            rootJson.put("data", dataJson);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //create POST request
+        StringRequest stringRequest = new StringRequest(StringRequest.Method.POST, BASE_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) { //POST REQUEST class implementation
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "key=" + SERVER_KEY);
+                return headers;
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return rootJson.toString().getBytes(); //return the root object with data inside
+            }
+        };
+
+        //sending the actual request
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        queue.add(stringRequest);
     }
 
     private void loadDetailsViews() {
@@ -1585,9 +1687,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    Snackbar.make(coordinatorLayout, "Upload succeed", Snackbar.LENGTH_SHORT).show();
+                                                    Snackbar.make(coordinatorLayout, R.string.picture_added, Snackbar.LENGTH_SHORT).show();
                                                 } else {
-                                                    Snackbar.make(coordinatorLayout, "Upload failed", Snackbar.LENGTH_SHORT).show();
+                                                    Snackbar.make(coordinatorLayout, R.string.failed_to_add_picture, Snackbar.LENGTH_SHORT).show();
                                                 }
                                             }
                                         });

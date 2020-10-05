@@ -340,11 +340,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginHorizontal="1dp"
-                        android:background="@drawable/profile_item_btn_selector"
+                        android:background="@drawable/profile_item_shape"
                         android:clickable="true"
                         android:focusable="true"
                         android:padding="10dp"
-                        android:translationZ="2dp">
+                        android:translationZ="1dp">
 
                         <ImageView
                             android:id="@+id/profile_about_icon"
@@ -393,11 +393,11 @@
                             android:layout_marginVertical="5dp"
                             android:layout_marginStart="1dp"
                             android:layout_weight="2"
-                            android:background="@drawable/profile_item_btn_selector"
+                            android:background="@drawable/profile_item_shape"
                             android:clickable="true"
                             android:focusable="true"
                             android:padding="15dp"
-                            android:translationZ="2dp">
+                            android:translationZ="1dp">
 
                             <ImageView
                                 android:id="@+id/profile_gender_iv"
@@ -426,12 +426,12 @@
                             android:layout_marginHorizontal="10dp"
                             android:layout_marginVertical="5dp"
                             android:layout_weight="3"
-                            android:background="@drawable/profile_item_btn_selector"
+                            android:background="@drawable/profile_item_shape"
                             android:clickable="true"
                             android:focusable="true"
                             android:orientation="horizontal"
                             android:padding="15dp"
-                            android:translationZ="2dp">
+                            android:translationZ="1dp">
 
                             <ImageView
                                 android:id="@+id/profile_location_iv"
@@ -461,11 +461,11 @@
                             android:layout_marginVertical="5dp"
                             android:layout_marginEnd="1dp"
                             android:layout_weight="2"
-                            android:background="@drawable/profile_item_btn_selector"
+                            android:background="@drawable/profile_item_shape"
                             android:clickable="true"
                             android:focusable="true"
                             android:padding="15dp"
-                            android:translationZ="2dp">
+                            android:translationZ="1dp">
 
                             <ImageView
                                 android:id="@+id/profile_type_iv"
@@ -510,7 +510,7 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:padding="10dp"
-                            android:translationZ="3dp">
+                            android:translationZ="2dp">
 
                             <ImageView
                                 android:id="@+id/dog_icon"
@@ -544,7 +544,7 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:padding="10dp"
-                            android:translationZ="3dp">
+                            android:translationZ="2dp">
 
                             <ImageView
                                 android:id="@+id/trek_icon"
@@ -589,7 +589,7 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:padding="10dp"
-                            android:translationZ="3dp">
+                            android:translationZ="2dp">
 
                             <ImageView
                                 android:id="@+id/clock_icon"
@@ -623,7 +623,7 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:padding="10dp"
-                            android:translationZ="3dp">
+                            android:translationZ="2dp">
 
                             <ImageView
                                 android:id="@+id/payment_icon"
@@ -669,7 +669,7 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:padding="10dp"
-                            android:translationZ="3dp">
+                            android:translationZ="2dp">
 
                             <ImageView
                                 android:id="@+id/exp_icon"
@@ -703,16 +703,18 @@
                         android:layout_marginBottom="10dp"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:visibility="gone">
+                        android:visibility="gone"
+                        android:weightSum="1">
 
                         <RelativeLayout
                             android:id="@+id/upload_pics_layout_to_hide"
-                            android:layout_width="180dp"
-                            android:layout_height="220dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginTop="35dp"
                             android:background="@drawable/hint_item_shape"
                             android:gravity="center"
+                            android:paddingHorizontal="7dp"
+                            android:paddingVertical="50dp"
                             android:visibility="gone">
 
                             <TextView
@@ -722,7 +724,7 @@
                                 android:layout_centerHorizontal="true"
                                 android:gravity="center"
                                 android:lineHeight="25dp"
-                                android:padding="15dp"
+                                android:padding="10dp"
                                 android:text="@string/upload_pictures_of_your_dogs"
                                 android:textSize="20sp" />
 
@@ -743,6 +745,28 @@
                             android:paddingStart="80dp"
                             android:paddingEnd="80dp"
                             android:visibility="visible" />
+
+                        <com.google.android.material.tabs.TabLayout
+                            android:id="@+id/profile_dots_tab_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            app:tabBackground="@drawable/dots_selector"
+                            app:tabIndicatorColor="@null">
+
+                            <!--<com.google.android.material.tabs.TabItem
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                            <com.google.android.material.tabs.TabItem
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                            <com.google.android.material.tabs.TabItem
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />-->
+
+                        </com.google.android.material.tabs.TabLayout>
 
                     </LinearLayout>
 

@@ -58,7 +58,6 @@
     <string name="invalid_email">כתובת המייל לא נמצאה</string>
     <string name="login_failed">ההתחברות נכשלה</string>
     <string name="email_sent">המייל נשלח!</string>
-    <string name="welcome">ברוכים הבאים</string>
     <string name="reg_failed">ההרשמה נכשלה</string>
     <string name="check_correct_details">אנא וודא שהפרטים נכונים</string>
     <string name="my_profile">הפרופיל שלי</string>
@@ -222,4 +221,22 @@
     <string name="upload_pictures_of_your_dogs">העלו תמונות של הכלבים שלכם</string>
     <string name="search_by_name_location">חיפוש לפי שם או מיקום..</string>
     <string name="only_reg_user">רק משתמשים רשומים יכולים לבצע פעולה זו</string>
+    <string name="guest_login_in">מתחבר כאורח</string>
+    <string name="welcome">ברוך הבא</string>
+    <string name="guest">ברוך הבא אורח</string>
+    <string name="delete_succeed">התמונה נמחקה</string>
+    <string name="delete_failed">התמונה לא נמחקה</string>
+    <string name="picture_added">התמונה נוספה</string>
+    <string name="failed_to_add_picture">נכשל בהוספת התמונה</string>
+    <string name="leave_a_review">השאר ביקורת</string>
+    <string name="please_write_a_respectful_review_about_this_dog_walker_s_service_to_give_him_and_the_other_users_feedback">כתוב ביקורת מכבדת על שירותיו של דוג ווקר זה כדי לתת פידבק לנותן השירות שגם משתמשים אחרים יוכלו לראות</string>
+    <string name="do_not_forget_to_leave_a_rating_that_matches_the_service_in_your_opinion">(אל תשכח להשאיר דירוג התואם בעינך את השירות)</string>
+    <string name="started_following_you">התחיל לעקוב אחריך</string>
+    <string name="tell_about_yourself">ספר קצת על עצמך..</string>
+    <string name="app_headline">רשת חברתית המקשרת בין בעלי כלבים לדוג ווקרים במטרה למצוא או ליצור את השירות הטוב ביותר עבורך.</string>
+    <string name="explore_headline">אתה יכול לחפש בעלי כלבים ודוג ווקרים כדי לעקוב אחר העדכונים שלהם וליצור קשרים חדשים.</string>
+    <string name="communicate_headline">אתה יכול לפרסם כל מה שעולה לך בראש כדי שהעוקבים שלך בכל רחבי העולם יישארו מעודכנים, לתקשר עם העוקבים שלך באמצעות הצ\'אט ובנוסף לכתוב ביקורות על דוג ווקרים ששכרת את שירותם.</string>
+    <string name="multiple_headline">אתה יכול להירשם כבעל כלב כדי למצוא את הדוג ווקר הטוב ביותר לכלב/ים שלך, או כדוג ווקר על מנת להציע את שירותך ללקוחות פוטנציאליים.</string>
+    <string name="communicate">שמור על קשר</string>
+    <string name="multiple_accounts">משתמשים מרובים</string>
 </resources>

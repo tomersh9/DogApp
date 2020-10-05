@@ -1,6 +1,8 @@
 package com.example.dogapp.Adapters;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +30,9 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
     private Context context;
     private String userID;
 
+    //location
+    private Geocoder geocoder;
+
     public interface MyWalkerAdapterListener {
         void onWalkerClicked(int pos);
     }
@@ -36,6 +42,9 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
         this.usersFull = new ArrayList<>(walkersList);
         this.context = context;
         this.userID = userID;
+        if(context!=null) {
+            this.geocoder = new Geocoder(context);
+        }
     }
 
     public void setWalkerAdapterListener(MyWalkerAdapterListener listener) {
@@ -102,9 +111,9 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
 
         //assign views with his data
         holder.nameTv.setText(walkerUser.getFullName());
-        holder.locationTv.setText(walkerUser.getLocation());
         holder.expTv.setText(expArr[walkerUser.getExperience()] + " " + context.getString(R.string.years_of_exp));
         holder.paymentTv.setText(walkerUser.getPaymentPerWalk() + " " + context.getString(R.string.ils) + " " + context.getString(R.string.per_walk));
+        holder.locationTv.setText(walkerUser.getLocation());
         int age = walkerUser.getAge();
 
         //gender rtl
@@ -137,10 +146,19 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
 
         //assign profile image with Glide
         try {
-            Glide.with(holder.itemView).asBitmap().load(walkerUser.getPhotoUrl()).placeholder(R.drawable.user_icon_png_128).into(holder.profileIv);
+            Glide.with(holder.itemView).asBitmap().load(walkerUser.getPhotoUrl()).placeholder(R.drawable.user_drawer_icon_256).into(holder.profileIv);
         } catch (Exception ex) {
             ex.getMessage();
         }
+
+        //rtl location
+        /*try {
+            List<Address> addresses = geocoder.getFromLocationName(walkerUser.getLocation(), 1);
+            final Address bestAddress = addresses.get(0);
+            holder.locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
     }
 
     @Override

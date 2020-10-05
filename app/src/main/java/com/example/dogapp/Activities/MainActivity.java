@@ -14,8 +14,10 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -42,6 +44,7 @@ import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
 import com.example.dogapp.Fragments.WalkerBoardFragment;
 import com.example.dogapp.R;
+import com.example.dogapp.Services.AlarmBroadcastReceiver;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
@@ -61,6 +64,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -139,6 +143,25 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
+    //*****************HELLO WORLD*********************//
+    public static void startAlarmBroadcastReceiver(Context context) {
+        Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 9, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        if(calendar.get(Calendar.HOUR_OF_DAY) >= 18 && calendar.get(Calendar.MINUTE) >= 45) {
+            calendar.add(Calendar.DATE,1); //adding 1 day
+        }
+        calendar.set(Calendar.HOUR_OF_DAY, 18);
+        calendar.set(Calendar.MINUTE, 45);
+        calendar.set(Calendar.SECOND, 0);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+    }
+
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +177,10 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
             NotificationChannel channel = new NotificationChannel("ID", "NAME", NotificationManager.IMPORTANCE_HIGH);
             manager.createNotificationChannel(channel);
         }
+
+
+        //alarm manager
+        //startAlarmBroadcastReceiver(this);
 
         //initial set up of referencing
         toolbar = findViewById(R.id.toolbar);
@@ -199,6 +226,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         if (!isAnonymous) {
 
             navigationView.inflateMenu(R.menu.drawer_menu);
+            locationTv.setVisibility(View.VISIBLE);
+            titleTv.setVisibility(View.VISIBLE);
 
             /*//TODO check if there are problems
             //listens to events of fire base instances
@@ -312,13 +341,20 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
             IntentFilter filter = new IntentFilter("action_msg_receive");
             LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
 
+            if (getIntent().hasExtra("pendingUserID")) {
+                String otherID = getIntent().getStringExtra("pendingUserID");
+                String otherUrl = getIntent().getStringExtra("pendingImgURL");
+                ProfileFragment profileFragment = ProfileFragment.newInstance(otherID, otherUrl);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+            }
+
         } else {
 
             navigationView.inflateMenu(R.menu.drawer_anonymus_menu);
             drawerProfilePic.setImageResource(R.drawable.user_drawer_icon_256);
-            fullNameTv.setText("Guest");
-            locationTv.setText("");
-            titleTv.setText("");
+            fullNameTv.setText(R.string.guest);
+            locationTv.setVisibility(View.GONE);
+            titleTv.setVisibility(View.GONE);
 
             navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -349,9 +385,24 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         }
     }
 
+    private void deleteToken(String userID) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens").child(userID);
+        reference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    System.out.println("token deleted!!!!!!!!!!!!!!!!!");
+                } else {
+                    System.out.println("token NOT deleted!!!!!!!!!!!!!!!!!!!!!!");
+                }
+            }
+        });
+    }
+
     private void setUpActionBar() {
         ActionBar actionBar = getSupportActionBar(); //getting the ToolBar we made
         actionBar.setDisplayHomeAsUpEnabled(true); //setting home button in top left
+        actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp); //hamburger icon
     }
 
@@ -443,10 +494,12 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         intent.putExtra("isWalker", isWalker); //true for walker
                         intent.putExtra("lastCall", lastCall);
                         startActivityForResult(intent, SETTINGS_REQUEST);
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                         break;
 
                     case R.id.item_sign_out:
                         setUserStatus(false);
+                        deleteToken(fUser.getUid());
                         firebaseAuth.signOut();
                         Intent signOutIntent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(signOutIntent);
@@ -563,6 +616,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     @Override
     public void changeProfileToolBar(Toolbar toolbar) {
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     @Override
@@ -577,6 +631,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         intent.putExtra("isWalker", isWalker); //true for walker
         intent.putExtra("lastCall", lastCall);
         startActivityForResult(intent, SETTINGS_REQUEST);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     @Override

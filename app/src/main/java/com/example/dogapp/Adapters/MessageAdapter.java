@@ -80,7 +80,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ChatView
 
         holder.messageTv.setText(chat.getMessage());
         try {
-            Glide.with(holder.itemView).asBitmap().load(imgUrl).placeholder(R.drawable.user_icon_png_64).into(holder.userProfileIv);
+            Glide.with(holder.itemView).asBitmap().load(imgUrl).placeholder(R.drawable.user_drawer_icon_64).into(holder.userProfileIv);
         } catch (Exception ex) {
 
         }

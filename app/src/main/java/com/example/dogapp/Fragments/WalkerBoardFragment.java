@@ -39,7 +39,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, WalkerAdapter.MyWalkerAdapterListener {
+public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWalkerAdapterListener {
 
     //List
     private RecyclerView recyclerView;
@@ -48,7 +48,7 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
 
     //UI
     private ProgressBar progressBar;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    //private SwipeRefreshLayout swipeRefreshLayout;
 
     //firebase
     private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -82,8 +82,8 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
 
         View rootView = inflater.inflate(R.layout.walker_board_fragment_layout, container, false);
         progressBar = rootView.findViewById(R.id.discover_walkers_progress_bar);
-        swipeRefreshLayout = rootView.findViewById(R.id.discover_walkers_swiper);
-        swipeRefreshLayout.setOnRefreshListener(this);
+        //swipeRefreshLayout = rootView.findViewById(R.id.discover_walkers_swiper);
+        //swipeRefreshLayout.setOnRefreshListener(this);
 
         //init recyclerview
         recyclerView = rootView.findViewById(R.id.discover_walkers_recycler);
@@ -123,7 +123,7 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
                 adapter.notifyDataSetChanged();
 
                 progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
+                //swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -274,11 +274,6 @@ public class WalkerBoardFragment extends Fragment implements SwipeRefreshLayout.
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onRefresh() {
-        getAllWalkers();
     }
 
     @Override

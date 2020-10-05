@@ -130,15 +130,17 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
         guestTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                buildLoaderDialog(getString(R.string.guest_login_in));
                 firebaseAuth.signInAnonymously().addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        progressDialog.dismiss();
                         if(task.isSuccessful()) {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
                             finish();
                         } else {
-                            Toast.makeText(LoginActivity.this, "fail", Toast.LENGTH_SHORT).show();
+                            buildFailDialog(getString(R.string.went_wrong),getString(R.string.try_again));
                         }
                     }
                 });
@@ -242,7 +244,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "aboutMe",null, 0, null, false, 0,0,new ArrayList<SliderItem>());
+                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "",null, 0, null, false, 0,0,new ArrayList<SliderItem>());
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
 
                 } else {

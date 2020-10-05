@@ -174,7 +174,6 @@ public class SecondRegisterFragment extends Fragment {
 
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                Toast.makeText(getActivity(), fileUri.toString(), Toast.LENGTH_SHORT).show();
                 bitmap2 = null;
                 try {
                     bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
@@ -182,12 +181,10 @@ public class SecondRegisterFragment extends Fragment {
                     e.printStackTrace();
                 }
                 profileBtn.setImageBitmap(bitmap1);
-                //getActivity().getContentResolver().delete(fileUri,null, null); // have to transfer to register button
                 pressTv.setVisibility(View.GONE);
                 isFromCamera = true;
                 alertDialog.dismiss();
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                //Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_SHORT).show();
                 fileUri = null;
             }
 

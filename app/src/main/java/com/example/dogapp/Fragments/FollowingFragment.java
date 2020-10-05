@@ -40,7 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FollowingFragment extends Fragment implements FriendsAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
+public class FollowingFragment extends Fragment implements FriendsAdapter.MyUserListener {
 
     private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
 
@@ -61,7 +61,7 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
 
     //UI
     private ProgressBar progressBar;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    //private SwipeRefreshLayout swipeRefreshLayout;
     private TextView noFollowingTv;
 
     public static FollowingFragment newInstance(String userID) {
@@ -114,8 +114,8 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
         }
 
         progressBar = rootView.findViewById(R.id.friends_fragment_progress_bar);
-        swipeRefreshLayout = rootView.findViewById(R.id.friends_swiper);
-        swipeRefreshLayout.setOnRefreshListener(this);
+        //swipeRefreshLayout = rootView.findViewById(R.id.friends_swiper);
+        //swipeRefreshLayout.setOnRefreshListener(this);
 
         //init recyclerview
         recyclerView = rootView.findViewById(R.id.friends_recycler);
@@ -163,27 +163,27 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
                         }
                     }
                     //adapter
-                    adapter = new FriendsAdapter(users, true, isMe,getActivity());
+                    adapter = new FriendsAdapter(users, true, isMe, getActivity());
                     //set adapter to recyclerview
                     recyclerView.setAdapter(adapter);
                     //adapter click events
                     adapter.setMyUserListener(FollowingFragment.this);
                     adapter.notifyDataSetChanged();
 
-                    if(users.isEmpty()) {
+                    if (users.isEmpty()) {
                         noFollowingTv.setVisibility(View.VISIBLE);
                     } else {
                         noFollowingTv.setVisibility(View.GONE);
                     }
                 }
                 progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
+                //swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
+                //swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -283,10 +283,5 @@ public class FollowingFragment extends Fragment implements FriendsAdapter.MyUser
     public void onDestroyView() {
         super.onDestroyView();
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-    }
-
-    @Override
-    public void onRefresh() {
-        getAllFollowing();
     }
 }

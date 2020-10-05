@@ -16,6 +16,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.dogapp.Activities.InChatActivity;
 import com.example.dogapp.Activities.MainActivity;
+import com.example.dogapp.Fragments.HomeFragment;
+import com.example.dogapp.Fragments.ProfileFragment;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -40,7 +42,8 @@ import java.util.Map;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private final int NOTIF_ID = 1;
-    private final int NOTIF_ID2 = 2;
+    private final int NOTIF_ID1 = 2;
+    private final int NOTIF_ID2 = 3;
 
     /**
      * Called if InstanceID token is updated. This may occur if the security of
@@ -90,9 +93,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String msg = data.get("message");
             String from = data.get("fullName");
             String uid = data.get("uID");
+            String imgURL = data.get("imgURL");
             String isLike = data.get("isLike");
             String isCom = data.get("isCom");
             String isMsg = data.get("isMsg");
+            String isFollow = data.get("isFollow");
             String nameComment = data.get("nameComment");
             String isComFriend = data.get("isComFriend");
 
@@ -106,6 +111,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Intent mainIntent = new Intent(MyFirebaseMessagingService.this, MainActivity.class);
             PendingIntent mainPendingIntent = PendingIntent.getActivity(MyFirebaseMessagingService.this,1,mainIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 
+            //for following notifications
+            Intent followIntent = new Intent(MyFirebaseMessagingService.this, MainActivity.class);
+            followIntent.putExtra("pendingUserID",uid);
+            followIntent.putExtra("pendingImgURL",imgURL);
+            PendingIntent followPendingIntent = PendingIntent.getActivity(MyFirebaseMessagingService.this,2,followIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 
             // when the user is OUT OF THE APP!!!!
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ID");
@@ -132,6 +142,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     .setContentTitle(from + " " + getString(R.string.also_commented_on) + " " + nameComment + " " + getString(R.string.post_notif))
                     .setContentIntent(mainPendingIntent);
 
+            NotificationCompat.Builder builder4 = new NotificationCompat.Builder(this, "ID");
+            builder4.setSmallIcon(R.drawable.ic_person_add_black_24dp)
+                    .setContentTitle(from + " " + getString(R.string.started_following_you))
+                    .setContentIntent(followPendingIntent);
+
             if (!checkApp()) {
                 NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 if (isCom != null) {
@@ -139,9 +154,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 } else if (isComFriend != null) {
                     manager.notify(NOTIF_ID, builder3.build());
                 } else if (isMsg != null)
-                    manager.notify(NOTIF_ID, builder.build());
+                    manager.notify(NOTIF_ID1, builder.build());
                 else if (isLike != null) {
                     manager.notify(NOTIF_ID, builder2.build());
+                }
+                else if(isFollow != null){
+                    manager.notify(NOTIF_ID2,builder4.build());
                 }
 
             }

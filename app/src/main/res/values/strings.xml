@@ -316,4 +316,21 @@
     <string name="upload_pictures_of_your_dogs">Upload pictures of your dogs</string>
     <string name="search_by_name_location">Search by name or location..</string>
     <string name="only_reg_user">Only registered users can use this feature</string>
+    <string name="guest_login_in">Guest logging in</string>
+    <string name="guest">Welcome guest</string>
+    <string name="delete_succeed">Delete succeed</string>
+    <string name="delete_failed">Delete failed</string>
+    <string name="picture_added">Picture added</string>
+    <string name="failed_to_add_picture">Failed to add picture</string>
+    <string name="leave_a_review">Leave a review</string>
+    <string name="please_write_a_respectful_review_about_this_dog_walker_s_service_to_give_him_and_the_other_users_feedback">Please write a respectful review about this dog walker\'s service to give him and the other users feedback</string>
+    <string name="do_not_forget_to_leave_a_rating_that_matches_the_service_in_your_opinion">(Do not forget to leave a rating that matches the service in your opinion)</string>
+    <string name="started_following_you">started following you</string>
+    <string name="tell_about_yourself">Tell a little about yourself..</string>
+    <string name="app_headline">This is a social network app that links between dog owners and dog walkers, in goal to find or create the best service for you.</string>
+    <string name="explore_headline">You can search dog owners and dog walkers to follow their updates and make new connections.</string>
+    <string name="communicate_headline">You can post anything that\'s on your mind for your followers all around the world will stay tuned, chat with your followers and also write reviews for dog walkers you experienced.</string>
+    <string name="multiple_headline">You can sign up either as a dog owner to find the best walker service for your dog/s, or as a dog walker in order to offer your service to potential clients.</string>
+    <string name="communicate">Communicate</string>
+    <string name="multiple_accounts">Multiple accounts</string>
 </resources>

@@ -20,6 +20,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.dogapp.Activities.InChatActivity;
 import com.example.dogapp.Adapters.FriendsAdapter;
 import com.example.dogapp.Enteties.User;
@@ -33,10 +39,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.MyUserListener, SwipeRefreshLayout.OnRefreshListener {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.MyUserListener {
 
     private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
 
@@ -55,23 +66,12 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
 
     //UI
     private ProgressBar progressBar;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    //private SwipeRefreshLayout swipeRefreshLayout;
 
-   /* public interface MyDiscoverFriendsFragmentListener {
-        void onDiscoverFriendPress();
-    }
+    ///Following notifications
+    private final String SERVER_KEY = "AAAAsSPUwiM:APA91bF5T2kokP05wtjBjEwMiUXAuB9OXF4cCSgqf4HV9ST1kzKuD9w3ncboYoGTZxMQbBSv0EocqTcycHE4gGzFDDeGIYkyLolsd3W1gY1ZPu5qCHjpNAh-H3g0Y-JvNUIZ1iOm8uOW";
+    private final String BASE_URL = "https://fcm.googleapis.com/fcm/send";
 
-    private MyDiscoverFriendsFragmentListener listener;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        try {
-            listener = (MyDiscoverFriendsFragmentListener) context;
-        } catch (ClassCastException ex) {
-            throw new ClassCastException("MainActivity must implement MyDiscoverFriendsFragmentListener interface");
-        }
-    }*/
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,8 +86,8 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
 
         View rootView = inflater.inflate(R.layout.discover_friends_fragment_layout, container, false);
         progressBar = rootView.findViewById(R.id.discover_friends_progress_bar);
-        swipeRefreshLayout = rootView.findViewById(R.id.discover_friends_swiper);
-        swipeRefreshLayout.setOnRefreshListener(this);
+        //swipeRefreshLayout = rootView.findViewById(R.id.discover_friends_swiper);
+        //swipeRefreshLayout.setOnRefreshListener(this);
 
         //init recyclerview
         recyclerView = rootView.findViewById(R.id.discover_friends_recycler);
@@ -136,7 +136,7 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
                         }
                     }
                     //adapter
-                    adapter = new FriendsAdapter(users, false, true,getActivity());
+                    adapter = new FriendsAdapter(users, false, true, getActivity());
                     //set adapter to recyclerview
                     recyclerView.setAdapter(adapter);
                     //adapter click events
@@ -144,7 +144,7 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
                     adapter.notifyDataSetChanged();
                 }
                 progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
+                //swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -173,12 +173,13 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
 
     @Override
     public void onFriendFollowClicked(int pos, View v) {
-        if(!fUser.isAnonymous()) {
+        if (!fUser.isAnonymous()) {
             final User user = users.get(pos);
             followingList.add(user.getId());
             users.remove(user);
             adapter.notifyItemRemoved(pos);
             followingRef.child(fUser.getUid()).setValue(followingList);
+            sendToToken(user.getId());
             Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_LONG)
                     .setAction(R.string.visit_profile, new View.OnClickListener() {
                         @Override
@@ -214,6 +215,57 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
             Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.only_reg_user, Snackbar.LENGTH_SHORT).show();
         }
 
+    }
+
+    private void sendToToken(String id) {
+        //setting data with JSON objects to get the children
+        final JSONObject rootJson = new JSONObject(); //we put here "data" and "to"
+        final JSONObject dataJson = new JSONObject();
+
+        try {
+            dataJson.put("message", "follow");
+            dataJson.put("isFollow", "check");
+            dataJson.put("fullName", fUser.getDisplayName());
+            dataJson.put("imgURL",fUser.getPhotoUrl().toString());
+            dataJson.put("uID",fUser.getUid());
+            rootJson.put("to", "/topics/" + id);
+            rootJson.put("data", dataJson);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        //create POST request
+        StringRequest stringRequest = new StringRequest(StringRequest.Method.POST, BASE_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) { ///POST REQUEST class implementation
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "key=" + SERVER_KEY);
+                return headers;
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return rootJson.toString().getBytes(); //return the root object with data inside
+            }
+        };
+
+        //sending the actual request
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        queue.add(stringRequest);
     }
 
     @Override
@@ -253,11 +305,6 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
     public void onDestroyView() {
         super.onDestroyView();
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-    }
-
-    @Override
-    public void onRefresh() {
-        getFollowingList();
     }
 
 }

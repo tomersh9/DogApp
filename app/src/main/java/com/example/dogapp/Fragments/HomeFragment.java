@@ -113,7 +113,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     //PUSH NOTIFICATION
     private final String SERVER_KEY = "AAAAsSPUwiM:APA91bF5T2kokP05wtjBjEwMiUXAuB9OXF4cCSgqf4HV9ST1kzKuD9w3ncboYoGTZxMQbBSv0EocqTcycHE4gGzFDDeGIYkyLolsd3W1gY1ZPu5qCHjpNAh-H3g0Y-JvNUIZ1iOm8uOW";
     private final String BASE_URL = "https://fcm.googleapis.com/fcm/send";
-    boolean s;
+    private boolean s;
 
     public interface MyHomeFragmentListener {
         void onMyPostClicked();
@@ -138,6 +138,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         setHasOptionsMenu(true);
 
         firebaseMessaging = FirebaseMessaging.getInstance();
+        firebaseMessaging.subscribeToTopic(fUser.getUid());
 
         final View rootView = inflater.inflate(R.layout.home_fragment, container, false);
 
@@ -188,7 +189,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                         name = user.getFullName();
                         location = user.getLocation();
                         try {
-                            Glide.with(rootView).load(user.getPhotoUrl()).placeholder(R.drawable.user_icon_png_64).into(homeIv);
+                            Glide.with(rootView).load(user.getPhotoUrl()).placeholder(R.drawable.user_drawer_icon_64).into(homeIv);
                         } catch (Exception ex) {
 
                         }
@@ -445,8 +446,8 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     for (DataSnapshot ds : snapshot.getChildren()) {
                         followingList.add(ds.getValue(String.class));
                     }
-                    loadPosts();
                 }
+                loadPosts();
             }
 
             @Override

@@ -18,21 +18,14 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:text="@string/no_following_yet"
         android:paddingHorizontal="10dp"
+        android:text="@string/no_following_yet"
         android:textSize="40sp"
         android:visibility="gone" />
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/friends_swiper"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/friends_recycler"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/friends_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

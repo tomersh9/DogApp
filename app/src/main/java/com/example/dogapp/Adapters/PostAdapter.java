@@ -120,7 +120,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         holder.nameTv.setText(uName);
         holder.timeTv.setText(pTime);
         holder.descTv.setText(pDesc);
-        Glide.with(holder.itemView).asBitmap().load(Uri.parse(uPic)).placeholder(R.drawable.user_icon_png_64).into(holder.postIv);
+        Glide.with(holder.itemView).asBitmap().load(Uri.parse(uPic)).placeholder(R.drawable.user_drawer_icon_64).into(holder.postIv);
         holder.likesTv.setText(pLikes + " " + context.getString(R.string.likes));
         holder.comTv.setText(pComments + " " + context.getString(R.string.comments));
 
