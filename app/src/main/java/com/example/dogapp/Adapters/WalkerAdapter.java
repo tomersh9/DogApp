@@ -3,6 +3,7 @@ package com.example.dogapp.Adapters;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
 
     //location
     private Geocoder geocoder;
+    private Address bestAddress;
+    private List<Address> addresses;
 
     public interface MyWalkerAdapterListener {
         void onWalkerClicked(int pos);
@@ -102,9 +105,9 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull WalkerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final WalkerViewHolder holder, int position) {
         //get walker instance
-        User walkerUser = walkersList.get(position);
+        final User walkerUser = walkersList.get(position);
 
         //for experience
         String[] expArr = context.getResources().getStringArray(R.array.exp_years_array);
@@ -113,7 +116,7 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
         holder.nameTv.setText(walkerUser.getFullName());
         holder.expTv.setText(expArr[walkerUser.getExperience()] + " " + context.getString(R.string.years_of_exp));
         holder.paymentTv.setText(walkerUser.getPaymentPerWalk() + " " + context.getString(R.string.ils) + " " + context.getString(R.string.per_walk));
-        holder.locationTv.setText(walkerUser.getLocation());
+        //holder.locationTv.setText(walkerUser.getLocation());
         int age = walkerUser.getAge();
 
         //gender rtl
@@ -124,6 +127,35 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
         } else {
             holder.ageGenderTv.setText(context.getString(R.string.other) + ", " + age);
         }
+
+
+
+        final Handler handler = new Handler();
+
+        Thread thread1 = new Thread()
+        {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    addresses = geocoder.getFromLocationName(walkerUser.getLocation(), 1);
+                    bestAddress = addresses.get(0);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(bestAddress!=null) {
+                            holder.locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+                        }
+
+
+                    }
+                });
+            }
+        };
+        thread1.start();
 
         //assign stars
         int rating = walkerUser.getRating();
@@ -150,15 +182,6 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
         } catch (Exception ex) {
             ex.getMessage();
         }
-
-        //rtl location
-        /*try {
-            List<Address> addresses = geocoder.getFromLocationName(walkerUser.getLocation(), 1);
-            final Address bestAddress = addresses.get(0);
-            holder.locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 
     @Override
@@ -182,7 +205,14 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
             } else {
                 String filterPattern = constraint.toString().toLowerCase().trim(); //the filter
                 for (User user : usersFull) { //adding matching items to the filtered list
-                    if (user.getFullName().toLowerCase().contains(filterPattern) || user.getLocation().toLowerCase().contains(filterPattern)) {
+                    try {
+                        addresses = geocoder.getFromLocationName(user.getLocation(), 1);
+                        bestAddress = addresses.get(0);
+                        user.setLocation(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (user.getFullName().toLowerCase().contains(filterPattern) || user.getLocation().toLowerCase().contains(filterPattern)){
                         filteredList.add(user);
                     }
                 }

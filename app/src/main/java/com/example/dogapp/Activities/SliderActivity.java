@@ -45,7 +45,7 @@ public class SliderActivity extends AppCompatActivity {
         backTv = findViewById(R.id.slider_back_btn);
         finishBtn = findViewById(R.id.finish_btn);
 
-        items.add(new StarterSliderPagerItem(R.drawable.door_icon_512, "Welcome to Dog App", getString(R.string.app_headline)));
+        items.add(new StarterSliderPagerItem(R.drawable.door_icon_512, getString(R.string.welcome_to_doglink), getString(R.string.app_headline)));
         items.add(new StarterSliderPagerItem(R.drawable.compass_icon_512, getString(R.string.explore), getString(R.string.explore_headline)));
         items.add(new StarterSliderPagerItem(R.drawable.chat_icon_512, getString(R.string.communicate), getString(R.string.communicate_headline)));
         items.add(new StarterSliderPagerItem(R.drawable.work_icon_512, getString(R.string.multiple_accounts), getString(R.string.multiple_headline)));

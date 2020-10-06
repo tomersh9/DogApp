@@ -2,6 +2,7 @@ package com.example.dogapp.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.dogapp.Adapters.FriendsAdapter;
 import com.example.dogapp.Adapters.WalkerAdapter;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
@@ -49,6 +51,9 @@ public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWal
     //UI
     private ProgressBar progressBar;
     //private SwipeRefreshLayout swipeRefreshLayout;
+
+    //handler
+    Handler handler = new Handler();
 
     //firebase
     private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -116,14 +121,19 @@ public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWal
                     }
                 }
 
-                //assign list to recyclerview
-                adapter = new WalkerAdapter(walkersList, getActivity(),fUser.getUid());
-                recyclerView.setAdapter(adapter);
-                adapter.setWalkerAdapterListener(WalkerBoardFragment.this);
-                adapter.notifyDataSetChanged();
+                Collections.reverse(walkersList);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter = new WalkerAdapter(walkersList, getActivity(),fUser.getUid());
+                        recyclerView.setItemViewCacheSize(20);
+                        recyclerView.setAdapter(adapter);
+                        adapter.setWalkerAdapterListener(WalkerBoardFragment.this);
+                        adapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                },150);
 
-                progressBar.setVisibility(View.GONE);
-                //swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override

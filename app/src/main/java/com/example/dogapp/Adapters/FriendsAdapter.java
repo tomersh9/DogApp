@@ -38,10 +38,11 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
     private boolean isMe;
     private Context context;
 
+
     //location
     private Geocoder geocoder;
-    private Handler handler;
-    private String result;
+    private Address bestAddress;
+    private List<Address> addresses;
 
     public interface MyUserListener {
         void onFriendClicked(int pos, View v);
@@ -156,7 +157,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final UserViewHolder holder, int position) {
 
         final User user = users.get(position);
         holder.usernameTv.setText(user.getFullName());
@@ -167,7 +168,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         }
 
         int age = user.getAge();
-        holder.locationTv.setText(user.getLocation());
+        //holder.locationTv.setText(user.getLocation());
 
         //gender rtl
         if (user.getGender() == 0) {
@@ -178,14 +179,32 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
             holder.ageGenderTv.setText(context.getString(R.string.other) + ", " + age);
         }
 
-        /*try {
-            List<Address> addresses = geocoder.getFromLocationName(user.getLocation(), 1);
-            final Address bestAddress = addresses.get(0);
-            holder.locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        final android.os.Handler handler = new android.os.Handler();
 
+        Thread thread = new Thread()
+        {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    addresses = geocoder.getFromLocationName(user.getLocation(), 1);
+                    bestAddress = addresses.get(0);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(bestAddress!=null) {
+                            holder.locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+                        }
+
+
+                    }
+                });
+            }
+        };
+        thread.start();
 
         try {
             Glide.with(holder.itemView).asBitmap().load(user.getPhotoUrl()).placeholder(R.drawable.user_drawer_icon_256).into(holder.profileIv);
@@ -215,7 +234,6 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
 
             List<User> filteredList = new ArrayList<>(); //only filtered items
 
-            System.out.println(usersFull.toString() + " !!!!!!!!!!!!!!!");
             if (constraint == null || constraint.length() == 0) {
                 filteredList.addAll(usersFull); //return full list if has no filter!
             } else {
@@ -239,4 +257,6 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
             notifyDataSetChanged();
         }
     };
+
+
 }

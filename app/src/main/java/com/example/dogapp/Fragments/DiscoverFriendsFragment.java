@@ -3,6 +3,7 @@ package com.example.dogapp.Fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -63,6 +64,9 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
     private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
     private DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers");
     private DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+
+    //handler
+    Handler handler = new Handler();
 
     //UI
     private ProgressBar progressBar;
@@ -135,16 +139,24 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
                             users.add(user);
                         }
                     }
+
                     //adapter
-                    adapter = new FriendsAdapter(users, false, true, getActivity());
-                    //set adapter to recyclerview
-                    recyclerView.setAdapter(adapter);
-                    //adapter click events
-                    adapter.setMyUserListener(DiscoverFriendsFragment.this);
-                    adapter.notifyDataSetChanged();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter = new FriendsAdapter(users, false, true, getActivity());
+                            //set adapter to recyclerview
+                            recyclerView.setHasFixedSize(true);
+                            recyclerView.setItemViewCacheSize(20);
+                            recyclerView.setAdapter(adapter);
+                            //adapter click events
+                            adapter.setMyUserListener(DiscoverFriendsFragment.this);
+                            adapter.notifyDataSetChanged();
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    },150);
                 }
-                progressBar.setVisibility(View.GONE);
-                //swipeRefreshLayout.setRefreshing(false);
+
             }
 
             @Override
@@ -154,7 +166,7 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
         });
     }
 
-    //*************ADAPTER EVENTS***************//
+    //****ADAPTER EVENTS******//
     @Override
     public void onFriendClicked(int pos, View v) {
         //go to profile (activity)
@@ -256,7 +268,6 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
                 headers.put("Authorization", "key=" + SERVER_KEY);
                 return headers;
             }
-
             @Override
             public byte[] getBody() throws AuthFailureError {
                 return rootJson.toString().getBytes(); //return the root object with data inside
@@ -273,7 +284,7 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
         //nothing
     }
 
-    //*************OPTIONS MENU**********************//
+    //****OPTIONS MENU*******//
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);

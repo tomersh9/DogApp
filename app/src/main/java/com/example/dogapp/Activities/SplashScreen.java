@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -51,14 +53,19 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
 
-        if(firebaseAuth.getCurrentUser()!=null) {
-            if(firebaseAuth.getCurrentUser().isAnonymous()) {
-                firebaseAuth.signOut();
-            }
-        }
-
         //fixed portrait mode
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        if(firebaseAuth.getCurrentUser()!=null) {
+            if(firebaseAuth.getCurrentUser().isAnonymous()) {
+                firebaseAuth.getCurrentUser().delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        firebaseAuth.signOut();
+                    }
+                });
+            }
+        }
 
         readCounter();
 

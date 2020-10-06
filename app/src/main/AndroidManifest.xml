@@ -13,7 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.SplashScreen">
+        <activity
+            android:name=".Activities.SplashScreen"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,16 +23,20 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Activities.SliderActivity"/>
+        <activity android:name=".Activities.SliderActivity" />
 
         <activity
             android:name=".Activities.LoginActivity"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activities.MainActivity"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".Activities.InChatActivity" />
+        <activity
+            android:name=".Activities.InChatActivity"
+            android:screenOrientation="portrait" />
 
         <service android:name=".Services.MyFirebaseMessagingService">
             <intent-filter>
@@ -38,9 +44,11 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".Services.AlarmBroadcastReceiver"/>
+        <receiver android:name=".Services.AlarmBroadcastReceiver" />
 
-        <activity android:name=".Activities.SettingsActivity"/>
+        <activity
+            android:name=".Activities.SettingsActivity"
+            android:screenOrientation="portrait" />
 
     </application>
 

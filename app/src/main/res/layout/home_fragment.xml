@@ -13,6 +13,18 @@
         android:indeterminateTint="@color/colorPrimary"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/no_posts_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:paddingHorizontal="10dp"
+        android:text="@string/no_curr_posts"
+        android:textSize="40sp"
+        android:visibility="gone" />
+
+
     <LinearLayout
         android:id="@+id/home_header_layout"
         android:layout_width="match_parent"

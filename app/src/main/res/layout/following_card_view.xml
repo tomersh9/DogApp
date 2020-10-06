@@ -44,7 +44,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text="ענת חיים"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -54,7 +53,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text="בעלת כלבים"
                     android:textSize="15sp" />
 
                 <TextView
@@ -62,7 +60,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text="34 אישה"
                     android:textSize="15sp" />
 
                 <TextView
@@ -70,7 +67,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text="חולון, ישראל"
                     android:textSize="15sp" />
             </LinearLayout>
 

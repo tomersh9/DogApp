@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ import androidx.fragment.app.Fragment;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -109,7 +111,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
 
     public interface MyFinalWalkerFragmentListener {
 
-        void onWalkerRegisterClick(String name, String email, String password, String date, Integer age, Integer gender, Boolean title, String location,
+        void onWalkerRegisterClick(Uri fileUri,String name, String email, String password, String date, Integer age, Integer gender, Boolean title, String location,
                                    String aboutMe, Integer exp, Integer kmRange, List<Integer> dogSizeList, Boolean lastCall, Integer payPerWalk);
 
         void startWalkerRegisterLoader();
@@ -308,7 +310,7 @@ public class WalkerFinalRegisterFragment extends Fragment {
 
                     listener.startWalkerRegisterLoader();
 
-                    if (bitmap1 != null) {
+                    /*if (bitmap1 != null) {
                         handleUpload(bitmap1);
                     } else if (bitmap2 != null) {
                         handleUpload(bitmap2);
@@ -316,13 +318,13 @@ public class WalkerFinalRegisterFragment extends Fragment {
                         //TODO fix register without photo
                         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.user_drawer_icon_256);
                         handleUpload(bitmap);
-                    }
+                    }*/
 
                     if (isFromCamera) {
                         getActivity().getContentResolver().delete(fileUri, null, null);
                     }
 
-                    listener.onWalkerRegisterClick(fullName, email, password, dateOfBirth, age, gender, type, location,
+                    listener.onWalkerRegisterClick(fileUri,fullName, email, password, dateOfBirth, age, gender, type, location,
                             aboutMe, experience, kmRange, dogValueList, lastCall, payPerWalk);
                 } else {
                     return;
@@ -331,6 +333,55 @@ public class WalkerFinalRegisterFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    private void buildSliderBottomDialog() {
+
+        final BottomSheetDialog bottomDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+        View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_profile_slider, null);
+
+        LinearLayout takePic, selectPic;
+        takePic = bottomSheetView.findViewById(R.id.slider_take_pic);
+        selectPic = bottomSheetView.findViewById(R.id.slider_select_pic);
+
+        takePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "Picture");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "from");
+                fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                startActivityForResult(intent, CAMERA_REQUEST);
+
+                bottomDialog.dismiss();
+            }
+        });
+
+        selectPic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //check permissions
+                if (Build.VERSION.SDK_INT >= 23) {
+                    int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+                    if (hasWritePermission != PackageManager.PERMISSION_GRANTED && hasReadPermission != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
+                    } else {
+                        openGallery();
+                    }
+                }
+
+                bottomDialog.dismiss();
+            }
+        });
+
+        bottomDialog.setContentView(bottomSheetView);
+        bottomDialog.show();
     }
 
     private boolean validateFields(String about, String exp, Integer range, List<Integer> sizeList) {
@@ -405,54 +456,18 @@ public class WalkerFinalRegisterFragment extends Fragment {
     }
 
     private void setProfileViewsListener() {
+
         profileBtn.animate().scaleX(1.3f).scaleY(1.3f).setDuration(500).withEndAction(new Runnable() {
             @Override
             public void run() {
                 profileBtn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(500).start();
             }
         }).start();
+
         profileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                final View dialogView;
-                final AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
-                dialogView = getLayoutInflater().inflate(R.layout.camera_dialog, null);
-                alertDialog = builder1.setView(dialogView).show();
-                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-                ImageButton camBtn = dialogView.findViewById(R.id.cam_dialog_btn);
-                ImageButton galleryBtn = dialogView.findViewById(R.id.gallery_dialog_btn);
-
-                camBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ContentValues values = new ContentValues();
-                        values.put(MediaStore.Images.Media.TITLE, "Picture");
-                        values.put(MediaStore.Images.Media.DESCRIPTION, "from");
-                        fileUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                        startActivityForResult(intent, CAMERA_REQUEST);
-                    }
-                });
-
-                galleryBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //check permissions
-                        if (Build.VERSION.SDK_INT >= 23) {
-                            int hasWritePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                            int hasReadPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
-                            if (hasWritePermission != PackageManager.PERMISSION_GRANTED && hasReadPermission != PackageManager.PERMISSION_GRANTED) {
-                                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
-                            } else {
-                                openGallery();
-                            }
-                        }
-                    }
-                });
+                buildSliderBottomDialog();
             }
         });
     }
@@ -489,7 +504,6 @@ public class WalkerFinalRegisterFragment extends Fragment {
 
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                //Toast.makeText(getActivity(), fileUri.toString(), Toast.LENGTH_SHORT).show();
                 bitmap2 = null;
                 try {
                     bitmap1 = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getActivity().getContentResolver(), fileUri));
@@ -497,10 +511,8 @@ public class WalkerFinalRegisterFragment extends Fragment {
                     e.printStackTrace();
                 }
                 profileBtn.setImageBitmap(bitmap1);
-                //getActivity().getContentResolver().delete(fileUri,null, null); // have to transfer to register button
                 pressTv.setVisibility(View.GONE);
                 isFromCamera = true;
-                alertDialog.dismiss();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 fileUri = null;
             }
@@ -521,12 +533,11 @@ public class WalkerFinalRegisterFragment extends Fragment {
                 isFromCamera = false;
                 if (isFromCamera)
                     getActivity().getContentResolver().delete(fileUri, null, null);
-                alertDialog.dismiss();
             }
         }
     }
 
-    private void handleUpload(Bitmap bitmap) {
+    /*private void handleUpload(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Profiles").child(getArguments().getString("email") + ".jpeg");
@@ -585,5 +596,5 @@ public class WalkerFinalRegisterFragment extends Fragment {
                         }
                     });
         }
-    }
+    }*/
 }

@@ -4,8 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.ImageDecoder;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +34,8 @@ import com.example.dogapp.Fragments.WalkerFinalRegisterFragment;
 import com.example.dogapp.Models.SliderItem;
 import com.example.dogapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputLayout;
@@ -39,7 +45,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +98,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
         setContentView(R.layout.login_page_layout);
 
         //fixed portrait mode
-        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         loginBtn = findViewById(R.id.login_btn);
         registerBtn = findViewById(R.id.register_btn);
@@ -135,12 +146,12 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressDialog.dismiss();
-                        if(task.isSuccessful()) {
+                        if (task.isSuccessful()) {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
                             finish();
                         } else {
-                            buildFailDialog(getString(R.string.went_wrong),getString(R.string.try_again));
+                            buildFailDialog(getString(R.string.went_wrong), getString(R.string.try_again));
                         }
                     }
                 });
@@ -234,7 +245,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
     }
 
     @Override
-    public void onRegister(final String name, final String email, String password, final String date, final Integer age, final Integer gender, final Boolean title, final String location) {
+    public void onRegister(final Uri fileUri, final String name, final String email, String password, final String date, final Integer age, final Integer gender, final Boolean title, final String location) {
         this.fullName = name; //for the auth listener
 
 
@@ -244,8 +255,19 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "",null, 0, null, false, 0,0,new ArrayList<SliderItem>());
+                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", "", null, 0, null, false, 0, 0, new ArrayList<SliderItem>());
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
+
+                    //upload to storage
+                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.user_drawer_icon_256); //default pic
+                    if(fileUri!=null) {
+                        try {
+                            bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), fileUri));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    handleUpload(bitmap, email);
 
                 } else {
                     progressDialog.dismiss();
@@ -256,6 +278,69 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
                 }
             }
         });
+    }
+
+    private void handleUpload(Bitmap bitmap, String email) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        final StorageReference storage = FirebaseStorage.getInstance().getReference().child("Profiles").child(email + ".jpeg");
+
+        storage.putBytes(baos.toByteArray())
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        getDownloadUrl(storage);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+    }
+
+    private void getDownloadUrl(StorageReference storage) {
+        storage.getDownloadUrl()
+                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        setUserProfileUrl(uri);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
+
+    private void setUserProfileUrl(Uri uri) {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                .setPhotoUri(uri)
+                .build();
+
+        if (user != null) {
+            user.updateProfile(request)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            //listener.stopLoader();
+                            stopLoader();
+                            //listener.createConfirmDialog();
+                            createConfirmDialog();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //listener.stopLoader();
+                            stopLoader();
+                        }
+                    });
+        }
     }
 
     private void buildRegisterBottomSheetDialog() {
@@ -411,7 +496,7 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
     //***************Walker 3rd page fragment events****************//
     @Override
-    public void onWalkerRegisterClick(final String name, final String email, String password, final String date, final Integer age, final Integer gender, final Boolean title, final String location,
+    public void onWalkerRegisterClick(final Uri fileUri, final String name, final String email, String password, final String date, final Integer age, final Integer gender, final Boolean title, final String location,
                                       final String aboutMe, final Integer exp, final Integer kmRange, final List<Integer> dogSizeList, final Boolean lastCall, final Integer payPerWalk) {
 
         this.fullName = name; //for the auth listener
@@ -422,8 +507,20 @@ public class LoginActivity extends AppCompatActivity implements RegisterFragment
 
                 if (task.isSuccessful()) {
                     //push new User to database
-                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", aboutMe,exp, kmRange, dogSizeList, lastCall, payPerWalk,0,new ArrayList<SliderItem>());
+                    User user = new User(name, date, age, email, gender, title, location, "profileUrl", "coverUrl", "id", true, "0", aboutMe, exp, kmRange, dogSizeList, lastCall, payPerWalk, 0, new ArrayList<SliderItem>());
                     users.child(firebaseAuth.getCurrentUser().getUid()).setValue(user);
+
+                    //upload to storage=
+                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.user_drawer_icon_256); //default pic
+                    if (fileUri != null) {
+                        try {
+                            bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), fileUri));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    handleUpload(bitmap, email);
+
 
                 } else {
                     progressDialog.dismiss();

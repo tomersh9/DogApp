@@ -239,4 +239,9 @@
     <string name="multiple_headline">אתה יכול להירשם כבעל כלב כדי למצוא את הדוג ווקר הטוב ביותר לכלב/ים שלך, או כדוג ווקר על מנת להציע את שירותך ללקוחות פוטנציאליים.</string>
     <string name="communicate">שמור על קשר</string>
     <string name="multiple_accounts">משתמשים מרובים</string>
+    <string name="upload_empty_post">לא ניתן להעלות פוסט ריק</string>
+    <string name="no_curr_posts">אין פוסטים עדיין</string>
+    <string name="dont_miss_update">אל תפספס/י דוג ווקרים ועדכונים חדשים</string>
+    <string name="hey_you">היי את/ה!</string>
+    <string name="welcome_to_doglink">ברוכים הבאים ל - Doglink</string>
 </resources>

@@ -29,7 +29,7 @@
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:padding="5dp"
-            android:text="@string/add_new_sliding_picture"
+            android:text="@string/choose_action"
             android:textSize="20sp" />
 
         <LinearLayout

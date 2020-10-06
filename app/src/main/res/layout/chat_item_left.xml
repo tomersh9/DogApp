@@ -9,7 +9,7 @@
         android:id="@+id/chat_item_profile"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_centerVertical="true"
+        android:layout_alignParentTop="true"
         android:src="@drawable/shutterstock_648907024" />
 
     <TextView

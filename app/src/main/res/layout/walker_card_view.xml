@@ -6,7 +6,7 @@
     android:background="@drawable/profile_item_shape"
     android:clickable="true"
     android:focusable="true"
-    app:cardElevation="5dp"
+    app:cardElevation="4dp"
     app:cardUseCompatPadding="true">
 
     <RelativeLayout

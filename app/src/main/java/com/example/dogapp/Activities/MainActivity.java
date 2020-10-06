@@ -26,6 +26,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -145,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
     //*****************HELLO WORLD*********************//
     public static void startAlarmBroadcastReceiver(Context context) {
-        Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
+        /*Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 9, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Calendar calendar = Calendar.getInstance();
@@ -159,7 +160,16 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);*/
+
+        Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 9, intent, 0);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.cancel(pendingIntent);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -180,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
 
         //alarm manager
-        //startAlarmBroadcastReceiver(this);
+        startAlarmBroadcastReceiver(this);
 
         //initial set up of referencing
         toolbar = findViewById(R.id.toolbar);
@@ -360,10 +370,15 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     if (item.getItemId() == R.id.item_sign_out_anonymus) {
-                        firebaseAuth.signOut();
-                        Intent signOutIntent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(signOutIntent);
-                        finish();
+                        firebaseAuth.getCurrentUser().delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                firebaseAuth.signOut();
+                                Intent signOutIntent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(signOutIntent);
+                                finish();
+                            }
+                        });
                     }
                     drawerLayout.closeDrawers();
                     return true;

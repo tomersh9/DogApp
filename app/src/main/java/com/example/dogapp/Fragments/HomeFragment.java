@@ -99,16 +99,17 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     private SwipeRefreshLayout swipeRefreshLayout;
 
     //comment references
-    TextView name_comment;
-    TextView description_comment;
-    TextView time_comment;
-    EditText commentEt;
-    ImageView picture_comment;
-    View bottomSheetView1;
-    ProgressDialog progressBarComment;
-    RecyclerView recyclerViewComments;
-    List<ModelComment> commentList;
-    CommentAdapter commentAdapter;
+    private TextView noPostYetTv;
+    private TextView name_comment;
+    private TextView description_comment;
+    private TextView time_comment;
+    private EditText commentEt;
+    private ImageView picture_comment;
+    private View bottomSheetView1;
+    private ProgressDialog progressBarComment;
+    private RecyclerView recyclerViewComments;
+    private List<ModelComment> commentList;
+    private CommentAdapter commentAdapter;
 
     //PUSH NOTIFICATION
     private final String SERVER_KEY = "AAAAsSPUwiM:APA91bF5T2kokP05wtjBjEwMiUXAuB9OXF4cCSgqf4HV9ST1kzKuD9w3ncboYoGTZxMQbBSv0EocqTcycHE4gGzFDDeGIYkyLolsd3W1gY1ZPu5qCHjpNAh-H3g0Y-JvNUIZ1iOm8uOW";
@@ -143,6 +144,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         final View rootView = inflater.inflate(R.layout.home_fragment, container, false);
 
         //views
+        noPostYetTv = rootView.findViewById(R.id.no_posts_tv);
         progressBar = rootView.findViewById(R.id.home_progress_bar);
         coordinatorLayout = rootView.findViewById(R.id.home_frag_coordinator_layout);
         homeEt = rootView.findViewById(R.id.home_et);
@@ -218,6 +220,13 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     ModelPost modelPost = ds.getValue(ModelPost.class);
                     postList.add(modelPost);
                 }
+
+                if(postList.isEmpty()) {
+                    noPostYetTv.setVisibility(View.VISIBLE);
+                } else {
+                    noPostYetTv.setVisibility(View.GONE);
+                }
+
                 postAdapter = new PostAdapter(getActivity(), postList);
                 postAdapter.setOnPostListener(HomeFragment.this);
                 recyclerView.setAdapter(postAdapter);
@@ -244,10 +253,16 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String description = postEt.getText().toString();
-                uploadPost(description);
-                postEt.setText("");
-                dialog.dismiss();
+                if(postEt.getText().toString().equals("")) {
+                    Toast.makeText(getActivity(), R.string.upload_empty_post, Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    String description = postEt.getText().toString();
+                    uploadPost(description);
+                    postEt.setText("");
+                    dialog.dismiss();
+                }
+
             }
         });
         dialog.setContentView(bottomSheetView);
@@ -468,6 +483,12 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     if (followingList.contains(modelPost.getuId()) || modelPost.getuId().equals(fUser.getUid())) {
                         postList.add(modelPost);
                     }
+                }
+
+                if(postList.isEmpty()) {
+                    noPostYetTv.setVisibility(View.VISIBLE);
+                } else {
+                    noPostYetTv.setVisibility(View.GONE);
                 }
 
                 postAdapter = new PostAdapter(getActivity(), postList);

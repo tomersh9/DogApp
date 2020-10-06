@@ -333,4 +333,9 @@
     <string name="multiple_headline">You can sign up either as a dog owner to find the best walker service for your dog/s, or as a dog walker in order to offer your service to potential clients.</string>
     <string name="communicate">Communicate</string>
     <string name="multiple_accounts">Multiple accounts</string>
+    <string name="upload_empty_post">Cannot upload empty post</string>
+    <string name="no_curr_posts">No current posts</string>
+    <string name="dont_miss_update">Don\'t miss out any new dog walkers and updates</string>
+    <string name="hey_you">Hey you!</string>
+    <string name="welcome_to_doglink">Welcome to Doglink</string>
 </resources>

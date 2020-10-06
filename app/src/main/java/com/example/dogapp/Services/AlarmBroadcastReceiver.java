@@ -23,16 +23,15 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         buildNotification(context);
     }
-
     void buildNotification(Context context) {
 
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 9, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "ID");
-        builder.setContentText("ALARM mANAGER")
+        builder.setContentText(context.getString(R.string.hey_you))
                 .setSmallIcon(R.drawable.ic_chat_black_24dp)
-                .setContentTitle("MANAGERRRR")
+                .setContentTitle(context.getString(R.string.dont_miss_update))
                 .setContentIntent(pendingIntent);
 
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
