@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -44,6 +43,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -180,6 +180,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private ViewPager2 viewPager2;
     private List<SliderItem> sliderItems = new ArrayList<>();
     private SliderAdapter sliderAdapter;
+    private LinearLayout linearLayoutIndicator;
 
     //location
     private Geocoder geocoder;
@@ -244,6 +245,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         geocoder = new Geocoder(getActivity());
 
         //assign views
+        linearLayoutIndicator = rootView.findViewById(R.id.profile_dots_tab_layout);
         uploadPicsHintLayout = rootView.findViewById(R.id.upload_pics_layout_to_hide);
         coordinatorLayout = rootView.findViewById(R.id.profile_coordinator);
         viewPager2 = rootView.findViewById(R.id.photo_view_pager);
@@ -895,8 +897,47 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         sliderAdapter = new SliderAdapter(sliderItems);
         viewPager2.setAdapter(sliderAdapter);
+        setUpViewPagerIndicator();
+        setCurrentViewPagerIndicator(0);
+        viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                setCurrentViewPagerIndicator(position);
+            }
+        });
         sliderAdapter.setListener(ProfileFragment.this);
         sliderAdapter.notifyDataSetChanged();
+    }
+
+    private void setCurrentViewPagerIndicator(int index) {
+        int childCount = linearLayoutIndicator.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            ImageView imageView = (ImageView) linearLayoutIndicator.getChildAt(i);
+            if (i == index) {
+                imageView.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.slider_indicator_active));
+            } else {
+                imageView.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.slider_indicator_inactive));
+            }
+        }
+    }
+
+    private void setUpViewPagerIndicator() {
+        linearLayoutIndicator.removeAllViews();
+        ImageView[] indicators = new ImageView[sliderAdapter.getItemCount()];
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        layoutParams.setMargins(8, 0, 8, 0);
+
+        for (int i = 0; i < indicators.length; i++) {
+            if (getContext() != null) {
+                indicators[i] = new ImageView(getContext());
+                indicators[i].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.slider_indicator_inactive));
+                indicators[i].setLayoutParams(layoutParams);
+                linearLayoutIndicator.addView(indicators[i]);
+            }
+        }
     }
 
     @Override
@@ -931,6 +972,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Snackbar.make(coordinatorLayout, R.string.delete_succeed, Snackbar.LENGTH_SHORT).show();
+                            setUpViewPagerIndicator();
                         } else {
                             Snackbar.make(coordinatorLayout, R.string.delete_failed, Snackbar.LENGTH_SHORT).show();
                         }
@@ -1688,6 +1730,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     Snackbar.make(coordinatorLayout, R.string.picture_added, Snackbar.LENGTH_SHORT).show();
+                                                    setUpViewPagerIndicator();
                                                 } else {
                                                     Snackbar.make(coordinatorLayout, R.string.failed_to_add_picture, Snackbar.LENGTH_SHORT).show();
                                                 }

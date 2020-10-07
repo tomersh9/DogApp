@@ -146,30 +146,32 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
     //*****************HELLO WORLD*********************//
     public static void startAlarmBroadcastReceiver(Context context) {
-        /*Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
+        Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 9, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        if(calendar.get(Calendar.HOUR_OF_DAY) >= 18 && calendar.get(Calendar.MINUTE) >= 45) {
+        if(calendar.get(Calendar.HOUR_OF_DAY) >= 12 && calendar.get(Calendar.MINUTE) >= 40) {
             calendar.add(Calendar.DATE,1); //adding 1 day
         }
-        calendar.set(Calendar.HOUR_OF_DAY, 18);
-        calendar.set(Calendar.MINUTE, 45);
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 40);
         calendar.set(Calendar.SECOND, 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(pendingIntent);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);*/
+        if(alarmManager!=null) {
+            alarmManager.cancel(pendingIntent);
+        }
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
 
-        Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
+        /*Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 9, intent, 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         if (alarmManager != null) {
             alarmManager.cancel(pendingIntent);
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-        }
+        }*/
     }
 
     @SuppressLint("SourceLockedOrientationActivity")

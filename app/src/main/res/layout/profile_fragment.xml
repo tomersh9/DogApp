@@ -127,7 +127,7 @@
             android:id="@+id/slider_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center"
+            android:layout_gravity="bottom|start"
             android:layout_marginStart="10dp"
             android:layout_marginBottom="15dp"
             android:src="@drawable/ic_add_black_24dp"
@@ -703,7 +703,7 @@
                         android:layout_marginBottom="10dp"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         android:weightSum="1">
 
                         <RelativeLayout
@@ -746,11 +746,13 @@
                             android:paddingEnd="80dp"
                             android:visibility="visible" />
 
-                        <com.google.android.material.tabs.TabLayout
+                        <LinearLayout
                             android:id="@+id/profile_dots_tab_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
                             android:background="@null"
+                            android:orientation="horizontal"
                             app:tabBackground="@drawable/dots_selector"
                             app:tabIndicatorColor="@null">
 
@@ -766,7 +768,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />-->
 
-                        </com.google.android.material.tabs.TabLayout>
+                        </LinearLayout>
 
                     </LinearLayout>
 

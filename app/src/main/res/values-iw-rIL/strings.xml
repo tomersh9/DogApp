@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">DogApp</string>
+    <string name="app_name">Doglink</string>
     <string name="welcome_to_dog_app">ברוכים הבאים לאפליקצית כלב</string>
     <string name="email">אימייל</string>
     <string name="password">סיסמה</string>

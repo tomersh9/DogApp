@@ -94,7 +94,7 @@
     </integer-array>
 
 
-    <string name="app_name">DogApp</string>
+    <string name="app_name">Doglink</string>
     <string name="welcome_to_dog_app">Welcome to Dog App</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
