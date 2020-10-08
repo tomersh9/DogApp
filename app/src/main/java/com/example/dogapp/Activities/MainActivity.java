@@ -44,6 +44,7 @@ import com.example.dogapp.Fragments.FollowingFragment;
 import com.example.dogapp.Fragments.HomeFragment;
 import com.example.dogapp.Fragments.ProfileFragment;
 import com.example.dogapp.Fragments.WalkerBoardFragment;
+import com.example.dogapp.Models.ModelPost;
 import com.example.dogapp.R;
 import com.example.dogapp.Services.AlarmBroadcastReceiver;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -63,8 +64,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -106,7 +109,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     FirebaseDatabase database = FirebaseDatabase.getInstance(); //actual database
     DatabaseReference usersRef = database.getReference("users"); //create new table named "users" and we get a reference to it
     FirebaseUser fUser = firebaseAuth.getCurrentUser();
-    File file;
+    FirebaseMessaging firebaseMessaging;
+    DatabaseReference postRef = database.getReference("Posts");
     private boolean isAnonymous;
 
     //Change UI from notification
@@ -151,18 +155,18 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        if(calendar.get(Calendar.HOUR_OF_DAY) >= 12 && calendar.get(Calendar.MINUTE) >= 40) {
-            calendar.add(Calendar.DATE,1); //adding 1 day
+        if (calendar.get(Calendar.HOUR_OF_DAY) >= 12 && calendar.get(Calendar.MINUTE) >= 40) {
+            calendar.add(Calendar.DATE, 1); //adding 1 day
         }
         calendar.set(Calendar.HOUR_OF_DAY, 12);
         calendar.set(Calendar.MINUTE, 40);
         calendar.set(Calendar.SECOND, 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        if(alarmManager!=null) {
+        if (alarmManager != null) {
             alarmManager.cancel(pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
 
         /*Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 9, intent, 0);
@@ -180,6 +184,9 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //subscribe to posts
+        subscribeSignIn();
+
         //fixed portrait mode
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -192,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
 
         //alarm manager
-        startAlarmBroadcastReceiver(this);
+        //startAlarmBroadcastReceiver(this);
 
         //initial set up of referencing
         toolbar = findViewById(R.id.toolbar);
@@ -389,6 +396,53 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         }
     }
 
+    //unsubscribe from topic when sign out
+    private void unsubscribeSignOut(final String myID) {
+        firebaseMessaging = FirebaseMessaging.getInstance();
+        firebaseMessaging.unsubscribeFromTopic(myID);
+        postRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    ModelPost modelPost = ds.getValue(ModelPost.class);
+                    if (myID.equals(modelPost.getuId())) {
+                        firebaseMessaging.unsubscribeFromTopic(modelPost.getpId());
+                        firebaseMessaging.unsubscribeFromTopic(modelPost.getpId() + "Likes");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void subscribeSignIn() {
+        firebaseMessaging = FirebaseMessaging.getInstance();
+        firebaseMessaging.subscribeToTopic(fUser.getUid());
+        postRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    ModelPost modelPost = ds.getValue(ModelPost.class);
+                    if (fUser.getUid().equals(modelPost.getuId())) {
+                        firebaseMessaging.subscribeToTopic(modelPost.getpId());
+                        firebaseMessaging.subscribeToTopic(modelPost.getpId() + "Likes");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void sendRegistrationToServer(String token) {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens");
@@ -517,6 +571,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                     case R.id.item_sign_out:
                         setUserStatus(false);
                         deleteToken(fUser.getUid());
+                        unsubscribeSignOut(fUser.getUid());
                         firebaseAuth.signOut();
                         Intent signOutIntent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(signOutIntent);

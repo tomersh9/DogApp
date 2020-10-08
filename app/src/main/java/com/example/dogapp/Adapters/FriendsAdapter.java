@@ -64,7 +64,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         this.isMe = isMe;
         this.context = context;
         usersFull = new ArrayList<>(users); //for filtering (copy of list)
-        if(context!=null) {
+        if (context != null) {
             geocoder = new Geocoder(context);
         }
     }
@@ -79,7 +79,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         ImageButton followBtn;
         ImageButton chatBtn;
         ImageView deleteBtn;
-        //String result;
+        long lastClickTime = System.currentTimeMillis();
+        final long CLICK_TIME_INTERVAL = 300; //to prevent clicking fast
 
         //constructor
         public UserViewHolder(@NonNull View itemView) {
@@ -111,7 +112,16 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
                 deleteBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        listener.onFriendDeleteClicked(getAdapterPosition(), v);
+                        if (listener != null) {
+                            long currTime = System.currentTimeMillis();
+                            System.out.println("curr = " + currTime + " last = " + lastClickTime);
+                            System.out.println((currTime - lastClickTime) + "");
+                            if (currTime - lastClickTime < CLICK_TIME_INTERVAL) {
+                                return;
+                            }
+                            lastClickTime = currTime;
+                            listener.onFriendDeleteClicked(getAdapterPosition(), v);
+                        }
                     }
                 });
 
@@ -128,7 +138,14 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
                 followBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        listener.onFriendFollowClicked(getAdapterPosition(), v);
+                        if (listener != null) {
+                            long currTime = System.currentTimeMillis();
+                            if (currTime - lastClickTime < CLICK_TIME_INTERVAL) {
+                                return;
+                            }
+                            lastClickTime = currTime;
+                            listener.onFriendFollowClicked(getAdapterPosition(), v);
+                        }
                     }
                 });
             }
@@ -179,32 +196,36 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
             holder.ageGenderTv.setText(context.getString(R.string.other) + ", " + age);
         }
 
-        final android.os.Handler handler = new android.os.Handler();
-
-        Thread thread = new Thread()
-        {
+        holder.locationTv.setText(user.getLocation());
+        /*final android.os.Handler handler = new android.os.Handler();
+        Thread thread = new Thread() {
             @Override
             public void run() {
                 super.run();
                 try {
                     addresses = geocoder.getFromLocationName(user.getLocation(), 1);
-                    bestAddress = addresses.get(0);
+                    if (!addresses.isEmpty()) {
+                        bestAddress = addresses.get(0);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                holder.locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+                            }
+                        });
+                    } else {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                holder.locationTv.setText(user.getLocation());
+                            }
+                        });
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(bestAddress!=null) {
-                            holder.locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
-                        }
-
-
-                    }
-                });
             }
         };
-        thread.start();
+        thread.start();*/
 
         try {
             Glide.with(holder.itemView).asBitmap().load(user.getPhotoUrl()).placeholder(R.drawable.user_drawer_icon_256).into(holder.profileIv);

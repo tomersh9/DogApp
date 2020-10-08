@@ -112,7 +112,7 @@
     <string name="is_willing_in_range_of">מוכנ/ה להגיע לבית הבעלים בטווח של</string>
     <string name="allows_last_minute_call">מסכימ/ה להזמנה ברגע האחרון?</string>
     <string name="service_cost_per_trip">עלות השירות עבור כל טיול (לשעה)</string>
-    <string name="ils">ש\"ח</string>
+    <string name="ils">₪</string>
     <string name="about_me">על עצמי</string>
     <string name="no_chats_yet">אין שיחות כרגע</string>
     <string name="no_following_yet">אין במעקב כרגע</string>
@@ -173,9 +173,9 @@
     <string name="change_email_add">שינוי כתובת מייל</string>
     <string name="enter_new_email_address">הכנס/י כתובת מייל חדשה</string>
     <string name="applying_change">מעדכן שינויים..</string>
-    <string name="commented_on_your_post">הגיב על הפוסט שלך</string>
-    <string name="liked_your_post">אהב את הפוסט שלך</string>
-    <string name="also_commented_on">גם הגיב על</string>
+    <string name="commented_on_your_post">הגיב/ה על הפוסט שלך</string>
+    <string name="liked_your_post">אהב/ה את הפוסט שלך</string>
+    <string name="also_commented_on">גם הגיב/ה על</string>
     <string name="post_notif">הפוסט</string>
     <string name="auto_location_pull">שליפת מיקום אוטומטית</string>
     <string name="years_of_experience">שנות ניסיון</string>
@@ -244,4 +244,5 @@
     <string name="dont_miss_update">אל תפספס/י דוג ווקרים ועדכונים חדשים</string>
     <string name="hey_you">היי את/ה!</string>
     <string name="welcome_to_doglink">ברוכים הבאים ל - Doglink</string>
+    <string name="a_post_you_comm">פוסט שהגבת עליו</string>
 </resources>

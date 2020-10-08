@@ -93,6 +93,7 @@ public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWal
         //init recyclerview
         recyclerView = rootView.findViewById(R.id.discover_walkers_recycler);
         recyclerView.setHasFixedSize(true);
+        recyclerView.setItemViewCacheSize(20);
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
 
         //init list of walkers
@@ -122,17 +123,17 @@ public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWal
                 }
 
                 Collections.reverse(walkersList);
-                handler.postDelayed(new Runnable() {
+                adapter = new WalkerAdapter(walkersList, getActivity(),fUser.getUid());
+                recyclerView.setAdapter(adapter);
+                adapter.setWalkerAdapterListener(WalkerBoardFragment.this);
+                adapter.notifyDataSetChanged();
+                progressBar.setVisibility(View.GONE);
+                /*handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        adapter = new WalkerAdapter(walkersList, getActivity(),fUser.getUid());
-                        recyclerView.setItemViewCacheSize(20);
-                        recyclerView.setAdapter(adapter);
-                        adapter.setWalkerAdapterListener(WalkerBoardFragment.this);
-                        adapter.notifyDataSetChanged();
-                        progressBar.setVisibility(View.GONE);
+
                     }
-                },150);
+                },150);*/
 
             }
 
@@ -192,8 +193,9 @@ public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWal
                         }
                     }
                 });
-                adapter.notifyItemRangeChanged(0, walkersList.size());
-                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.pricing_low_to_high, Snackbar.LENGTH_SHORT).show();
+                //adapter.notifyItemRangeChanged(0, walkersList.size());
+                adapter.notifyDataSetChanged();
+                //Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.pricing_low_to_high, Snackbar.LENGTH_SHORT).show();
                 break;
 
             case R.id.price_high_to_low_item_sub_menu:
@@ -209,8 +211,8 @@ public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWal
                         }
                     }
                 });
-                adapter.notifyItemRangeChanged(0, walkersList.size());
-                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.pricing_high_to_low, Snackbar.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
+                //Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.pricing_high_to_low, Snackbar.LENGTH_SHORT).show();
                 break;
 
             case R.id.rating_high_to_low_item_sub_menu:
@@ -226,8 +228,8 @@ public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWal
                         }
                     }
                 });
-                adapter.notifyItemRangeChanged(0, walkersList.size());
-                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.rating_high_to_low, Snackbar.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
+                //Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.rating_high_to_low, Snackbar.LENGTH_SHORT).show();
                 break;
 
             case R.id.rating_low_to_high_item_sub_menu:
@@ -243,8 +245,8 @@ public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWal
                         }
                     }
                 });
-                adapter.notifyItemRangeChanged(0, walkersList.size());
-                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.rating_low_to_high, Snackbar.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
+                //Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.rating_low_to_high, Snackbar.LENGTH_SHORT).show();
                 break;
 
             case R.id.exp_high_to_low_item_sub_menu:
@@ -261,8 +263,8 @@ public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWal
                         }
                     }
                 });
-                adapter.notifyItemRangeChanged(0, walkersList.size());
-                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.exp_high_to_low, Snackbar.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
+                //Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.exp_high_to_low, Snackbar.LENGTH_SHORT).show();
                 break;
 
             case R.id.exp_low_to_high_item_sub_menu:
@@ -278,8 +280,8 @@ public class WalkerBoardFragment extends Fragment implements WalkerAdapter.MyWal
                         }
                     }
                 });
-                adapter.notifyItemRangeChanged(0, walkersList.size());
-                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.exp_low_to_high, Snackbar.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
+                //Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.exp_low_to_high, Snackbar.LENGTH_SHORT).show();
                 break;
         }
 

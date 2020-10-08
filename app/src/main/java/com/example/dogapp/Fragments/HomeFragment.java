@@ -139,7 +139,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         setHasOptionsMenu(true);
 
         firebaseMessaging = FirebaseMessaging.getInstance();
-        firebaseMessaging.subscribeToTopic(fUser.getUid());
 
         final View rootView = inflater.inflate(R.layout.home_fragment, container, false);
 

@@ -56,8 +56,8 @@ public class SplashScreen extends AppCompatActivity {
         //fixed portrait mode
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        if(firebaseAuth.getCurrentUser()!=null) {
-            if(firebaseAuth.getCurrentUser().isAnonymous()) {
+        if (firebaseAuth.getCurrentUser() != null) {
+            if (firebaseAuth.getCurrentUser().isAnonymous()) {
                 firebaseAuth.getCurrentUser().delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -81,7 +81,7 @@ public class SplashScreen extends AppCompatActivity {
                         if (snapshot.exists()) {
                             User user = snapshot.getValue(User.class);
                             userId = user.getId();
-                            authStateListener.onAuthStateChanged(firebaseAuth);
+                            //authStateListener.onAuthStateChanged(firebaseAuth);
                         }
                     }
 
@@ -107,6 +107,7 @@ public class SplashScreen extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 
                 if (bool) {
+                    //bool = false;
                     if (counter == 0) { //first time loading the app
                         if (userId != null) {
                             Intent intent = new Intent(SplashScreen.this, MainActivity.class);

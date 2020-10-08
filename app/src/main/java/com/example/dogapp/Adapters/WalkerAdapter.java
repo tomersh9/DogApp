@@ -116,7 +116,6 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
         holder.nameTv.setText(walkerUser.getFullName());
         holder.expTv.setText(expArr[walkerUser.getExperience()] + " " + context.getString(R.string.years_of_exp));
         holder.paymentTv.setText(walkerUser.getPaymentPerWalk() + " " + context.getString(R.string.ils) + " " + context.getString(R.string.per_walk));
-        //holder.locationTv.setText(walkerUser.getLocation());
         int age = walkerUser.getAge();
 
         //gender rtl
@@ -128,10 +127,8 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
             holder.ageGenderTv.setText(context.getString(R.string.other) + ", " + age);
         }
 
-
-
-        final Handler handler = new Handler();
-
+        holder.locationTv.setText(walkerUser.getLocation());
+       /* final Handler handler = new Handler();
         Thread thread1 = new Thread()
         {
             @Override
@@ -139,23 +136,28 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
                 super.run();
                 try {
                     addresses = geocoder.getFromLocationName(walkerUser.getLocation(), 1);
-                    bestAddress = addresses.get(0);
+                    if (!addresses.isEmpty()) {
+                        bestAddress = addresses.get(0);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                holder.locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+                            }
+                        });
+                    } else {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                holder.locationTv.setText(walkerUser.getLocation());
+                            }
+                        });
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(bestAddress!=null) {
-                            holder.locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
-                        }
-
-
-                    }
-                });
             }
         };
-        thread1.start();
+        thread1.start();*/
 
         //assign stars
         int rating = walkerUser.getRating();
@@ -205,13 +207,15 @@ public class WalkerAdapter extends RecyclerView.Adapter<WalkerAdapter.WalkerView
             } else {
                 String filterPattern = constraint.toString().toLowerCase().trim(); //the filter
                 for (User user : usersFull) { //adding matching items to the filtered list
-                    try {
+                    /*try {
                         addresses = geocoder.getFromLocationName(user.getLocation(), 1);
-                        bestAddress = addresses.get(0);
-                        user.setLocation(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+                        if(!addresses.isEmpty()) {
+                            bestAddress = addresses.get(0);
+                            user.setLocation(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
-                    }
+                    }*/
                     if (user.getFullName().toLowerCase().contains(filterPattern) || user.getLocation().toLowerCase().contains(filterPattern)){
                         filteredList.add(user);
                     }

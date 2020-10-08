@@ -96,6 +96,7 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
         //init recyclerview
         recyclerView = rootView.findViewById(R.id.discover_friends_recycler);
         recyclerView.setHasFixedSize(true);
+        recyclerView.setItemViewCacheSize(20);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         //init friends list
@@ -141,20 +142,19 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
                     }
 
                     //adapter
-                    handler.postDelayed(new Runnable() {
+                    adapter = new FriendsAdapter(users, false, true, getActivity());
+                    //set adapter to recyclerview
+                    recyclerView.setAdapter(adapter);
+                    //adapter click events
+                    adapter.setMyUserListener(DiscoverFriendsFragment.this);
+                    adapter.notifyDataSetChanged();
+                    progressBar.setVisibility(View.GONE);
+                    /*handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            adapter = new FriendsAdapter(users, false, true, getActivity());
-                            //set adapter to recyclerview
-                            recyclerView.setHasFixedSize(true);
-                            recyclerView.setItemViewCacheSize(20);
-                            recyclerView.setAdapter(adapter);
-                            //adapter click events
-                            adapter.setMyUserListener(DiscoverFriendsFragment.this);
-                            adapter.notifyDataSetChanged();
-                            progressBar.setVisibility(View.GONE);
+
                         }
-                    },150);
+                    },150);*/
                 }
 
             }

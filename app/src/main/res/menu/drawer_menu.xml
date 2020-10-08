@@ -7,10 +7,6 @@
             android:id="@+id/item_profile"
             android:icon="@drawable/user_drawer_icon_64"
             android:title="@string/profile" />
-        <item
-            android:id="@+id/item_rate_us"
-            android:icon="@drawable/star_icon"
-            android:title="@string/rate_us" />
 
         <item
             android:id="@+id/item_settings"

@@ -44,6 +44,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private final int NOTIF_ID = 1;
     private final int NOTIF_ID1 = 2;
     private final int NOTIF_ID2 = 3;
+    private final int NOTIF_ID3 = 4;
+    private final int NOTIF_ID4 = 5;
 
     /**
      * Called if InstanceID token is updated. This may occur if the security of
@@ -109,19 +111,19 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             //for likes and comments
             Intent mainIntent = new Intent(MyFirebaseMessagingService.this, MainActivity.class);
-            PendingIntent mainPendingIntent = PendingIntent.getActivity(MyFirebaseMessagingService.this,1,mainIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent mainPendingIntent = PendingIntent.getActivity(MyFirebaseMessagingService.this, 1, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             //for following notifications
             Intent followIntent = new Intent(MyFirebaseMessagingService.this, MainActivity.class);
-            followIntent.putExtra("pendingUserID",uid);
-            followIntent.putExtra("pendingImgURL",imgURL);
-            PendingIntent followPendingIntent = PendingIntent.getActivity(MyFirebaseMessagingService.this,2,followIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+            followIntent.putExtra("pendingUserID", uid);
+            followIntent.putExtra("pendingImgURL", imgURL);
+            PendingIntent followPendingIntent = PendingIntent.getActivity(MyFirebaseMessagingService.this, 2, followIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // when the user is OUT OF THE APP!!!!
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ID");
             builder.setContentText(msg)
                     .setSmallIcon(R.drawable.ic_chat_black_24dp)
-                    .setContentTitle(getString(R.string.new_msg_from) + " " + from)
+                    .setContentTitle(getString(R.string.new_msg_from) + " - " + from)
                     .setContentIntent(pendingIntent);
 
             NotificationCompat.Builder builder1 = new NotificationCompat.Builder(this, "ID");
@@ -139,7 +141,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             NotificationCompat.Builder builder3 = new NotificationCompat.Builder(this, "ID");
             builder3.setContentText(msg)
                     .setSmallIcon(R.drawable.ic_add_black_24dp)
-                    .setContentTitle(from + " " + getString(R.string.also_commented_on) + " " + nameComment + " " + getString(R.string.post_notif))
+                    .setContentTitle(from + " " + getString(R.string.also_commented_on) + " " + getString(R.string.a_post_you_comm))
                     .setContentIntent(mainPendingIntent);
 
             NotificationCompat.Builder builder4 = new NotificationCompat.Builder(this, "ID");
@@ -152,14 +154,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 if (isCom != null) {
                     manager.notify(NOTIF_ID, builder1.build());
                 } else if (isComFriend != null) {
-                    manager.notify(NOTIF_ID, builder3.build());
+                    manager.notify(NOTIF_ID4, builder3.build());
                 } else if (isMsg != null)
                     manager.notify(NOTIF_ID1, builder.build());
                 else if (isLike != null) {
-                    manager.notify(NOTIF_ID, builder2.build());
-                }
-                else if(isFollow != null){
-                    manager.notify(NOTIF_ID2,builder4.build());
+                    manager.notify(NOTIF_ID3, builder2.build());
+                } else if (isFollow != null) {
+                    manager.notify(NOTIF_ID2, builder4.build());
                 }
 
             }

@@ -222,6 +222,7 @@ public class FollowersFragment extends Fragment implements FriendsAdapter.MyUser
 
     @Override
     public void onFriendDeleteClicked(int pos, View v) {
+
         final User user = users.get(pos);
         //remove from following list
         Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), user.getFullName() + " " + getString(R.string.was_removed_from_followers), Snackbar.LENGTH_LONG).show();

@@ -48,8 +48,8 @@ public class ExploreFragment extends Fragment {
 
         viewPager.setAdapter(boardsPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setIcon(R.drawable.group_icon_64);
-        tabLayout.getTabAt(1).setIcon(R.drawable.dog_helper_icon_64);
+        tabLayout.getTabAt(0).setIcon(R.drawable.dog_helper_icon_64);
+        tabLayout.getTabAt(1).setIcon(R.drawable.group_icon_64);
     }
 
     @Override

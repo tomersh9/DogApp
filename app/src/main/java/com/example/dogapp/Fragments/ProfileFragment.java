@@ -659,7 +659,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         View dialogView = getLayoutInflater().inflate(R.layout.profile_location_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        deleteSliderDialog = builder.setView(dialogView).show();
+        deleteSliderDialog = builder.setCancelable(false).setView(dialogView).show();
         deleteSliderDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
 
@@ -745,26 +745,37 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                     final User user = snapshot.getValue(User.class);
 
-                    new Thread() {
+                    /*new Thread() {
                         @Override
                         public void run() {
                             super.run();
                             try {
                                 List<Address> addresses = geocoder.getFromLocationName(user.getLocation(), 1);
-                                final Address bestAddress = addresses.get(0);
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
-                                    }
-                                });
+                                if (!addresses.isEmpty()) {
+                                    final Address bestAddress = addresses.get(0);
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            locationTv.setText(bestAddress.getLocality() + ", " + bestAddress.getCountryName());
+                                        }
+                                    });
+                                } else {
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            locationTv.setText(user.getLocation());
+                                        }
+                                    });
+                                }
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
 
                         }
-                    }.start();
+                    }.start();*/
 
+                    locationTv.setText(user.getLocation());
                     //for dialogs including name
                     otherUserName = user.getFullName();
 
