@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.graphics.ImageDecoder;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
@@ -103,6 +102,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener, SliderAdapter.MySliderAdapterListener {
 
@@ -131,7 +132,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     //views
     private float scaleXProfile, scaleYProfile;
-    private ImageView profileIv, genderIv, typeIv, coverIv;
+    private ImageView genderIv, typeIv, coverIv;
+    private CircleImageView profileIv;
+    private CircleImageView onlineIv, offlineIv;
     private TextView nameTv, followingTv, followersTv, criticsCountTv, genderAgeTv, locationTv, typeTv, aboutMeTv;
     private LinearLayout followersLayoutBtn, followingLayoutBtn, criticsLayoutBtn;
     private RelativeLayout uploadPicsHintLayout;
@@ -254,6 +257,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         row3 = rootView.findViewById(R.id.row_3);
         row4 = rootView.findViewById(R.id.row_4);
         profileIv = rootView.findViewById(R.id.profile_frag_iv);
+        /*onlineIv = rootView.findViewById(R.id.profile_status_online_iv);
+        offlineIv = rootView.findViewById(R.id.profile_status_offline_iv);*/
         coverIv = rootView.findViewById(R.id.profile_cover_iv);
         scaleXProfile = profileIv.getScaleX();
         scaleYProfile = profileIv.getScaleY();
@@ -776,9 +781,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     }.start();*/
 
                     locationTv.setText(user.getLocation());
-                    //for dialogs including name
                     otherUserName = user.getFullName();
-
                     email = user.getEmail();
                     imgURL = user.getPhotoUrl();
                     coverURL = user.getCoverUrl();
@@ -802,6 +805,16 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     }
 
                     if (getActivity() != null) {
+
+                        /*if (user.getStatus()) {
+                            //profileIv.setBorderColor(getResources().getColor(R.color.green));
+                        onlineIv.setVisibility(View.VISIBLE);
+                        offlineIv.setVisibility(View.GONE);
+                        } else {
+                            //profileIv.setBorderColor(getResources().getColor(R.color.nav_bar_item_color));
+                        onlineIv.setVisibility(View.GONE);
+                        offlineIv.setVisibility(View.VISIBLE);
+                        }*/
 
                         if (user.getGender() == 0) {
                             genderAgeTv.setText(getString(R.string.male) + ", " + age);
@@ -1181,6 +1194,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     followingTv.setText(snapshot.getChildrenCount() + "");
+                } else {
+                    followingTv.setText(0+"");
                 }
             }
 
@@ -1196,6 +1211,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     followersTv.setText(snapshot.getChildrenCount() + "");
+                } else {
+                    followersTv.setText(0+"");
                 }
             }
 
@@ -1212,6 +1229,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     criticsCountTv.setText(snapshot.getChildrenCount() + "");
+                }else {
+                    criticsCountTv.setText(0+"");
                 }
             }
 
@@ -1692,11 +1711,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == WRITE_PERMISSION_REQUEST) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getActivity(), "No permissions!!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.no_permissions, Toast.LENGTH_SHORT).show();
                 permission = false;
             } else {
 
-                Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.permissions_granted, Toast.LENGTH_SHORT).show();
                 permission = true;
 
                 if (isSliderGallery) {

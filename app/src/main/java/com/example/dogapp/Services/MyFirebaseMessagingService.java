@@ -124,28 +124,33 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             builder.setContentText(msg)
                     .setSmallIcon(R.drawable.ic_chat_black_24dp)
                     .setContentTitle(getString(R.string.new_msg_from) + " - " + from)
+                    .setAutoCancel(true)
                     .setContentIntent(pendingIntent);
 
             NotificationCompat.Builder builder1 = new NotificationCompat.Builder(this, "ID");
             builder1.setContentText(msg)
                     .setSmallIcon(R.drawable.ic_explore_black_24dp)
                     .setContentTitle(from + " " + getString(R.string.commented_on_your_post))
+                    .setAutoCancel(true)
                     .setContentIntent(mainPendingIntent);
 
             NotificationCompat.Builder builder2 = new NotificationCompat.Builder(this, "ID");
             builder2
                     .setSmallIcon(R.drawable.ic_baseline_thumb_up_black_24)
                     .setContentTitle(from + " " + getString(R.string.liked_your_post))
+                    .setAutoCancel(true)
                     .setContentIntent(mainPendingIntent);
 
             NotificationCompat.Builder builder3 = new NotificationCompat.Builder(this, "ID");
             builder3.setContentText(msg)
                     .setSmallIcon(R.drawable.ic_add_black_24dp)
+                    .setAutoCancel(true)
                     .setContentTitle(from + " " + getString(R.string.also_commented_on) + " " + getString(R.string.a_post_you_comm))
                     .setContentIntent(mainPendingIntent);
 
             NotificationCompat.Builder builder4 = new NotificationCompat.Builder(this, "ID");
             builder4.setSmallIcon(R.drawable.ic_person_add_black_24dp)
+                    .setAutoCancel(true)
                     .setContentTitle(from + " " + getString(R.string.started_following_you))
                     .setContentIntent(followPendingIntent);
 

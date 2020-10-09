@@ -541,10 +541,12 @@ public class SecondRegisterFragment extends Fragment {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    locationEt.setText(bestAddress.getLocality() + ",  " + bestAddress.getCountryName());
-                                    location = locationEt.getText().toString().trim();
-                                    locationEt.setHint(getString(R.string.your_location));
-                                    alertDialog.dismiss();
+                                    if(getActivity()!=null) {
+                                        locationEt.setText(bestAddress.getLocality() + ",  " + bestAddress.getCountryName());
+                                        location = locationEt.getText().toString().trim();
+                                        locationEt.setHint(getString(R.string.your_location));
+                                        alertDialog.dismiss();
+                                    }
                                 }
                             });
                         } catch (IOException e) {

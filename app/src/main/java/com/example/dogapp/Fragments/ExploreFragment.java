@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.Adapters.BoardsPagerAdapter;
 import com.example.dogapp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -24,6 +25,12 @@ public class ExploreFragment extends Fragment {
     private TabLayout tabLayout;
     private FloatingActionButton fab;
     private TabItem tab;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)getActivity()).toolbar.setTitle(getString(R.string.explore));
+    }
 
     @Nullable
     @Override

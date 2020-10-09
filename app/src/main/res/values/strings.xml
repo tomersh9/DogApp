@@ -339,4 +339,6 @@
     <string name="hey_you">Hey you!</string>
     <string name="welcome_to_doglink">Welcome to Doglink</string>
     <string name="a_post_you_comm">a post you commented</string>
+    <string name="no_token">No Token</string>
+    <string name="data_not_exist">DataSnapShot doesn\'t exist</string>
 </resources>

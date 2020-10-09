@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     private final int SETTINGS_REQUEST = 1;
 
     //UI Layout
-    private Toolbar toolbar;
+    public Toolbar toolbar;
     private AppBarLayout appBarLayout;
     private FrameLayout frameLayout;
     private CollapsingToolbarLayout collapsingToolbarLayout;
@@ -150,32 +150,25 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
     //*****************HELLO WORLD*********************//
     public static void startAlarmBroadcastReceiver(Context context) {
+
         Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 9, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        if (calendar.get(Calendar.HOUR_OF_DAY) >= 12 && calendar.get(Calendar.MINUTE) >= 40) {
-            calendar.add(Calendar.DATE, 1); //adding 1 day
-        }
         calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 40);
+        calendar.set(Calendar.MINUTE, 29);
         calendar.set(Calendar.SECOND, 0);
+
+        if (calendar.before(Calendar.getInstance())) {
+            calendar.add(Calendar.DATE, 1);
+        }
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
             alarmManager.cancel(pendingIntent);
             alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }
-
-        /*Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 9, intent, 0);
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        if (alarmManager != null) {
-            alarmManager.cancel(pendingIntent);
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-        }*/
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -199,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
 
         //alarm manager
-        //startAlarmBroadcastReceiver(this);
+        startAlarmBroadcastReceiver(this);
 
         //initial set up of referencing
         toolbar = findViewById(R.id.toolbar);
@@ -282,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         if (task.isSuccessful()) {
                             sendRegistrationToServer(task.getResult().getToken());
                         } else {
-                            Toast.makeText(MainActivity.this, "NO TOKEN", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, R.string.no_token, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -328,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         lastCall = user.getLastCall();
 
                     } else {
-                        Toast.makeText(MainActivity.this, "DataSnapShot doesn't exist", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, R.string.data_not_exist, Toast.LENGTH_SHORT).show();
                     }
                 }
 
