@@ -117,6 +117,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     private FriendsAdapter likesAdapter;
     private List<User> usersLikes;
     private BottomSheetDialog likesDialog;
+    private ProgressBar likesProgressBar;
 
     //PUSH NOTIFICATION
     private final String SERVER_KEY = "AAAAsSPUwiM:APA91bF5T2kokP05wtjBjEwMiUXAuB9OXF4cCSgqf4HV9ST1kzKuD9w3ncboYoGTZxMQbBSv0EocqTcycHE4gGzFDDeGIYkyLolsd3W1gY1ZPu5qCHjpNAh-H3g0Y-JvNUIZ1iOm8uOW";
@@ -303,9 +304,10 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                 }
 
                 if (!idsList.isEmpty()) {
-                    getUsersLikes(idsList);
+                    assignLikesList(idsList);
+                    //getUsersLikes(idsList);
                 } else {
-                    Snackbar.make(coordinatorLayout, "R.string.no_likes", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(coordinatorLayout, R.string.no_likes, Snackbar.LENGTH_SHORT).show();
                 }
             }
 
@@ -329,30 +331,33 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                         usersLikes.add(user);
                     }
                 }
-                if (!usersLikes.isEmpty()) {
-                    assignLikesList();
-                }
 
+                likesProgressBar.setVisibility(View.GONE);
+                likesAdapter = new FriendsAdapter(usersLikes, true, false, getActivity());
+                likesRecyclerView.setAdapter(likesAdapter);
+                likesAdapter.setMyUserListener(HomeFragment.this);
+                likesAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                likesProgressBar.setVisibility(View.GONE);
             }
         });
     }
 
-    private void assignLikesList() {
+    private void assignLikesList(final List<String> idsList) {
         likesDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
         View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_likes, null);
 
         likesRecyclerView = bottomSheetView.findViewById(R.id.likes_recycler);
         likesRecyclerView.setHasFixedSize(true);
         likesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        likesAdapter = new FriendsAdapter(usersLikes, true, false, getActivity());
-        likesRecyclerView.setAdapter(likesAdapter);
-        likesAdapter.setMyUserListener(this);
-        likesAdapter.notifyDataSetChanged();
+
+        likesProgressBar = bottomSheetView.findViewById(R.id.likes_progress_bar);
+        likesProgressBar.setVisibility(View.VISIBLE);
+
+        getUsersLikes(idsList);
 
         likesDialog.setContentView(bottomSheetView);
         likesDialog.show();
