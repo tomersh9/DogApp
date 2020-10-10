@@ -389,8 +389,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                 if (isMe) {
                     buildProfileSheetDialog(false); //cover photo not profile
-
-                } else if (!coverURL.equals("coverUrl")) {
+                } else if (coverURL!=null && !coverURL.equals("coverUrl")) {
                     loadImageDialog(coverURL);
                 } else {
                     Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.no_cover_to_show, Snackbar.LENGTH_SHORT).show();

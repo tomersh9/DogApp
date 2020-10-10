@@ -341,4 +341,6 @@
     <string name="a_post_you_comm">a post you commented</string>
     <string name="no_token">No Token</string>
     <string name="data_not_exist">DataSnapShot doesn\'t exist</string>
+    <string name="who_liked_this_post">Who liked this post?</string>
+    <string name="no_likes">No likes</string>
 </resources>

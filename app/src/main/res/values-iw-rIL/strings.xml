@@ -245,4 +245,8 @@
     <string name="hey_you">היי את/ה!</string>
     <string name="welcome_to_doglink">ברוכים הבאים ל - Doglink</string>
     <string name="a_post_you_comm">פוסט שהגבת עליו</string>
+    <string name="no_token">אין טוקן</string>
+    <string name="data_not_exist">לא קיים מידע</string>
+    <string name="who_liked_this_post">מי אהב את הפוסט?</string>
+    <string name="no_likes">אין לייקים</string>
 </resources>

@@ -72,6 +72,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     public interface OnPostListener {
         void onCommentClicked(String pId);
 
+        void onLikesClicked(String pId);
+
         void onAnonymousLikeClicked();
 
         void onPostImageClicked(String userID, String imgURL);
@@ -137,6 +139,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             @Override
             public void onClick(View v) {
                 listener.onCommentClicked(pId);
+            }
+        });
+
+        holder.comTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onCommentClicked(pId);
+            }
+        });
+
+        holder.likesTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onLikesClicked(pId);
             }
         });
 

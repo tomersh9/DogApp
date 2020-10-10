@@ -40,6 +40,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Adapters.CommentAdapter;
+import com.example.dogapp.Adapters.FriendsAdapter;
 import com.example.dogapp.Adapters.PostAdapter;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Models.ModelComment;
@@ -69,7 +70,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class HomeFragment extends Fragment implements PostAdapter.OnPostListener, SwipeRefreshLayout.OnRefreshListener {
+public class HomeFragment extends Fragment implements PostAdapter.OnPostListener, SwipeRefreshLayout.OnRefreshListener, FriendsAdapter.MyUserListener {
 
     private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
 
@@ -110,6 +111,12 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     private RecyclerView recyclerViewComments;
     private List<ModelComment> commentList;
     private CommentAdapter commentAdapter;
+
+    //likes references
+    private RecyclerView likesRecyclerView;
+    private FriendsAdapter likesAdapter;
+    private List<User> usersLikes;
+    private BottomSheetDialog likesDialog;
 
     //PUSH NOTIFICATION
     private final String SERVER_KEY = "AAAAsSPUwiM:APA91bF5T2kokP05wtjBjEwMiUXAuB9OXF4cCSgqf4HV9ST1kzKuD9w3ncboYoGTZxMQbBSv0EocqTcycHE4gGzFDDeGIYkyLolsd3W1gY1ZPu5qCHjpNAh-H3g0Y-JvNUIZ1iOm8uOW";
@@ -155,10 +162,10 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         homeEt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!fUser.isAnonymous()) {
+                if (!fUser.isAnonymous()) {
                     buildPostSheetDialog();
                 } else {
-                    Snackbar.make(coordinatorLayout, R.string.only_reg_user,Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(coordinatorLayout, R.string.only_reg_user, Snackbar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -220,7 +227,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     postList.add(modelPost);
                 }
 
-                if(postList.isEmpty()) {
+                if (postList.isEmpty()) {
                     noPostYetTv.setVisibility(View.VISIBLE);
                 } else {
                     noPostYetTv.setVisibility(View.GONE);
@@ -252,7 +259,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(postEt.getText().toString().equals("")) {
+                if (postEt.getText().toString().equals("")) {
                     Toast.makeText(getActivity(), R.string.upload_empty_post, Toast.LENGTH_SHORT).show();
                     return;
                 } else {
@@ -270,22 +277,119 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
     @Override
     public void onCommentClicked(String pId) {
-        if(!fUser.isAnonymous()) {
+        if (!fUser.isAnonymous()) {
             buildCommentSheetDialog(pId);
         } else {
-            Snackbar.make(coordinatorLayout, R.string.only_reg_user,Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(coordinatorLayout, R.string.only_reg_user, Snackbar.LENGTH_SHORT).show();
         }
 
     }
 
     @Override
+    public void onLikesClicked(String pId) {
+        //create list of users
+        final List<String> idsList = new ArrayList<>();
+
+        //get all ID's of post from DB
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Likes").child(pId);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                idsList.clear();
+                if (snapshot.exists()) {
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        idsList.add(ds.getKey());
+                    }
+                }
+
+                if (!idsList.isEmpty()) {
+                    getUsersLikes(idsList);
+                } else {
+                    Snackbar.make(coordinatorLayout, "R.string.no_likes", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getUsersLikes(final List<String> idsList) {
+        usersLikes = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                usersLikes.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    User user = ds.getValue(User.class);
+                    if (idsList.contains(user.getId())) {
+                        usersLikes.add(user);
+                    }
+                }
+                if (!usersLikes.isEmpty()) {
+                    assignLikesList();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void assignLikesList() {
+        likesDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+        View bottomSheetView = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_likes, null);
+
+        likesRecyclerView = bottomSheetView.findViewById(R.id.likes_recycler);
+        likesRecyclerView.setHasFixedSize(true);
+        likesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        likesAdapter = new FriendsAdapter(usersLikes, true, false, getActivity());
+        likesRecyclerView.setAdapter(likesAdapter);
+        likesAdapter.setMyUserListener(this);
+        likesAdapter.notifyDataSetChanged();
+
+        likesDialog.setContentView(bottomSheetView);
+        likesDialog.show();
+    }
+
+    @Override
+    public void onFriendClicked(int pos, View v) {
+        //enter profile
+        likesDialog.dismiss();
+        User user = usersLikes.get(pos);
+        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUrl());
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onFriendChatClicked(int pos, View v) {
+        //nothing
+    }
+
+    @Override
+    public void onFriendFollowClicked(int pos, View v) {
+        //nothing
+    }
+
+    @Override
+    public void onFriendDeleteClicked(int pos, View v) {
+        //nothing
+    }
+
+    @Override
     public void onAnonymousLikeClicked() {
-        Snackbar.make(coordinatorLayout, R.string.only_reg_user,Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(coordinatorLayout, R.string.only_reg_user, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPostImageClicked(String userID, String imgURL) {
-        if(fUser.getUid().equals(userID)) {
+        if (fUser.getUid().equals(userID)) {
             listener.onMyPostClicked(); //only change bottom nav bar item
         } else {
             ProfileFragment profileFragment = ProfileFragment.newInstance(userID, imgURL);
@@ -484,7 +588,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     }
                 }
 
-                if(postList.isEmpty()) {
+                if (postList.isEmpty()) {
                     noPostYetTv.setVisibility(View.VISIBLE);
                 } else {
                     noPostYetTv.setVisibility(View.GONE);
@@ -508,7 +612,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
     @Override
     public void onRefresh() {
-        if(!fUser.isAnonymous()) {
+        if (!fUser.isAnonymous()) {
             loadFollowing();
         } else {
             loadAnonymousPosts();
@@ -612,7 +716,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     if (!TextUtils.isEmpty(query)) {
                         searchPosts(query);
                     } else {
-                        if(!fUser.isAnonymous()) {
+                        if (!fUser.isAnonymous()) {
                             loadPosts();
                         } else {
                             loadAnonymousPosts();
@@ -627,7 +731,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     if (!TextUtils.isEmpty(newText)) {
                         searchPosts(newText);
                     } else {
-                        if(!fUser.isAnonymous()) {
+                        if (!fUser.isAnonymous()) {
                             loadPosts();
                         } else {
                             loadAnonymousPosts();
@@ -780,8 +884,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                     s = true;
                 } else
                     s = false;
-
-
             }
 
             @Override
