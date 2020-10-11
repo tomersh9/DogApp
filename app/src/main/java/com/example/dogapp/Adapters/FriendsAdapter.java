@@ -81,6 +81,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
         ImageView deleteBtn;
         long lastClickTime = System.currentTimeMillis();
         final long CLICK_TIME_INTERVAL = 300; //to prevent clicking fast
+        long currTime;
 
         //constructor
         public UserViewHolder(@NonNull View itemView) {
@@ -100,6 +101,10 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
                 @Override
                 public void onClick(View v) {
                     if (listener != null) {
+                        currTime = System.currentTimeMillis();
+                        if (currTime - lastClickTime < CLICK_TIME_INTERVAL) {
+                            return;
+                        }
                         listener.onFriendClicked(getAdapterPosition(), v);
                     }
                 }
@@ -113,7 +118,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
                     @Override
                     public void onClick(View v) {
                         if (listener != null) {
-                            long currTime = System.currentTimeMillis();
+                            currTime = System.currentTimeMillis();
                             System.out.println("curr = " + currTime + " last = " + lastClickTime);
                             System.out.println((currTime - lastClickTime) + "");
                             if (currTime - lastClickTime < CLICK_TIME_INTERVAL) {

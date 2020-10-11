@@ -59,6 +59,10 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
     private List<String> followingList = new ArrayList<>();
     private List<String> followersList = new ArrayList<>();
 
+    //handle double click
+    long lastClickTime = System.currentTimeMillis();
+    long CLICK_TIME_INTERVAL = 300; //to prevent clicking fas
+
     //firebase
     private FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
     private DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following");
@@ -192,12 +196,20 @@ public class DiscoverFriendsFragment extends Fragment implements FriendsAdapter.
             adapter.notifyItemRemoved(pos);
             followingRef.child(fUser.getUid()).setValue(followingList);
             sendToToken(user.getId());
+
             Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), getString(R.string.you_now_follow) + " " + user.getFullName(), Snackbar.LENGTH_LONG)
                     .setAction(R.string.visit_profile, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            long currTime = System.currentTimeMillis();
+                            if (currTime - lastClickTime < CLICK_TIME_INTERVAL) {
+                                return;
+                            }
+                            lastClickTime = currTime;
                             ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUrl());
-                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+                            if(getActivity()!=null) {
+                                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+                            }
                         }
                     }).show();
 
