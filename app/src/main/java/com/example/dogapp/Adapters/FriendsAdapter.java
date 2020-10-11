@@ -119,8 +119,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.UserView
                     public void onClick(View v) {
                         if (listener != null) {
                             currTime = System.currentTimeMillis();
-                            System.out.println("curr = " + currTime + " last = " + lastClickTime);
-                            System.out.println((currTime - lastClickTime) + "");
+                            /*System.out.println("curr = " + currTime + " last = " + lastClickTime);
+                            System.out.println((currTime - lastClickTime) + "");*/
                             if (currTime - lastClickTime < CLICK_TIME_INTERVAL) {
                                 return;
                             }

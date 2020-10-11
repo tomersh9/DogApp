@@ -148,22 +148,20 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
-    //*****************HELLO WORLD*********************//
     public static void startAlarmBroadcastReceiver(Context context) {
-
-        Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 9, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 29);
-        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 15);
+        calendar.set(Calendar.MINUTE, 7);
+        calendar.set(Calendar.SECOND, 20);
 
         if (calendar.before(Calendar.getInstance())) {
             calendar.add(Calendar.DATE, 1);
         }
 
+        Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 9, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
             alarmManager.cancel(pendingIntent);
@@ -565,6 +563,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         setUserStatus(false);
                         deleteToken(fUser.getUid());
                         unsubscribeSignOut(fUser.getUid());
+                        cancelAlarmManger();
                         firebaseAuth.signOut();
                         Intent signOutIntent = new Intent(MainActivity.this, LoginActivity.class);//.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(signOutIntent);
@@ -577,6 +576,15 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 return true; //done dealing with it
             }
         });
+    }
+
+    private void cancelAlarmManger() {
+        Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 9, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.cancel(pendingIntent);
+        }
     }
 
     private void clearBackStack() {
