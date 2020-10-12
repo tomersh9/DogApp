@@ -41,6 +41,7 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.dogapp.Adapters.CommentAdapter;
 import com.example.dogapp.Adapters.FriendsAdapter;
+import com.example.dogapp.Adapters.LikesAdapter;
 import com.example.dogapp.Adapters.PostAdapter;
 import com.example.dogapp.Enteties.User;
 import com.example.dogapp.Models.ModelComment;
@@ -70,7 +71,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class HomeFragment extends Fragment implements PostAdapter.OnPostListener, SwipeRefreshLayout.OnRefreshListener, FriendsAdapter.MyUserListener {
+public class HomeFragment extends Fragment implements PostAdapter.OnPostListener, SwipeRefreshLayout.OnRefreshListener, LikesAdapter.MyLikesUsersListener {
 
     private final String PROFILE_FRAGMENT_TAG = "profile_fragment_tag";
 
@@ -114,7 +115,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
     //likes references
     private RecyclerView likesRecyclerView;
-    private FriendsAdapter likesAdapter;
+    private LikesAdapter likesAdapter;
     private List<User> usersLikes;
     private BottomSheetDialog likesDialog;
     private ProgressBar likesProgressBar;
@@ -333,9 +334,9 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                 }
 
                 likesProgressBar.setVisibility(View.GONE);
-                likesAdapter = new FriendsAdapter(usersLikes, true, false, getActivity());
+                likesAdapter = new LikesAdapter(usersLikes, getActivity());
                 likesRecyclerView.setAdapter(likesAdapter);
-                likesAdapter.setMyUserListener(HomeFragment.this);
+                likesAdapter.setMyLikesUsersListener(HomeFragment.this);
                 likesAdapter.notifyDataSetChanged();
             }
 
@@ -364,27 +365,13 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     }
 
     @Override
-    public void onFriendClicked(int pos, View v) {
-        //enter profile
+    public void onUserClicked(int position) {
         likesDialog.dismiss();
-        User user = usersLikes.get(pos);
-        ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUrl());
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
-    }
-
-    @Override
-    public void onFriendChatClicked(int pos, View v) {
-        //nothing
-    }
-
-    @Override
-    public void onFriendFollowClicked(int pos, View v) {
-        //nothing
-    }
-
-    @Override
-    public void onFriendDeleteClicked(int pos, View v) {
-        //nothing
+        User user = usersLikes.get(position);
+        if (getActivity() != null) {
+            ProfileFragment profileFragment = ProfileFragment.newInstance(user.getId(), user.getPhotoUrl());
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, profileFragment, PROFILE_FRAGMENT_TAG).addToBackStack(null).commit();
+        }
     }
 
     @Override

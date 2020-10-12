@@ -389,7 +389,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                 if (isMe) {
                     buildProfileSheetDialog(false); //cover photo not profile
-                } else if (coverURL!=null && !coverURL.equals("coverUrl")) {
+                } else if (coverURL != null && !coverURL.equals("coverUrl")) {
                     loadImageDialog(coverURL);
                 } else {
                     Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.no_cover_to_show, Snackbar.LENGTH_SHORT).show();
@@ -1194,7 +1194,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 if (snapshot.exists()) {
                     followingTv.setText(snapshot.getChildrenCount() + "");
                 } else {
-                    followingTv.setText(0+"");
+                    followingTv.setText(0 + "");
                 }
             }
 
@@ -1211,7 +1211,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 if (snapshot.exists()) {
                     followersTv.setText(snapshot.getChildrenCount() + "");
                 } else {
-                    followersTv.setText(0+"");
+                    followersTv.setText(0 + "");
                 }
             }
 
@@ -1228,8 +1228,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     criticsCountTv.setText(snapshot.getChildrenCount() + "");
-                }else {
-                    criticsCountTv.setText(0+"");
+                } else {
+                    criticsCountTv.setText(0 + "");
                 }
             }
 
@@ -1870,7 +1870,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                         Glide.with(getActivity()).asBitmap().load(uri).listener(new RequestListener<Bitmap>() {
                             @Override
                             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_update_cover, Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(coordinatorLayout, R.string.failed_update_cover, Snackbar.LENGTH_SHORT).show();
                                 coverProgressBar.setVisibility(View.GONE);
                                 coverIv.setVisibility(View.VISIBLE);
                                 return false;
@@ -1878,7 +1878,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                             @Override
                             public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                                Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.cover_photo_updated, Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(coordinatorLayout, R.string.cover_photo_updated, Snackbar.LENGTH_SHORT).show();
                                 coverProgressBar.setVisibility(View.GONE);
                                 coverIv.setVisibility(View.VISIBLE);
                                 return false;
@@ -1890,7 +1890,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
                 } else {
                     coverIv.setVisibility(View.VISIBLE);
-                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.failed_update_cover, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(coordinatorLayout, R.string.failed_update_cover, Snackbar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -1920,7 +1920,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                                 public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                                                     profileProgressBar.setVisibility(View.GONE);
                                                     profileIv.setVisibility(View.VISIBLE);
-                                                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.profile_photo_update_fail, Snackbar.LENGTH_SHORT).show();
+                                                    Snackbar.make(coordinatorLayout, R.string.profile_photo_update_fail, Snackbar.LENGTH_SHORT).show();
                                                     return false;
                                                 }
 
@@ -1928,7 +1928,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                                                 public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
                                                     profileProgressBar.setVisibility(View.GONE);
                                                     profileIv.setVisibility(View.VISIBLE);
-                                                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), R.string.profile_pho_change, Snackbar.LENGTH_SHORT).show();
+                                                    Snackbar.make(coordinatorLayout, R.string.profile_pho_change, Snackbar.LENGTH_SHORT).show();
                                                     return false;
                                                 }
                                             }).into(profileIv);

@@ -94,8 +94,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     private CoordinatorLayout coordinatorLayout;
 
     //drawer header views
-    TextView fullNameTv, titleTv, locationTv;
-    ImageView drawerProfilePic;
+    private TextView fullNameTv, titleTv, locationTv;
+    private ImageView drawerProfilePic;
 
     //Main Fragments
     private HomeFragment homeFragment;
@@ -104,17 +104,18 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     private ProfileFragment profileFragment;
 
     //firebase stuff
-    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(); //sign in/up auth instance
-    FirebaseAuth.AuthStateListener authStateListener; //listens to login/out changes
-    FirebaseDatabase database = FirebaseDatabase.getInstance(); //actual database
-    DatabaseReference usersRef = database.getReference("users"); //create new table named "users" and we get a reference to it
-    FirebaseUser fUser = firebaseAuth.getCurrentUser();
-    FirebaseMessaging firebaseMessaging;
-    DatabaseReference postRef = database.getReference("Posts");
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(); //sign in/up auth instance
+    private FirebaseAuth.AuthStateListener authStateListener; //listens to login/out changes
+    private FirebaseDatabase database = FirebaseDatabase.getInstance(); //actual database
+    private DatabaseReference usersRef = database.getReference("users"); //create new table named "users" and we get a reference to it
+    private FirebaseUser fUser = firebaseAuth.getCurrentUser();
+    private FirebaseMessaging firebaseMessaging;
+    private DatabaseReference postRef = database.getReference("Posts");
     private boolean isAnonymous;
 
     //Change UI from notification
-    BroadcastReceiver receiver;
+    private BroadcastReceiver receiver;
+    private int badges = 0;
 
     //is walker
     private boolean isWalker;
@@ -152,9 +153,9 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 15);
-        calendar.set(Calendar.MINUTE, 7);
-        calendar.set(Calendar.SECOND, 20);
+        calendar.set(Calendar.HOUR_OF_DAY, 16);
+        calendar.set(Calendar.MINUTE, 20);
+        calendar.set(Calendar.SECOND, 0);
 
         if (calendar.before(Calendar.getInstance())) {
             calendar.add(Calendar.DATE, 1);
@@ -343,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         MenuItem menuItem = menu.findItem(R.id.bottom_chat); //chats item
                         BadgeDrawable badgeDrawable = bottomNavBar.getOrCreateBadge(menuItem.getItemId());
                         badgeDrawable.setVisible(true);
+                        badgeDrawable.setNumber(++badges);
                         badgeDrawable.setBackgroundColor(getResources().getColor(R.color.red));
                     }
                 };
@@ -508,6 +510,8 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                         //clean badge dot
                         BadgeDrawable badgeDrawable = bottomNavBar.getBadge(item.getItemId());
                         if (badgeDrawable != null) {
+                            badges = 0; // reset count when opening chats fragment
+                            badgeDrawable.setNumber(badges);
                             badgeDrawable.setVisible(false);
                         }
                         break;
