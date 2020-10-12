@@ -94,7 +94,7 @@ public class InChatActivity extends AppCompatActivity {
         setContentView(R.layout.in_chat_layout);
 
         //fixed portrait mode
-        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //setup chat toolbar
         Toolbar toolbar = findViewById(R.id.in_chat_toolbar);
@@ -177,7 +177,7 @@ public class InChatActivity extends AppCompatActivity {
             if (hisToken != null) {
 
                 dataJson.put("message", msg);
-                dataJson.put("isMsg",msg);
+                dataJson.put("isMsg", msg);
                 dataJson.put("fullName", fUser.getDisplayName());
                 dataJson.put("uID", fUser.getUid());
                 rootJson.put("to", hisToken);
@@ -428,7 +428,7 @@ public class InChatActivity extends AppCompatActivity {
     }
 
     private void setUserStatus(Boolean status) {
-        if(fUser!=null) {
+        if (fUser != null) {
             databaseReference = FirebaseDatabase.getInstance().getReference("users").child(fUser.getUid());
             Map<String, Object> hashMap = new HashMap<>();
             hashMap.put("status", status);

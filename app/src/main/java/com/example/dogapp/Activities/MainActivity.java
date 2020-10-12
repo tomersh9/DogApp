@@ -116,10 +116,23 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
     //Change UI from notification
     private BroadcastReceiver receiver;
     private int badges = 0;
+    private boolean isActive;
 
     //is walker
     private boolean isWalker;
     private boolean lastCall;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        isActive = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isActive = false;
+    }
 
     //TODO check if there are problems
 
@@ -339,13 +352,15 @@ public class MainActivity extends AppCompatActivity implements ProfileFragment.O
                 receiver = new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
-                        //add badge to the chats bottom nav item
-                        Menu menu = bottomNavBar.getMenu();
-                        MenuItem menuItem = menu.findItem(R.id.bottom_chat); //chats item
-                        BadgeDrawable badgeDrawable = bottomNavBar.getOrCreateBadge(menuItem.getItemId());
-                        badgeDrawable.setVisible(true);
-                        badgeDrawable.setNumber(++badges);
-                        badgeDrawable.setBackgroundColor(getResources().getColor(R.color.red));
+                        if (isActive) {
+                            //add badge to the chats bottom nav item
+                            Menu menu = bottomNavBar.getMenu();
+                            MenuItem menuItem = menu.findItem(R.id.bottom_chat); //chats item
+                            BadgeDrawable badgeDrawable = bottomNavBar.getOrCreateBadge(menuItem.getItemId());
+                            badgeDrawable.setVisible(true);
+                            badgeDrawable.setNumber(++badges);
+                            badgeDrawable.setBackgroundColor(getResources().getColor(R.color.red));
+                        }
                     }
                 };
             }
