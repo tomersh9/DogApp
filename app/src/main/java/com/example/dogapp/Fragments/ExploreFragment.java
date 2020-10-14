@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +22,7 @@ import com.google.android.material.tabs.TabLayout;
 
 public class ExploreFragment extends Fragment {
 
+
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private FloatingActionButton fab;
@@ -30,6 +32,7 @@ public class ExploreFragment extends Fragment {
     public void onResume() {
         super.onResume();
         ((MainActivity)getActivity()).toolbar.setTitle(getString(R.string.explore));
+        
     }
 
     @Nullable
@@ -41,6 +44,7 @@ public class ExploreFragment extends Fragment {
         tabLayout = rootView.findViewById(R.id.tab_layout);
         return rootView;
     }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

@@ -39,6 +39,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.Adapters.CommentAdapter;
 import com.example.dogapp.Adapters.FriendsAdapter;
 import com.example.dogapp.Adapters.LikesAdapter;
@@ -139,6 +140,12 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         } catch (ClassCastException ex) {
             throw new ClassCastException("MainActivity must implement MyHomeFragmentListener interface");
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)getActivity()).toolbar.setTitle(getString(R.string.home));
     }
 
     @Nullable

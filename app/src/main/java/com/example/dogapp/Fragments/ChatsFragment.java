@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.dogapp.Activities.MainActivity;
 import com.example.dogapp.Adapters.ChatUsersAdapter;
 import com.example.dogapp.Enteties.ChatList;
 import com.example.dogapp.Enteties.User;
@@ -67,6 +68,12 @@ public class ChatsFragment extends Fragment implements ChatUsersAdapter.MyChatUs
         } catch (ClassCastException ex) {
             throw new ClassCastException("The Activity must implement OnChatClickListener interface");
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)getActivity()).toolbar.setTitle(getString(R.string.chats));
     }
 
     @Nullable
